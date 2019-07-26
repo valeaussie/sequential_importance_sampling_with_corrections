@@ -1,0 +1,257 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}  
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+
+ \textwidth=16cm \hoffset = -1.9cm
+ \lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\s}{\mathbb{S}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathscr{D}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+
+
+\begin{document}
+
+
+\section{Sequential Importance Sampling with corrections for the AR1 model}
+
+Let us first introduce our importance sampling idea using a simple example.
+
+Consider an AR(1) process for which
+
+\[
+x_{t} = \varphi x_{t-1} + \eps_{t}
+\]
+with $\eps_{t} \stackrel{iid}{\sim} \mathcal{N}(0, \sigma^{2})$ and $|\varphi| < 1$, so that:
+
+\[
+(x_{t} | x_{t-1}) \sim \mathcal{N} (\varphi x_{t-1}, \sigma^{2}).
+\]
+This process is stationary provided that the initial distribution is
+
+\[
+x_{1} \sim \mathcal{N} \Bigg (0, \frac{\sigma^2}{1- \varphi^2} \Bigg )
+\]
+
+Suppose that at any time $t$, only some subset of the values $\vec {x}^{(t)} = (x_1, \dots, x_{t})$ have so far been observed. However, those that have been observed are known without error. We collect the values that have been observed at or before time $t$ to form a vector $\vec{z}^{(t)} = (z_1^{(t)}, \dots, z_{t}^{(t)})$, where for each $s \leq t$, $z_s^{(t)} = x_s$ if $x_s$ has been observed at or before time $t$ and $z_s^{(t)} = -$ otherwise. Thus the coordinates of $\vec{z}^{(t)}$ belong to an extension of the reals $\mathbb{R} \cup \{ - \}$.
+
+As time progresses, new observations become available. Thus some dashes in the vector $\vec{z}^{(t)}$ will be replaced by observations in the subsequent vector $\vec{z}^{(t+1)}$. However, the reverse does not occur: if we have $z_s^{(t)} = x_s$ for times $s$ and $t$ where $s \leq t$ then we must also have $z_s^{(t^{\prime})} = x_s$ at all subsequent times $t^{\prime} > t$.
+
+It will also be convenient to define binary vectors $\vec{b}^{(t)} = (b_1^{(t)}, \dots, b_{t}^{(t)})$, where $b_s^{(t)} = 1$ if $z_s^{(t)} = x_s$, and $b_s^{(t)} = 0$ if $z_s^{(t)} = -$. Note $\vec{b}^{(t)}$ is fully determined by $\vec{z}^{(t)}$.
+
+\subsection{Bayesian inference in a partially observed state space}
+
+To perform Bayesian inference in this partially observed state space we want to determine the posterior distribution for $\vec{x}^{(t)}$ in light of observations $\vec{z}^{(t)}$. Suppose we have some prior density $q(\vec{x}^{(t)}|\vec{z}^{(t-1)})$ defined on the subspace $\prod_{s=1}^t \mathbb{X}_s^{(t-1)} \subseteq \mathbb{R}^t$ where $\mathbb{X}_s^{(t-1)} = \mathbb{R}$ for $b_s^{(t-1)} = 0$ or $s=t$, and $\mathbb{X}_s^{(t-1)} = \{ x_s \}$ for $b_s^{(t-1)} = 1$. We also assume $\vec{b}^{(t)}$ evolves independently of $\vec{x}^{(t)}$, so that the distribution of $\vec{b}^{(t)}$ is a conditional probability of the form $P( \vec{b}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)} ) = P( \vec{b}^{(t)} | \vec{b}^{(t-1)} )$. Under these conditions, the posterior distribution for $\vec{x}^{(t)}$ is obtained by re-normalising $q$ over values consistent with $\vec{z}^{(t)}$. In other words, it has a density on the subspace $\prod_{s=1}^t \mathbb{X}_s^{(t)} \subseteq \mathbb{R}^t$ where $\mathbb{X}_s^{(t)} = \mathbb{R}$ for $b_s^{(t)} = 0$ and $\mathbb{X}_s^{(t)} = \{ z_s^{(t)}\}$ for $b_s^{(t)} = 1$, given by:
+\[
+p(\vec{x}^{(t)} | \vec{z}^{(t)})  =   
+\frac{ q(\vec{x}^{(t)}|\vec{z}^{(t-1)})} {r(\vec{z}^{(t)} | \vec{z}^{(t-1)})}
+\]
+where 
+\[
+r(\vec{z}^{(t)} | \vec{z}^{(t-1)}) = \int q(\vec{x}^{(t)}|\vec{z}^{(t-1)}) \prod_{\{s \leq t: b_s^{(t)} = 0\}} dx_s^{(t)}.
+\]
+
+This follows from Bayes' Rule, but we omit the proof to keep the example simple. A proof for a more general context is provided below (HHH TO DO).
+
+\subsection{Sequential importance sampling with an auxiliary variable in a partially observed state space}
+
+We will want to estimate the distribution $p(\vec{x}^{(t)} | \vec{z}^{(t)})$ recursively in time, as well as other related properties like $p(x_{t} | \vec{z}^{(t)})$ or an expectation of the form:
+
+\[
+E_{p}[f(\vec{x}^{(t)}) | \vec{z}^{(t)}] = \int f(\vec{x}^{(t)})\; p(\vec{x}^{(t)} | \vec{z}^{(t)})\; d\vec{x}^{(t)}
+\]
+for every function $f: \Omega_1 \rightarrow \Real$, sampling from the prior kernel $q( \cdot | \vec{z}^{(t-1)})$.
+
+In our sampling strategy, at time $t$ we will generate $n$ iid samples $y_{t_j}, \dots, y_{t_n}$ according to the prior density $q(\vec{y}^{(t)} | \vec{z}^{(t-1)})$, then we will correct each $y_{t_j}$ for $j = 1, \dots, n$ in light of the partial observations $\vec{z}^{(t)}$ to obtain new samples $x_{t_1}, \dots, x_{t_n}$.
+
+For the AR(1) simple example we will consider the corrections to be deterministic, therefore we correct every element $y_{t_j}, \dots, y_{t_n}$ simply substituting its value with the value of the observation $z_t$ when $b_s^{(t)} = 1$ so that $x_{t_1} = \dots = x_{t_n} = z_t$.
+
+Let us define a projection $\pi : \Omega_{\vec{z}^{(t)}} \rightarrow \mathbb{X}_s^{(t)}$ such that $\pi(\vec{x}^{(t)}, \vec{y}^{(t)}) = \vec{x}^{(t)}$ with $\Omega_{\vec{z}^{(t)}} = \{ (\vec{x}^{(t)},\vec{y}^{(t)}) : \vec{y}^{(t)} \in \Real^t,\; \vec{x}^{(t)} \in \prod_{s=1}^t \mathbb{X}_s^{(t-1)} \}$ an augmented state space and $\vec{y}^{(t)}$ an auxiliary variable.
+
+We will define a probability $p'(\vec{x}^{(t)}, \vec{y}^{(t)} | \vec{z}^{(t)})$ such that the marginal distribution of $p'$ is $p$, that is:
+
+\[
+p(\vec{x}^{(t)} | \vec{z}^{(t)}) = \int p'(\vec{x}^{(t)}, \vec{y}^{(t)} | \vec{z}^{(t)})\; d\vec{y}^{(t)}
+\]
+so that using the disintegration theorem we will have:
+
+\begin{align*}
+E_{p}[f(\vec{x}^{(t)}) | \vec{z}^{(t)}]  & = \int_{\mathbb{X}_s^{(t)}} f(\vec{x}^{(t)})\; p(\vec{x}^{(t)} | \vec{z}^{(t)})\; d \vec{x^{(t)}} = \int_{\mathbb{X}_s^{(t)}} f(\vec{x}^{(t)})\Bigg[\int_{\pi^{-1}} p'(\vec{x}^{(t)}, \vec{y}^{(t)} | \vec{z}^{(t)})\; d\vec{y}^{(t)}\Bigg] d\vec{x}^{(t)} \\ &= \int_{\Omega_{\vec{z}^{(t)}}} f(\pi(\vec{x}^{(t)}, \vec{y}^{(t)}))\; p'(\vec{x}^{(t)}, \vec{y}^{(t)} | \vec{z}^{(t)})\; d \vec{y}^{(t)} = E_{p'}[f(\pi (\vec{x}^{(t)}, \vec{y}^{(t)})) | \vec{z}^{(t)}].
+\end{align*}
+Using importance sampling
+
+\begin{align*}
+E_{p'}[f(\pi (\vec{x}^{(t)}, \vec{y}^{(t)})) | \vec{z}^{(t)}] & = \int (\vec{x}^{(t)},  \vec{y}^{(t)})\; \frac{p'(\vec{x}^{(t)}, \vec{y}^{(t)}|\vec{z}^{(t)})}{q(\ \vec{y}^{(t)} | \vec{z}^{(t-1)})} q(\vec{y}^{(t)} | \vec{z}^{(t-1)})\; d\vec{y}^{(t)} \\ &\approx \sum_{j=1}^n  w^{(t_j)}(\vec{x}^{(t_j)}, \vec{y}^{(t_j)}) f(\pi (\vec{x}^{(t_j)}, \vec{y}^{(t_j)}))
+\end{align*}
+Where the weights $w^{(t)}(\vec{x}^{(t)}, \vec{y}^{(t)})$ are:
+
+\[
+w^{(t)}(\vec{x}^{(t)}, \vec{y}^{(t)}) = \frac{p'(\vec{x}^{(t)}, \vec{y}^{(t)} | \vec{z}^{(t)})} {q(\vec{y}^{(t)}|\vec{z}^{(t-1)})}
+\]
+We will choose $p'$ such that:
+
+\[
+p'(\vec{x}^{(t)}, \vec{y}^{(t)} | \vec{z}^{(t)}) = p(\vec{x}^{(t)} | \vec{z}^{(t)}) = \frac{ q(\vec{x}^{(t)}|\vec{z}^{(t-1)})} {r(\vec{z}^{(t)} | \vec{z}^{(t-1)})}
+\]
+therefore the weights $w^{(t_j)}$ will be:
+
+\[
+w^{(t_j)} = \frac{q(\vec{x}^{(t_j)} | \vec{z}^{((t-1)_j)}) }{q(\vec{y}^{(t_j)} | \vec{z}^{((t-1)_j)})}\Bigg( \sum_{j=1}^n \frac{q(\vec{x}^{(t_j)} | \vec{z}^{((t-1)_j)}) }{q(\vec{y}^{(t_j)} | \vec{z}^{((t-1)_j)})}\Bigg)^{-1}
+\]
+where the constant $r$ cancel out after normalisation.
+
+The prior distribution for a single iteration is the posterior distribution from the previous iteration.
+So for the AR(1) models we will have:
+
+\[
+q(\vec{x}^{(t)}) = q(x_t | \vec{x}^{(t-1)}, \vec{z}^{(t)})q(\vec{x}^{(t-1)})
+\]
+and
+
+\begin{equation}
+q(x_t| \vec{x}^{(t-1)}, \vec{z}^{(t)}) = \frac{q(\vec{x}^{(t)} , \vec{z}^{(t)})}{q(\vec{x}^{(t-1)}, \vec{z}^{(t)})}
+\end{equation}
+
+\begin{equation}
+q(y_t | \vec{y}^{(t-1)}, \vec{z}^{(t)}) = \frac{q(\vec{y}^{(t)}, \vec{z}^{(t)})}{q(\vec{y}^{(t-1)}, \vec{z}^{(t)})}
+\end{equation}
+Notice that the denominator in equation (1) and (2) is the same before and after the corrections and will cancel out in the calculation of the weights, therefore the weights at time $t$ are calculated as follows:
+
+\[
+w^{(t_j)}(\vec{x}^{(t_j)}, \vec{y}^{(t_j)}) = w^{((t-1)_j)}(\vec{x}^{((t-1)_j)}, \vec{y}^{((t-1)_j)}) \frac{q(\vec{x}^{(t)_j} , \vec{z}^{(t)_j})}{q(\vec{y}^{(t)_j}, \vec{z}^{(t)_j})} \Bigg( \sum_{j=1}^n \frac{q(\vec{x}^{(t)_j} , \vec{z}^{(t)_j})}{{q(\vec{y}^{(t)_j}, \vec{z}^{(t)_j})} }\Bigg)^{-1}
+\]
+
+
+In method.tex we defined vectors $\vec{x}^{(t)}$, $\vec{z}^{(t)}$ and $\vec{b}^{(t)}$. At our meeting yesterday, I suggested that "the state space", by which I mean the true state of the system at time $t$, contains all pairs $(\vec{x}^{(t)}, \vec{B}^{(t)})$, where $\vec{B}^{(t)}$ is a lower triangular $t \times t$ binary matrix in which row $i$ is the vector $\vec{b}^{(i)}$, that is $B_{ij}^{(t)} = b_j^{(i)}$ for $i \in \{ 1, \ldots, t \}$ and $j \in \{ 1, \ldots, i \}$. The matrix $\vec{B}^{(t)}$ must satisfy the constraints that if $B_{ij}^{(t)} = 1$, then $B_{kj}^{(t)} = 1$ for all $k \in \{ i+1, \ldots, t \}$.
+
+I reckon that the space of all valid pairs $(\vec{x}^{(t)}, \vec{B}^{(t)})$ is the state space $\Omega$ defined in Section 3 of SIScorrections
+
+I'd like to define a lower triangular $t \times t$ matrix $\vec{Z}^{(t)}$ in which row $i$ is the vector $\vec{z}^{(i)}$, I reckon that the "observation space" $\Omega^{\prime}$ in Section 3 of SIScorrections is the space consisting of all valid matrices of this form. The map $\sigma: \Omega \rightarrow \Omega^{\prime}$ defined in that section maps a pair $(\vec{x}^{(t)}, \vec{B}^{(t)})$ to a matrix $\vec{Z}^{(t)}$ by setting $Z_{ij}^{(t)} = x_j$ wherever $B_{ij}^{(t)} = 1$, and $Z_{ij}^{(t)} = -$ wherever $B_{ij}^{(t)} = 0$.
+
+That's a good start I think. It makes clear that the prior $q$ must be defined on the set of valid pairs $(\vec{x}^{(t)}, \vec{B}^{(t)})$, and that the posterior distribution is obtained by renormalising $q$ over $\sigma^{-1}(\vec{Z}^{(t)})$.
+
+The prior for time $t$ must be $q(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t-1)})$. That represents our knowledge about the state before we observe $z^{(t)}$. Using the independence of the processes $x$ and $B$, we have
+\[
+q(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t-1)}) = q(\vec{x}^{(t-1)},\vec{B}^{(t-1)} | \vec{Z}^{(t-1)}) p(x_t | x_{t-1}) p(\vec{b}^{(t)} | \vec{b}^{(t-1)}).
+\]
+I think we know how to calculate the terms on the RHS, except possibly for the normalisation constant of $q(\vec{x}^{(t-1)},\vec{B}^{(t-1)} | \vec{Z}^{(t-1)})$.
+
+When performing SIS, we will take a particle $(\vec{x}^{(t-1)},\vec{B}^{(t-1)})$ from the previous time point, simulate values $x_t$ using $p(x_t | x_{t-1})$ and $\vec{b}^{(t)}$ using $p(\vec{b}^{(t)} | \vec{b}^{(t-1)})$ and finally correct $\vec{x}^{(t)}$ and $\vec{b}^{(t)}$ in light of the new observation $\vec{z}^{(t)}$. Let's call the corrected terms $\vec{x}^{(t)\prime}$ and $\vec{b}^{(t)\prime}$. The corrected binary matrix we can call $\vec{B}^{(t)\prime}$, \textcolor{red}{noting that it differs from $\vec{B}^{(t)}$ only in the last row [NOTE: is this true? It will differ for the last row only as soon as the first observation happen but I think that unmodified row will remain unmodified in $\vec{B}'$ in future times. I don't think this will impact the calculation of the weights]}. Note also that by correcting $\vec{x}^{(t)}$ to $\vec{x}^{(t)\prime}$, we have also corrected $\vec{x}^{(t-1)}$ to $\vec{x}^{(t-1)\prime}$.
+
+\textcolor{red}{The unnormalized weight of this particle will be multiplied by a factor 
+\[
+\frac{q(\vec{x}^{(t)\prime},\vec{B}^{(t)\prime} | \vec{Z}^{(t-1)})}{q(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t-1)})}
+\]
+which again we now know how to calculate.
+[NOTE: I don't think this is true, our new unnormalized weights are calculated with that expression]}
+
+I had formerly supposed $q(\vec{x}^{(t-1)},\vec{B}^{(t-1)} | \vec{Z}^{(t-1)})$ would cancel from the weights, but it's now clear that was incorrect. While it's true $\vec{B}^{(t-1)}$ and $\vec{Z}^{(t-1)}$ do not change in the correction, $\vec{x}^{(t-1)}$ does. However, it is true that the normalisation constant of $q(\vec{x}^{(t-1)},\vec{B}^{(t-1)} | \vec{Z}^{(t-1)})$ will cancel, so we don't need to calculate that. There will also be many common factors that do cancel.
+	
+
+
+
+
+
+\section{The pseudocode for the AR(1) model}
+
+\begin{algorithm}[H]
+\caption{Sequential Importance Sampling with corrections for an AR(1) model}\label{euclid}
+ \begin{algorithmic}
+
+ \State  \bf{Initialize:} \normalfont At time i = 1
+            
+\begin{enumerate}
+	\item For $j = 1, \dots , n$
+	\begin{enumerate}
+		\item Sample $y_{1}^{(j)} \sim p(y_{1}) = f(y_{1})$ and sample $t_1^{(j)}$ form a geometric distribution
+		\item Evaluate the importance weights up to a normalising constant:
+		\[
+		\tilde{w}^{(j)}_{1} = p(x_{1} | y_{1}^{(j)}) = 1
+		\]
+	\end{enumerate}
+	\item For $j = 1, \dots , n$ normalise the importance weights: 
+	\[
+	w^{(j)}_{1} = \frac{\tilde{w}^{(j)}_{1}}{\sum_{k=1}^{n}\tilde{w}^{(k)}_{1}} = \frac{1}{n}
+	\]
+\end{enumerate}
+
+ \State  \bf{Iterate:} \normalfont For $i$ from 2 to $N$
+
+\begin{enumerate}
+	\item For $j = 1, \dots , n$
+	\begin{enumerate}
+  		\item sample $y_{i}^{(j)} \sim q(y_{i} | y_{1:i - 1}^{(j)} , z_{1 : i})$.
+		\item {If there was an observation, correct every $y_{i}^{(j)}$ in light of the data $z_{i}$ to obtain new samples $x_{i}^{(j)}$ directly substituting the new data: $x_i^{(i)} = z_{i}$, if not keep the samples.}
+		\item Evaluate the importance weights up to a normalising constant:
+		\[
+		\tilde{w}^{(j)}_{i} = \tilde{w}^{(j)}_{(1:i - 1)} \frac{q(x_{i}^{(j)})}{q(y_{i}^{(j)})}
+		\]
+	\end{enumerate}
+	\item For $j = 1, \dots , n$ normalise the importance weights:
+	\[
+	w^{(j)}_{i} = \frac{\tilde{w}^{(j)}_{i}}{\sum_{k=1}^{n}\tilde{w}^{(k)}_{i}}
+	\]
+	
+
+\end{enumerate}
+
+\State  \bf{Output:} \normalfont $\Big \{ x_{i}^{(j)} , w_{i}^{(j)} \Big \}_{j = 1}^{n}$ for $i \in \{ 1, N \}$
+
+\item Calculate the expectation  $E[x_i] = \sum_{k=1}^{n} x^{(k)}_i w_{i}^{(k)}$
+
+
+        
+
+  
+ \end{algorithmic}
+\end{algorithm}
+
+\end{document}
+

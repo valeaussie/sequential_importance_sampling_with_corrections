@@ -1,0 +1,132 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}  
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+\usepackage[round]{natbib}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+
+ \textwidth=16cm \hoffset = -1.9cm
+ \lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\s}{\mathbb{S}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathscr{D}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+
+
+\begin{document}
+
+\section{Introduction}
+
+This paper considers the problem of imputing missing data in the presence of incomplete observations made sequentially in real time. We thus envisage data that consists of a series of correlated observations made sequentially in time, each of which is correct but only partially reveals the true state of the system. The main difficulty that arises in this context is that data missing at one time point can be revealed at a later time point, so that imputed missing values must later be corrected in light of new information.
+
+Our original motivation for considering this problem was to facilitate analysis of the Red Imported Fire Ant (RIFA) invasion in Queensland, Australia, where in an ongoing surveillance program, the locations of ants’ nests are regularly being detected. For detected nests, the location can be precisely determined, but at any given time there is an unknown number of undetected nests, each with an unknown location. To infer the current extent of the invasion, we aim to impute plausible locations of undetected individuals, but these imputations are only informed guesses, and will require constant correction as new detections come to light.
+
+In addition, new nests are constantly being produced: the unseen state of the system is thus constantly evolving. Knowing the location of at least some of the invaders at time $t$, we can simulate the evolution of this system. However, again the imputed locations of simulated nests will require constant correction as more information about the true state of the system becomes available.
+
+In this paper, we propose a new approach to problems of this type. Although our approach is ultimately aimed at inference for invasive species, here we will illustrate the method for less complex evolving systems in which correct but partial observations are being made in real time.
+
+To handle problems of this kind, we introduce a Bayesian approach that uses a new sequential importance sampling (SIS) strategy. As is typical of SIS methods, we generate a population of particles, each representing a plausible sequence of system states, and we evolve each particle at each time step according to a model of system dynamics. Again in a manner typical of SIS methods, new observations arrive in real time, and we use these observations to adjust the weights assigned to particles. However, a crucial new element in our method is that we allow missing values imputed at earlier time steps to be corrected so that they are consistent with the new observations.
+
+Our method thus addresses a problem that is common in practice: new observations made in real time can render previously imputed missing values implausible, and may even conflict with what has been simulated. For example, in the invasive species context described above, undetected nests imputed to geographic areas that do not contain any nests become increasingly implausible as time passes without detections being made in those regions. In standard SIS approaches, such particles receive low weights and are eventually eliminated by resampling, but a common problem is that all particles can become implausible, if not inconsistent, with observations.
+
+Problems of this kind arise in many contexts. {\color{red} We can envisage the approach being used to study the evolution of a species' geographic range, for both invasive and non-invasive species. The algorithm could be also applied to a variety of other missing data problems where new incomplete data is continuously acquired, like in crime prediction, \cite{Malathy} or bushfire modeling \cite{Beer}.} Another potential application is in the study of the spread of infectious diseases, where observations are made in the form of diagnosed cases, but missing data in the form of undiagnosed cases is unavoidable \cite{O'Neill}. 
+
+
+Missing data are ubiquitous in ecological and evolutionary data sets as in any other branch of science. The common methods used to deal with missing data are to delete cases containing missing data, and to use the mean to fill in missing values. However, these ‘traditional’ methods result in biased estimation of parameters and uncertainty, and reduction in statistical power. Better missing data procedures such as data augmentation \cite{Tanner} and multiple imputation \cite{RubinMI} are readily available and implementable \cite{Nakagawa}.
+
+Particle filters are used to estimate a hidden state when partial (noisy) observations are made. However, the standard particle filtering algorithm can diverge or its performance can severely degrade in the presence of missing data \cite{Zhang}.
+
+On the other hand, multiple imputations do not use past observations and the state transition equations when estimating the probability of the hidden state knowing the observations. This can result in poor performance when the problem can be well modelled by a Markov structure \cite{Zhang}.
+
+In the context of missing observations, \cite{Zhang} have developed a Multiple Imputation Particle Filter (MIPF) to deal with these deficiencies. This method uses randomly drawn values (imputations) to provide a replacement for the missing data and then uses the particle filter to estimate non-linear state with the data.
+
+Data Augmentation methods in Bayesian statistic are normally used to evaluate an intractable posterior distribution of the parameters when data can be augmented in such a way that it become easy to analyse the augmented data. \cite{Tanner}
+
+In our method we will use data augmentation in sequential importance sampling in order to simulate the new state of the system using a first set of samples and a second sample corrected in light of new data acquired at each step.
+
+Our method deals with situations where the data are informative, a situation where standard sequential Monte Carlo methods can perform poorly. 
+
+Similarly, Del Moral and Murray (cite) have proposed a Sequential Monte Carlo method for sampling the posterior distribution of state-space models under highly informative observation regimes. In their method they introduce a schedule of intermediate weighting and resampling times between observation times, which guide particles towards the final state.
+
+A similar method was use by Finke et al. (2018) developed a Particle Monte Carlo Markov Chain algorithm to estimate the demographic parameters of a population and then incorporate this algorithm into a sequential Monte Carlo sampler in order to perform model comparison motivated by the fact that a simple importance sampling performs poorly if there is a strong mismatch between the prior and the posterior, which is common when the data is highly informative.
+
+
+In this paper we provide a proof of concept for our proposed methodology using a simple system modelled by an AR(1) process. In section HHH we present a version of our method in which only those imputed values that are strictly inconsistent with later observations are corrected, in a deterministic manner. In Section HHH we generalise this approach to allow non-deterministic revision of imputed values that, while not inconsistent with later observations, can nevertheless be updated in light of new information.
+
+\begin{thebibliography}{}
+
+\bibitem [\protect\citeauthoryear{Beer}{1990}]{Beer} 
+Beer T.:The Australian National Bushfire model project. Math Comput. Model. 13(12), 49-56 (1990)
+
+\bibitem [\protect\citeauthoryear{Del Moral}{2014}]{Del Moral} 
+Del Moral P, Murraly L.M..:Sequential Monte Carlo with Highly Informative Observations. Math Comput. Model. 13(12), 49-56 (1990)
+
+\bibitem [\protect\citeauthoryear{Malathy}{2011}]{Malathy} 
+Malathy A., Baboo S.S.: An Enhanced Algorithm to Predict a Future Crime using Data Mining. Int. J. Comput. Appl. 21(1), 1-6 (2011)
+
+\bibitem [\protect\citeauthoryear{Nakagawa}{2015}]{Nakagawa}
+Nakagawa S.: Missing data. In: Fox G.A., Negrete-Yankelevich S., Sosa V.J. (eds.) Ecological Statistics: Contemporary theory and application, pp 81-105. Oxford University Press (2015). 
+
+\bibitem[\protect\citeauthoryear{O'Neill}{2002}]{O'Neill}
+O'Neill P.D., Roberts G.O.:Bayesian inference for partially observed stochastic epidemics. J. R. Stat. Soc. A. Stat. 162(1), 121-129 (2002)
+
+\bibitem [\protect\citeauthoryear{Rubin}{1987}]{RubinMI}
+Rubin D.B.: Multiple imputation for nonresponse in surveys. Wiley, New York (1987)
+
+\bibitem [\protect\citeauthoryear{Rubin}{1987}]{Rubin}
+Rubin D.B.: The Calculation of Posterior Distributions by Data Augmentation: Comment: A Noniterative Sampling/Importance Resampling Alternative to the Data Augmentation Algorithm for Creating a Few Imputations When Fractions of Missing Information Are Modest: The SIR Algorithm. J. Am. Stat. Assoc. 82(398), 543-546 (1987)
+
+\bibitem [\protect\citeauthoryear{Tanner and Wong}{1987}]{Tanner}
+Tanner M.A., Wong W.H.: The Calculation of Posterior Distributions by Data Augmentation. J. Am. Stat. Assoc. 82(398), 528-540 (1987)
+
+\bibitem [\protect\citeauthoryear{Zhang}{2015}]{Zhang}
+Zhang X-P. et al.: Multiple Imputations Particle Filters: Convergence and Performance Analyses for Nonlinear State Estimation with Missing Data. IEEE J. Sel. Top Signa. 9(8), 1536-1547 (2015)
+
+\end{thebibliography}
+
+\end{document}

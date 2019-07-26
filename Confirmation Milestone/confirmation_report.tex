@@ -1,0 +1,344 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}  
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+\usepackage[round]{natbib}
+\usepackage{hyperref}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+
+ \textwidth=16cm \hoffset = -1.9cm
+ \lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\s}{\mathbb{S}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathscr{D}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+
+
+
+\title{Confirmation Report}
+
+
+\author{Valentina Di Marco}
+
+
+\date{\today}
+
+
+
+\begin{document}
+ \maketitle
+
+\section{Statement of research problem}
+
+My research focuses on a new Bayesian approach for modelling invasive species. It considers the problem of imputing a series of correlated observations made sequentially in time, each of which is correct but only partially reveals the true state of the system. The main difficulty that arises in this context is that data missing at one time point can be revealed at a later time point, so that imputed missing values must later be corrected in light of new information.
+
+The motivation for considering this problem is to facilitate analysis of the Red Imported Fire Ant (RIFA) invasion in Queensland, Australia, where in an ongoing surveillance program the locations of ants’ nests are regularly being detected. For detected nests, the location can be precisely determined, but at any given time there is an unknown number of undetected nests, each with an unknown location. To infer the current extent of the invasion, we aim to impute plausible locations of undetected individuals, but these imputations are only informed guesses, and will require constant correction as new observations come to light.
+
+At the same time, new nests are constantly being produced, so the hidden state of the system is also constantly evolving. Knowing the location of at least some of the invaders at time $t$, we can simulate the evolution of this system. But, again the imputed locations of simulated nests will require constant correction as more information about the true state of the system becomes available.
+
+I am proposing a new approach to problems of this type. Although this approach is ultimately aimed at inference for invasive species, at this stage I am investigating the method for less complex evolving systems in which correct but partial observations are being made in real time, introducing a Bayesian approach that uses a new sequential importance sampling (SIS) strategy. 
+
+In this strategy we generate a population of particles, each representing a plausible sequence of system states, and evolve each particle at each time step according to a model of system dynamics. We then use observations that arrive sequentially in time to adjust the weights assigned to particles. A crucial new element in our method is that we allow missing values imputed at earlier time steps to be corrected so that they are consistent with the new observations.
+
+The new observations made in real time about passed events, can render previously imputed missing values implausible, and may even conflict with what has been simulated. For example, in the invasive species context, undetected nests imputed to geographic areas that do not contain any nests become increasingly implausible as time passes without detections being made in those regions. In standard SIS approaches, such particles receive low weights and are eventually eliminated by resampling, but a common problem is that all particles can become implausible, if not inconsistent, with observations.
+
+Problems of this kind arise in many contexts. A possible application of this methodology is the study of the evolution of a species' geographic range, for both invasive and non-invasive species. But the algorithm could be also applied to a variety of other missing data problems where new incomplete data is continuously acquired, like in crime prediction (\cite{Malathy}) or bushfire modeling (\cite{Beer}). Another potential application is in the study of the spread of infectious diseases, where observations are made in the form of diagnosed cases, but missing data in the form of undiagnosed cases is unavoidable (\cite{O'Neill}). 
+
+At the beginning of my research I have created a new model for the fire ants invasion that was based on a self exciting point process.
+You can find this new model in one of the chapters of the thesis I have shared with you. I will use this model, with some modifications, in the second papers I will be working on.
+
+I am now in the process of writing a first paper in which I apply the method to a simple AR(1) toy model.
+I have attached the draft of this unfinished paper as well.
+
+I have coded the new algorithm for the method in C++, which you can find on \url{https://github.com/valeaussie/SIS/tree/master/AR1_model}. You can run the code with the makefile available. This will output the values for the simulated sequence and the weights.
+
+\section{Literature Review}
+
+I have conducted a literature review, which I am continuously updating, and stored all the relevant papers with notes and comments on Mendeley. I can share with you access to this tool if needed. This is a small summary of the methodologies that I have found that deal with similar problems:
+
+Missing data are ubiquitous in ecological and evolutionary data sets as in any other branch of science. The common methods used to deal with this problem are to delete cases containing missing data, or to use mean values to fill in missing observations. However, these ‘traditional’ methods result in biased estimation of parameters, and reduction in statistical power. Better missing data procedures such as data augmentation (\cite{Tanner}) and multiple imputation (\cite{RubinMI}) and many more are readily available and implementable (\cite{Nakagawa}).
+
+Particle filters are used to estimate a hidden state when partial (noisy) observations are made. However, the standard particle filtering algorithm can diverge or its performance can severely degrade in the presence of missing data (\cite{Zhang}).
+
+On the other hand, multiple imputations do not use past observations and the state transition equations when estimating the probability of the hidden state knowing the observations. This can result in poor performance when the problem can be well modelled by a Markov structure (\cite{Zhang}).
+
+In the context of missing observations, \cite{Zhang} have developed a Multiple Imputation Particle Filter (MIPF) to deal with these deficiencies. This method uses randomly drawn values (imputations) to provide a replacement for the missing data and then uses the particle filter to estimate non-linear state with the data.
+
+Data Augmentation methods in Bayesian statistic are normally used to evaluate an intractable posterior distribution of the parameters when data can be augmented in such a way that it becomes easy to analyse the augmented data (\cite{Tanner}).
+
+In this new method we use data augmentation in sequential importance sampling in order to simulate the new state of the system using a first set of samples and a second sample corrected in light of new data acquired at each step.
+
+This method deals with situations where the data are informative, a situation where standard sequential Monte Carlo methods can perform poorly. 
+
+Similarly, \cite{Del Moral} have proposed a Sequential Monte Carlo method for sampling the posterior distribution of state-space models under highly informative observation regimes. In their method they introduce a schedule of intermediate weighting and resampling times between observation times, which guide particles towards the final state.
+
+A similar method to Del Moral's one was used by \cite{Finke} who developed a Particle Monte Carlo Markov Chain algorithm to estimate the demographic parameters of a population and then incorporate this algorithm into a sequential Monte Carlo sampler in order to perform model comparison motivated by the fact that a simple importance sampling performs poorly if there is a strong mismatch between the prior and the posterior, which is common when the data is highly informative.
+
+\section{The New Sequential Importance Sample algorithm with corrections}
+
+In the paper I am currently working on I provide a proof of concept for the proposed methodology using a simple system modelled by a linear, normal and stationary AR(1) process.
+
+We assume that at any time $t$, only some subset of the elements of the state space $\vec {x}^{(t)} = (x_1, \dots, x_{t})$ have so far been observed without error. The values that have been observed at or before time $t$ will form a vector $\vec{z}^{(t)} = (z_1^{(t)}, \dots, z_{t}^{(t)})$, where for each $s \leq t$, $z_s^{(t)} = x_s$ if $x_s$ has been observed at or before time $t$ and $z_s^{(t)} = -$ otherwise.
+
+As time progresses, new observations become available and some dashes in the vector $\vec{z}^{(t)}$ will be replaced by observations in the subsequent vector $\vec{z}^{(t+1)}$. However, if we have $z_s^{(t)} = x_s$ for times $s$ and $t$ where $s \leq t$ then we must also have $z_s^{(t^{\prime})} = x_s$ at all subsequent times $t^{\prime} > t$.
+
+We will then define a lower triangular $t \times t$ matrix $\vec{Z}^{(t)}$ in which row $i$ is the vector $\vec{z}^{(i)}$ and a binary vectors $\vec{b}^{(t)} = (b_1^{(t)}, \dots, b_{t}^{(t)})$, where $b_s^{(t)} = 1$ if $z_s^{(t)} = x_s$, and $b_s^{(t)} = 0$ if $z_s^{(t)} = -$, and a lower triangular $t \times t$ binary matrix $\vec{B}^{(t)}$ in which row $i$ is the vector $\vec{b}^{(i)}$.
+The matrix $\vec{B}^{(t)}$ must satisfy the constraints that if $B_{ij}^{(t)} = b_j^{(i)} = 1$ for $i \in \{ 1, \ldots, t \}$ and $j \in \{ 1, \ldots, i \}$, then $B_{mj}^{(t)} = 1$ for all $m \in \{ i+1, \ldots, t \}$.
+
+We will model $b_j^{(i)}$, when $b_j^{(i-1)} = 0$ as Bernoulli with probability $\theta$:
+\[
+(b_j^{(i)} | b_j^{(i-1)} = 0) \sim Bernoulli(\theta).
+\]
+
+To perform Bayesian inference in this partially observed state space we want to determine the posterior distribution for the pairs $(\vec{x}^{(t)}, \vec{B}^{(t)})$ in light of observations $\vec{Z}^{(t)}$. Suppose that at time $t$ we have some prior density $q(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t-1)})$ that represents our knowledge about the state before we observe $\vec{z}^{(t)}$. Also, $\vec{b}^{(t)}$ evolves independently of $\vec{x}^{(t)}$, so that the distribution of $\vec{b}^{(t)}$ is a conditional probability of the form $P(\vec{b}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)} ) = P( \vec{b}^{(t)} | \vec{b}^{(t-1)} )$. Under these conditions, the posterior distribution for the pair $(\vec{x}^{(t)}, \vec{B}^{(t)})$ is obtained by re-normalising $q$ over values consistent with $\vec{Z}^{(t)}$ and the posterior will be equal to:
+\[
+p(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t)})  =   
+\frac{ q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)})} {r(\vec{Z}^{(t)} | \vec{Z}^{(t-1)})}
+\]
+where 
+\[
+r(\vec{Z}^{(t)} | \vec{Z}^{(t-1)}) = \int q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)}) \prod_{\{s \leq t: b_s^{(t)} = 0\}} dx_s^{(t)}.
+\]
+
+In our toy example, using the independence of the processes $x$ and $B$, we have
+\begin{equation}
+q(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t-1)}) = q(\vec{x}^{(t-1)},\vec{B}^{(t-1)} | \vec{Z}^{(t-1)}) p(x_t | x_{t-1}) p(\vec{b}^{(t)} | \vec{b}^{(t-1)}).
+\end{equation}
+
+We will want to approximate the posterior $p(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t)})$ iteratively, and to do so we take a sequential importance sampling approach: at each iteration we use a collection of weighted particles to represent $p(\vec{x}^{(t-1)}, \vec{B}^{(t-1)} | \vec{Z}^{(t-1)})$ from the previous iteration. We evolve these under the model to create a new set of weighted particles representing the prior for iteration $t$, namely $q(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t-1)})$. We then modify these particles to be consistent with the observations $\vec{Z}^{(t)}$, and adjust the weights to ensure the resulting weighted particles represent $p(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t)})$.
+
+Consider a particle $(\vec{x}^{(t-1)},\vec{B}^{(t-1)})$ constructed at time point $t$, one of $n$ such particles. We generate a new value $x_t$ for this particle by drawing $p(x_t | x_{t-1})$. Similarly, we generate a new value $\vec{b}^{(t)}$ for this particle by drawing from $p(\vec{b}^{(t)} | \vec{b}^{(t-1)})$ (see equation $(1)$). However, the new vector of observations $\vec{z}^{(t)}$ is typically inconsistent with a particle $(\vec{x}^{(t)}, \vec{B}^{(t)})$ thus constructed, in two ways: first, the coordinates at which $\vec{b}^{(t)}$ contains a 0 may not correspond to the coordinates at which $\vec{z}^{(t)}$ contains a `-', and second, the observed values in $\vec{z}^{(t)}$ differ from the corresponding coordinates of $\vec{x}^{(t)}$. We must therefore correct $\vec{x}^{(t)}$ and $\vec{b}^{(t)}$ in light of the new observation $\vec{z}^{(t)}$. The simplest way to do this is to first replace $\vec{b}^{(t)}$ with the unique binary vector $\vec{b'}^{(t)}$ that is consistent with $\vec{z}^{(t)}$, and then replace the coordinates of $\vec{x}^{(t)}$ with the corresponding coordinates of $\vec{z}^{(t)}$ wherever $\vec{b'}^{(t)}$ has a `1', thus generating a corrected term $\vec{x'}^{(t)}$. The corrections thus made at time point $t$ will be carried forward into the particles used at all future times. Note that in this simple example the corrections are deterministic, that is, $\vec{x'}^{(t)}$ and $\vec{b'}^{(t)}$ are deterministic functions of $\vec{x}^{(t)}$ and $\vec{b}^{(t)}$. 
+
+At each iteration, in order to simulate via a two-step process in which we generate a sample and then correct in light of data, we propose to introduce an auxiliary variable into importance sampling. The auxiliary variable will be the yet to be corrected sample $(\vec{x}^{(t)}, \vec{B}^{(t)})$ at time $t$. We will use a projection map $\pi$ to relate the augmented space $\Omega_{\vec{Z}^{(t)}}$ containing the elements $(\vec{x'}^{(t)}, \vec{B'}^{(t)}, \vec{x}^{(t)}, \vec{B}^{(t)})$ to the corrected state space $\Omega'$ containing $(\vec{x'}^{(t)}, \vec{B'}^{(t)})$. Then, we apply importance sampling to be able to estimate the posterior distribution $p(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t)})$ or the expectation $E_{p}[f(\vec{x}^{(t)},\vec{B}^{(t)})]$  sampling from the known distribution $q$.
+
+For simplicity, let us call $(\vec{x}^{(t)}, \vec{B}^{(t)}) = \vec{y}^{(t)}$ and $(\vec{x'}^{(t)}, \vec{B'}^{(t)}) = \vec{y'}^{(t)}$
+
+Our strategy is to define a probability $p^*$ on $\Omega_{\vec{z}^{(t)}}$ such that the marginal distribution of $p^*$ on $\Omega'$ is $p$, that is:
+
+\[
+p(\vec{y'}^{(t)} | \vec{Z}^{(t)}) = \int p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)})\; d\vec{y}^{(t)}
+\]
+Using the disintegration theorem and applying Importance Sampling will have.
+
+\begin{align*}
+E_{p^*}[f(\pi (\vec{y'}^{(t)}, \vec{y}^{(t)})] & = \int_{\Omega_{\vec{Z}^{(t)}}} f(\pi(\vec{y'}^{(t)},  \vec{y}^{(t)})) \; \frac{p^*(\vec{y'}^{(t)}, \vec{y}^{(t)}|\vec{Z}^{(t)})}{q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)})} q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)})\; d\vec{y}^{(t)} \\ &\approx \sum_{j=1}^n  w^{(t)_j}f(\pi (\vec{y'}^{(t)_j}, \vec{y}^{(t)_j}))
+\end{align*}
+Where the weights $w^{(t)_j}$ are:
+
+\[
+w^{(t)_j} = \frac{p^*(\vec{y'}^{(t)_j}, \vec{y}^{(t)_j} | \vec{Z}^{(t)})} {q(\vec{y'}^{(t)_j}, \vec{y}^{(t)_j}|\vec{Z}^{(t-1)})}
+\]
+In our example with deterministic substitutions $p^*$ will simply be:
+
+\[
+p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)}) = p(\vec{y'}^{(t)} | \vec{Z}^{(t)}) = \frac{ q(\vec{y'}^{(t)}|\vec{Z}^{(t-1)})} {r(\vec{Z}^{(t)} | \vec{Z}^{(t-1)})}
+\]
+and
+
+\[
+q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)}) = q(\vec{y}^{(t)} | \vec{Z}^{(t-1)})
+\]
+therefore the normalised weights $w_t$ will be:
+
+\begin{align*}
+w^{(t)_j} & = \frac{q(\vec{x'}^{(t)_j}, \vec{B'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{x}^{(t)_j}, \vec{B}^{(t)_j} | \vec{Z}^{(t-1)})}\Bigg( \sum_{j=1}^n \frac{q(\vec{x'}^{(t)_j}, \vec{B'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{x}^{(t)_j}, \vec{B}^{(t)_j} | \vec{Z}^{(t-1)})}\Bigg)^{-1}
+\end{align*}
+since the constant $r$ of $q(\vec{x}^{(t-1)_j},\vec{B}^{(t-1)_j} | \vec{Z}^{(t-1)})$ cancels out after normalisation.
+
+Notice that since we are correcting every previous event at every iteration, the weights for the previous times too will need to be recalculated at every iteration. However, there will be many cancellations in the calculation of the weights, making the process manageable and not computationally expensive.
+
+I am currently working on improving the method by considering non-deterministic corrections to our algorithm. This is still work in progress.
+In this new setting, every substitution made based on observations will have an effect on the adjacent unobserved events: the new algorithm will substitute each observed elements and also correct the previous element and the following element if they are unobserved. We will be sampling an unobserved event at times $s\leq t$ where $t$ is the current time, with probability $H(x'_s|x'_{s-1}, x'_{s+1})$.
+
+The probability $H(x'_s|x'_{s-1}, x'_{s+1})$ will have the form:
+
+\[
+H(x'_s|x'_{s-1}, x'_{s+1}) = \begin{cases} p(x'_s|x'_{s-1}), & \mbox{if} \quad b'_s = 0  \quad \mbox{and} \quad b'_{s-1} = 1 \quad \mbox{and} \quad b'_{s+1} = 0\\ 
+p(x'_s|x'_{s+1}), & \mbox{if} \quad b'_s = 0  \quad \mbox{and} \quad b'_{s-1} = 0 \quad \mbox{and} \quad b'_{s+1} = 1\\
+\frac{p(x'_s|x'_{s-1})p(x'_{s+1}|x'_s)}{p(x'_s)}, & \mbox{if} \quad b'_s = 0  \quad \mbox{and} \quad b'_{s-1} = 1 \quad \mbox{and} \quad b'_{s+1} = 1\\
+1 & \mbox{otherwise} \end{cases}
+\]
+We already know that $p(x'_s|x'_{s-1}) \sim \mathcal{N} (\varphi x'_{s}, \sigma^{2})$. Also, for a stationary AR(1) model, the marginal distribution for every value of $s$ is $p(x'_{s}) \sim \mathcal{N}(0, v)$ where $v = Var(x'_s)$ is the variance of $x'_s$. Since the process is stationary, (linear and Gaussian), it is also time reversible and using Bayes theorem it can be shown that $p(x'_{s}|x'_{s+1}) \sim \mathcal{N} (\varphi x'_{s+1}, \sigma^{2})$ as well.
+
+This new terms will be introduced in the calculation of the weights.
+
+\subsection{The Fire Ants model}
+
+In a second paper, I will apply the new methodology to the RIFA invasion.
+
+For this I have already worked on a new model based on a self-exciting point process.
+
+In this paper I will be seeking to simplify and improve on Keith and Spring agent-based model (\cite{Keith}) with the aim to reduce the running time without compromising on flexibility and completeness.
+
+A key feature of my new model is that it will not need to include the phylogeny of the nests in the likelihood, which will result in a much lower computational time when running the inference code.
+
+This will also allow the model to be adapted to other type of invasions where control strategies will have to be decided rapidly as new data is acquired.
+
+This model will consider a self-exciting spatial-temporal point process $N$ as a generalization of an Hawkes model with intensity function $\lambda(x, y, t)$: 
+
+\[
+\lambda(x, y, t) = \mu(x, y, t) + \int_{0}^{t} \iint_{S} g(x - x', y - y', f - f') \d N(x', y', f')
+\]
+This function represents the infinitesimal expected rate of events at time $t$ and location $(x, y)$ given all the events up to time $t$.
+
+We will set the background term $\mu(x, y, f) $ equal to 0 as we assume no new external introductions to the area.
+
+Each parent nest will be able to found more than one nest, with the number of nests founded per nest per month being a parameter $\zeta$, therefore the temporal triggering kernel will be a step function. Also the nest will have a maturation time $t_m$ of 8 months. Before this time they will not be able to produce new nests. 
+The step function will be:
+
+\[
+m (f - f') =
+\begin{cases}
+0, & \mbox{if} \quad f - f' < t_{m} \\
+\zeta, & \mbox{if} \quad f - f' \geq t_{m}
+\end{cases}
+\]
+Where $f$ is the founding time of the new nest and $f'$ is the founding time of the parent nest.
+
+For the newly founded nests we will consider a radial distance from the parent nest with an exponential distribution. The distribution over the angular direction will be uniform as it is equally possible to found a nest in every direction from the parent nest.
+
+\begin{equation}
+l(x - x', y - y')= J \bigg(\frac{1}{2 \pi} \sigma e^{- \sigma r}\bigg)
+\end{equation}
+where $J$ is the Jacobian.
+
+We also make the assumption that nests are killed as soon as they are detected, so we introduce an indicator function $I(t' - t)$ such that
+
+\[
+I (t' - t) =
+\begin{cases}
+1, & \mbox{if} \quad t' -  t> 0 \\
+0, & \mbox{otherwise}
+\end{cases}
+\]
+Where $t'$ represents the time of detection. So the conditional intensity function will be
+
+\[
+\lambda(x, y, t) = \int_{0}^{t} \int_{0}^{t} \iint_{S} m(f - f') \cdot I(t' - t)\cdot \frac{\sigma J }{2 \pi} e^{- \sigma r} \d N(x',y',t',f')
+\]
+
+The likelihood at time $T$ will then be that of  an inhomogeneous Poisson process for the founding process with intensity $\lambda(x, y, t)$.
+
+Also, the discovery time $t$ of a nest is known, but it is unknown when the nest was founded. So the time from establishment to notification $(t - f)$ of a nest $i$ is a random variable which we will consider exponentially distributed.
+
+\[
+h(t_{i} - f_{i}) = \gamma \exp (- \gamma(t_{i} - f_{i}))
+\]
+The Likelihood for a set of $n$ locations $(s_{1}, ... , s_{n})$, a set of founding times $f_{1}, ... , f_{n}$, and detection times $(t_{1},  ... , t_{n})$ will then be:
+
+\[
+\begin{aligned}
+L(s_{1}, ..., s_{n}, f_{1}, ..., f_{n}, t_{1}, ..., t_{n} | \Theta) = & \Bigg[ \prod_{j=1}^{n} \lambda(s_{j}, t_{j}) \Bigg] \times \exp \Bigg(- \int_{0}^{T} \int_{S} \lambda(s, t) \d s \d t \Bigg) \times \\ 
+& \times \prod_{\{ i : t_{i} < T \} } h (t_{i} - f_{i}) \times \prod_{ \{ i : t_{i} = \infty \} } \int_{T}^{\infty} h(t - f_{i}) \d t
+\end{aligned}
+\]
+Where $t_{i} = \infty$ if nest $i$ has not been detected at time $T$. $h(t_{i} - f_{i})$ is the contribution of the observed nests, while $\int_{T}^{\infty} h(t - f_{i}) dt$ is the contribution of the unobserved nest. $\Theta= ( \sigma, \gamma, \zeta)$ is the vector of the unknown parameters and $n$ is the number of nests founded.
+
+Solving, the log likelihood will be:
+
+\[
+\begin{aligned}
+l = & \Bigg[ \sum_{j=1}^{n} \log \lambda(s_{j},f_{j}, t_{j}) \Bigg] - \bigg(\zeta \sum_{i=1}^{n} (min\{ T, t_i \} - f_i) \bigg)  + \sum_{\{ i : t_{i} < T \} }  \bigg[\log (\gamma) -\gamma(t_{i} - f_{i}) \bigg] \\
++ & \sum_{ \{ i : t_{i} = \infty \} } \bigg[\log \bigg(\frac{1}{\gamma}\bigg) -\gamma(T - f_{i}) \bigg]
+\end{aligned}
+\]
+
+\section{Expected Future Progress}
+
+Once the non-deterministic corrections are finalised and the algorithm will be updated, I will have to prove the validity of the method. I will try to demonstrate the precision and computational efficiency of the algorithm. I could try to solve this problem analytically possibly with an adaptation of a Kalman filter. I could also compare this method with similar methods like \cite{Del Moral}.
+I am planning to use real data-sets and calculate the posterior of the parameters of interest for real-world examples.
+
+After this paper I will be working on a second paper, where I will make use of the new fire ants model, and will apply the SIS with correction method to the more complex spatial-temporal self-exciting point process model. Numerical evaluations of these models are usually slow (\cite{Reinhart}).
+
+In the future, I would like to explore the applicability of this methodology to other problems, and possibly create and make available an R package. This will require some changes in the way my code is written. For example I might have to introduce classes and templates to allow the sampling from different distributions. The code is split at the moment between model and method, but it is not easily modifiable to allow for different models.
+
+
+\begin{thebibliography}{99}
+
+\bibitem [\protect\citeauthoryear{Beer}{1990}]{Beer} 
+Beer T.:The Australian National Bushfire model project. Math Comput. Model. 13(12), 49-56 (1990)
+
+\bibitem [\protect\citeauthoryear{Finke}{1990}]{Finke} 
+Finke A., et al. (2019) : Efficient Sequential Monte Carlo Algorithms for Integrated Population Models project. Math Journal of Agricultural, Biological, and Environmental Statistics 24(2), 204-224
+
+\bibitem[\protect\citeauthoryear{Jewell}{2009}]{Jewell} Jewell C.P., et al. (2009) Bayesian analysis for emerging infectious diseases. Bayesian Anal. 4(3): 465-496
+
+\bibitem [\protect\citeauthoryear{Keith}{2013}]{Keith} Keith J.M., Spring D. Agent-based Bayesian approach to monitoring the progress of invasive species eradication programs. Proc. Natl. Acad. Sci. 110(33): 13428-13433
+
+\bibitem [\protect\citeauthoryear{Del Moral}{2014}]{Del Moral} 
+Del Moral P., Murraly L.M.: Sequential Monte Carlo with Highly Informative Observations. Math Comput. Model. 13(12), 49-56 (1990)
+
+\bibitem [\protect\citeauthoryear{Malathy}{2011}]{Malathy} 
+Malathy A, Baboo S.S.: An Enhanced Algorithm to Predict a Future Crime using Data Mining. Int. J. Comput. Appl. 21(1), 1-6 (2011)
+
+\bibitem [\protect\citeauthoryear{Nakagawa}{2015}]{Nakagawa}
+Nakagawa S.: Missing data. In: Fox G.A., Negrete-Yankelevich S., Sosa V.J. (eds.) Ecological Statistics: Contemporary theory and application, pp 81-105. Oxford University Press (2015). 
+
+\bibitem [\protect\citeauthoryear{O'Neill}{2002}]{O'Neill}
+O'Neill P.D., Roberts G.O.:Bayesian inference for partially observed stochastic epidemics. J. R. Stat. Soc. A. Stat. 162(1), 121-129 (2002)
+
+\bibitem [\protect\citeauthoryear{Reinhart}{2017}]{Reinhart} Reinhart A.: A review of self-exciting spatio-temporal point processes and their applications. \textit{ArXiv e-prints} 1708.02647v2 (2017) 
+
+\bibitem [\protect\citeauthoryear{Rubin}{1987}]{RubinMI}
+Rubin D.B.: Multiple imputation for nonresponse in surveys. Wiley, New York (1987)
+
+\bibitem [\protect\citeauthoryear{Rubin}{1987}]{Rubin}
+Rubin D.B.: The Calculation of Posterior Distributions by Data Augmentation: Comment: A Noniterative Sampling/Importance Resampling Alternative to the Data Augmentation Algorithm for Creating a Few Imputations When Fractions of Missing Information Are Modest: The SIR Algorithm. J. Am. Stat. Assoc. 82(398), 543-546 (1987)
+
+\bibitem [\protect\citeauthoryear{Tanner and Wong}{1987}]{Tanner}
+Tanner M.A., Wong W.H.: The Calculation of Posterior Distributions by Data Augmentation. J. Am. Stat. Assoc. 82(398), 528-540 (1987)
+
+\bibitem [\protect\citeauthoryear{Zhang}{2015}]{Zhang}
+Zhang X-P. et al.: Multiple Imputations Particle Filters: Convergence and Performance Analyses for Nonlinear State Estimation with Missing Data. IEEE J. Sel. Top Signa. 9(8), 1536-1547 (2015)
+
+
+
+\end{thebibliography}
+
+
+\end{document}
