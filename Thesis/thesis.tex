@@ -65,11 +65,12 @@
 \newcommand{\K}{\mathbb{K}}
 \renewcommand{\Re}{\mathrm{Re}}
 \renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
 
 
 
 
-\title{Novel approach for modelling and Forecating the spread of invasive species}
+\title{Novel approach for modelling and forecating the spread of invasive species}
 
 
 \author{Valentina Di Marco}
@@ -399,9 +400,9 @@ P(\Theta | s_{1}, ..., s_{n}, f_{1}, ... , f_{n}, t_{1}, ..., t_{n}) \propto L(s
 
 \section{AR(1) model}
 
-To prove our concept we have firstly applied our method to a simple linear, normal, stationary, Gaussian auto-regressive process of order 1 that was easy to sample from. The advantages of using an AR(1) model as a toy model to prove our new methodology are many. The AR(1) model can describe many time-varying processes in nature and it is the simplest, non-trivial model usually utilised to introduce new simulations techniques. {\color{red} NOTE I can expand on this (why is the AR(1) model a good model to prove the concept?)}
+To prove our concept we have firstly applied our method to a simple linear, normal, stationary, Gaussian auto-regressive process of order 1 that was easy to sample from. The advantages of using an AR(1) model as a toy model to prove our new methodology are many. The AR(1) model can describe many time-varying processes in nature and it is the simplest, non-trivial model usually utilised to introduce new simulations techniques.
 
-in the AR(1) model, the time series is "regressed" on itself: the prior value predicts the current value.
+In the AR(1) model, the time series is "regressed" on itself: the prior value predicts the current value.
 
 \begin{equation} \label{eq:1}
 x_{t} = \varphi x_{t-1} + \eps_{t}.

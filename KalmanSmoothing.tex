@@ -1,0 +1,436 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}  
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+\usepackage[round]{natbib}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+
+ \textwidth=16cm \hoffset = -1.9cm
+ \lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\s}{\mathbb{S}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathscr{D}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+
+\begin{document}
+
+
+\section{Kalman filter and smoother for exact observations with missing data}
+
+A Kalman filter is a recursive linear optimal estimator. In its most common form it is an algorithm that uses noisy observations that arrive sequentially in time to estimate the hidden state of a noisy linear system. It is optimal in the sense that if all the noise is additive and Gaussian, it minimises the mean square error of the estimated state.
+
+The object of filtering is therefore to update the knowledge we have of the system each time we obtain a new observation.
+The object of smoothing, on the other hand, is to estimate the past states of the system using all the available data.
+
+Our aim will be to define the smoothing algorithm to obtain an optimal estimation of the state of the system at the time points where we have missing observations, given all the available exact observations. We will then compare the estimates obtained using our new Monte Carlo method, with this optimal estimates. 
+
+\subsection{Filter and predictor}
+
+We will begin considering a model of this form:
+
+\begin{align*}
+    x_{t+1} &= \varphi x_t + \eta_t, & \eta_t &\sim \mathcal{N}(0,\sigma^2_\eta) \\
+    y_t &= x_t + \varepsilon_t, & \varepsilon_t &\sim \mathcal{N}(0,\sigma^2_\varepsilon)
+\end{align*}
+In which the state system is an AR(1) stationary model, for which $|\varphi| < 1$. 
+Since the model is stationary, the distribution $p(x_t)$ of each $x_t$, including the one for the initial value $p(x_{1})$, will be the asymptotic distribution
+
+\[
+    \mathcal{N} \Bigg (0, \frac{\sigma_\eta^2}{1- \varphi^2} \Bigg)
+\]
+and in our case we assume that $\sigma_\eta$ and $\varphi$ are known.
+
+The following arguments will hold also for a random walk in which $\varphi = 1$. For more general cases and applications of the Kalman filter see \cite{Durbin} from which part of the following derivation have been taken.
+
+A Kalman filter looks for a linear predictor $\hat{x}_{l|n}$ of $x_l$, given the observations $Y_n = y_1, \dots, y_n$:
+
+\[
+    \hat{x}_{l|n} = \alpha_0 + \alpha_1 y_1 + \dots +\alpha_n y_n
+\]
+where we want $E[(x_l - \hat{x}_{l|n})y_t]$ = 0 for $t = 1, \dots, n$. 
+
+Notice that since all the distributions in the model are Gaussian, the following distributions will be Gaussian too:
+
+\begin{align*}
+    p(x_t| Y_{t-1}) &= \mathcal{N} (\mu_t, P_t)\\
+    p(x_t| Y_t) &= \mathcal{N} (\mu_{t|t}, P_{t|t})\\
+    p(x_{t+1}|Y_t) &= \mathcal{N} (\mu_{t+1}, P_{t+1}).
+\end{align*}
+
+We assume that we know the values $\mu_t$ and $P_t$ from the previous iteration. Our first objective will be to calculate the filtered estimator $\mu_{t|t}$ and its variance $P_{t|t}$, as well as the one-step ahead predictor $\mu_{t+1}$ and its variance $P_{t+1}$ when the new observation $y_t$ becomes available.
+
+let us define the one-step ahead prediction error (or forecast error) $v_t$ of $y_t$ for $t = 1, \dots, n$ :
+
+\[
+    v_t = y_t - \mu_t = x_t + \varepsilon_t - \mu_t
+\]
+then
+
+\begin{align*}
+    \E[v_t|Y_{t-1}] &= \E[x_t + \varepsilon_t - \mu_t | Y_{t-1}] = \mu_t - \mu_t = 0,\\
+    \var[v_t|Y_{t-1}] &= \var[x_t + \varepsilon_t - \mu_t | Y_{t-1}] = P_t + \sigma^2_\varepsilon,\\
+    \E[v_t|x_t, Y_{t-1}] &= \E[x_t + \varepsilon_t - \mu_t |x_t, Y_{t-1}] = x_t - \mu_t,\\
+    \var[v_t|x_t, Y_{t-1}] &= \var[x_t + \varepsilon_t - \mu_t |x_t, Y_{t-1}] = \sigma^2_\varepsilon.\\
+\end{align*}
+By Bayes' theorem, and since these are all normal quantities we have
+
+\begin{align*}
+    p(x_t|Y_{t-1},v_t) &= p(x_t, v_t|Y_{t-1})/p(v_t|Y_{t-1})\\
+    &= p(x_t|Y_{t-1})p(v_t|x_t,Y_{t-1})/p(v_t|Y_{t-1})\\
+    &= c\times \exp\Big(-\frac{1}{2} R\Big)
+\end{align*}
+where $c$ is a constant and
+
+\begin{align*}
+    R &= \frac{(x_t - \mu_t)^2}{P_t} + \frac{(v_t - x_t + \mu_t)^2}{\sigma^2_\varepsilon} - \frac{v^2_t}{P_t + \sigma^2_\varepsilon}.
+\end{align*}
+Solving we get
+
+\[
+    R = \frac{P_t + \sigma^2_\varepsilon}{P_t\sigma^2_\varepsilon} \Bigg(x_t - \mu_t - \frac{P_t v_t}{P_t + \sigma^2_\varepsilon} \Bigg).
+\]
+Fixing $Y_t$ means fixing $Y_{t-1}$ and $y_t$, so also $v_t = y_t - \mu_t$. We can therefore write
+
+\[
+    p(x_t|Y_t) = p(x_t|Y_{t-1}, v_t) = \mathcal{N}\Bigg(\mu_t + \frac{P_t v_t}{P_t + \sigma^2_\varepsilon}, \frac{P_t\sigma^2_\varepsilon}{P_t + \sigma^2_\varepsilon} \Bigg)
+\]
+so the filtering estimator and its variance are
+
+\begin{align*}
+    \mu_{t|t} &= \mu_t + \frac{P_t v_t}{P_t + \sigma^2_\varepsilon},\\
+    P_{t|t} &= \frac{P_t\sigma^2_\varepsilon}{P_t + \sigma^2_\varepsilon}.
+\end{align*}
+Since
+
+\begin{align*}
+    \mu_{t+1} &= \E[x_{t+1}|Y_t] = \E[\varphi x_t + \eta_t|Y_t] = \E[\varphi x_t|Y_t] = \varphi \mu_{t|t},\\
+    P_{t+1} &= \var(x_{t+1}|Y_t) = \var(\varphi x_t + \eta_t|Y_t) = \varphi^2 \var(x_t|Y_t) + \sigma^2_\eta
+\end{align*}
+we have that the one-step ahead predictor and its variance are
+
+\begin{align*}
+    \mu_{t+1} &= \varphi \mu_t + \frac{\varphi P_t v_t}{P_t + \sigma^2_\varepsilon},\\
+    P_{t+1} &= \frac{\varphi^2  P_t\sigma^2_\varepsilon}{P_t + \sigma^2_\varepsilon} + \sigma^2_\eta.
+\end{align*}
+All this is true for t=2, \dots, n. We can prove this holds for $t=1$ too repeating the calculations without the term $Y_{t-1}$.
+
+Let us now define the Kalman gain:
+
+\[
+K_t = \frac{P_t}{P_t + \sigma^2_\varepsilon} = \frac{P_t}{F_t}
+\]
+where $F_t = P_t + \sigma^2_\varepsilon$, and rewrite the equations this way
+
+\begin{align*}
+    \mu_{t|t} &= \mu_t + K_t v_t,\\
+    P_{t|t} &= P_t(1 - K_t),\\
+    \mu_{t+1} &= \varphi(\mu_t + K_t v_t),\\
+    P_{t+1} &= \varphi^2 P_t(1 - K_t) + \sigma^2_\eta.
+\end{align*}
+
+It follows that we can compute the Kalman filter in steps:
+
+\begin{enumerate}
+    \item Compute the one step prediction error $v_t$.
+    \item Compute the Kalman gain $K$.
+    \item Compute the filtering estimator and its variance $\mu_{t|t}$ and $P_{t|t}$.
+    \item Compute the one-step ahead predictor and its variance $\mu_{t+1}$ and $P_{t+1}$ which will then be used in the next iteration.
+\end{enumerate}
+
+In our simple AR(1) toy model, when we have an observation it will be exact, therefore there will be no uncertainty in the measurements ($\sigma^2_\varepsilon = 0$). It follows that $K_t = \frac{P_t}{P_t + \sigma^2_\varepsilon} = 1$ and there is no error in the one-step ahead prediction error $v_t = 0$ and $x_t = y_t$. The equations will then reduce to:
+
+\begin{align*}
+    \mu_{t|t} &= y_t,\\
+    P_{t|t} &= 0,\\
+    \mu_{t+1} &= \varphi y_t,\\
+    P_{t+1} &= \sigma^2_\eta.
+\end{align*}
+for $t = 1, \dots, n$
+
+\subsection{Smoother}
+
+Let us consider now the case where we want to estimate the past events given the entire sample.
+As we have seen, since all the distributions are normal we will have that 
+
+\[
+    p(x_t | Y_t) = \mathcal{N}(\mu_{t|t}, V_{t|t})
+\]
+were $\mu_t = \E[x_t | Y_n]$ and $V_t = \var(x_t | Y_n)$.
+
+Now we will introduce a regression lemma for the bivariate case.
+Suppose that $x$ and $y$ are jointly normally distributed variables with
+
+\[
+\E\begin{pmatrix}a\\b\end{pmatrix} = \begin{pmatrix}\mu_a\\ \mu_b\end{pmatrix}
+\]
+
+\[
+\var\begin{pmatrix}a\\b\end{pmatrix} = \begin{bmatrix}\sigma^2_a & \sigma_{a b}\\ \sigma_{a b} & \sigma^2_b\end{bmatrix}
+\]
+with means $\mu_a$ and $\mu_b$, variances $\sigma^2_a$ and $\sigma^2_b$ and covariance $\sigma_{a b}$. 
+Then $(a,b)$ is a bivariate Gaussian variable with density
+
+\[
+    p(a,b) = \frac{1}{2\pi \sigma_a \sigma_b \sqrt{1-\rho^2}} \exp \Bigg( -\frac{1}{2(1-\rho^2)}\Bigg[\frac{(a - \mu_a)^2}{\sigma^2_a} + \frac{(b - \mu_b)^2}{\sigma^2_b} - \frac{2 \rho (a - \mu_a)(b - \mu_b)}{\sigma_a \sigma_b} \Bigg] \Bigg)
+\]
+where the quantity $\rho = \frac{\sigma_{a b}}{\sigma_a\sigma_b}$ and is called the population correlation coefficient.
+
+For the definition of conditional density we have
+
+\[
+    p(a|b) = \frac{p(a,b)}{p(b)}
+\]
+and therefore
+
+\[
+    p(a|b) = \mathcal{N}\Big(\E(a|b), \var(a|b)\Big)
+\]
+with expectation and variance
+
+\begin{align*}
+   \E[a|b] &= \mu_a + \frac{\sigma_{a b}}{\sigma^2_b}(b - \mu_b),
+   \\
+   \var(a|b) &= \sigma^2_a - \frac{\sigma^2_{a b}}{\sigma^2_b}.
+\end{align*}
+
+To apply this lemma to the Kalman filter, remember that $v_t = y_t - \mu_y$ and keep $Y_{t-1}$ fixed. Take $a = x_t$ so that $\mu_a = \mu_x$ and $b = v_t$. It follows that $\mu_b = \E[v_t] = 0$. Then,
+
+\begin{align*}
+    \sigma^2_a &= \var(x_t) = P_t, \\
+    \sigma^2_b &= \var(v_t) = \var(x_t - \mu_t + \varepsilon_t) = P_t + \sigma^2_\varepsilon, \\
+    \sigma_{a b} &= \cov(x_t, v_t) = P_t
+\end{align*}
+where the last equation is derived this way $\cov(x_t, v_t) = \E[x_tv_t] - \E[x_t]\E[v_t] = \E[x_t v_t] = \E[x_t(x_t - \mu_t + \varepsilon_t)] = \E[x^2_t] - \mu^2_t + \E[x_t]\E[\varepsilon_t] = \E[x^2_t] - \mu^2_t = \var(x_t) = P_t$, and therefore
+
+\begin{align*}
+    \E[x_t | v_t] = \mu_{t|t} &= \mu_t + \frac{P_t}{P_t + \sigma^2_\varepsilon}(y_t - \mu_t)\\
+    \var(x_t | v_t) &= P_{t|t} = \frac{P_t}{P_t + \sigma^2_\varepsilon}
+\end{align*}
+And we have derived again the filtering estimate and its variance.
+
+Let us now define the state estimation
+
+\[
+    \alpha_t = x_t - \mu_t
+\]
+with $\var(\alpha_t) = P_t$.
+
+\begin{align*}
+    v_t &= y_t - \mu_t\\
+    &= x_t + \varepsilon_t - \mu_t\\
+    &= \alpha_t + \varepsilon_t
+\end{align*}
+and
+
+\begin{align*}
+    \alpha_{t+1} &= x_{t+1} - \mu_{t+1}\\
+    &= \varphi x_t + \eta_t - \varphi \mu_t - \varphi K_t v_t\\
+    &= \varphi \alpha_t + \eta_t - \varphi K(\alpha_t + \varepsilon_t)\\
+    &= \varphi L_t\alpha_t + \eta_t - \varphi K_t\varepsilon_t,
+\end{align*}
+where    $L_t = 1 - K_t$.
+
+Notice now that the forecast errors $v_1, \dots, v_n$ are mutually independent and that $v_t, \dots, v_n$ are independent of $y_1, \dots, y_{t-1}$ with zero means. Moreover, when $y_1, \dots, y_n$ are fixed, $Y_{t-1}$ and $v_t, \dots, v_n$ are fixed.
+
+By an extension of the regression lemma to the multivariate case we have the regression relation for the conditional distribution of $x_t$ and $v_t, \dots, v_n$ given $Y_{t-1}$
+
+\[
+    \hat{x_t} = \E[x_t | Y_n] = \E[x_t | Y_{t-1}, v_t, \dots, v_n] = \mu_t + \sum^n_{j=t} \cov(x_t, v_t)F^{-1}_j v_j.
+\]
+Notice that
+
+\begin{align*}
+    \cov(x_t, v_j) &= \cov(\alpha_t, v_j) && \textrm{for} && j = t, \dots, n\\
+    \cov(\alpha_t, v_t) &= \E[\alpha_t(\alpha_t + \varepsilon_t)] = \var(x_t) = P_t,\\
+    \cov(\alpha_t, v_{t+1}) &= \E[\alpha_t(\alpha_{t+1} + \varepsilon_{t+1})] = \E[\alpha_t(\varphi L_t\alpha_t + \eta_t - \varphi K_t\varepsilon_t)] = \varphi P_t L_t,
+\end{align*}
+Similarly we have
+
+\begin{align*}
+   \cov(x_t, v_{t+2}) &= \varphi^2 P_t L_t L_{t+1},\\
+   &\vdots\\
+   \cov(x_t, v_n) &= \varphi^{n-t} P_t L_t L_{t+1} \dots L_{n-1},\\
+\end{align*}
+therefore
+
+\begin{align*}
+    \hat{x}_t &= \mu_t + \varphi P_t \frac{v_t}{F_t} + \varphi^2 P_t L_t \frac{v_{t+1}}{F_{t+1}} + \varphi^3 P_t L_t L_{t+1} \frac{v_{t+2}}{F_{t+2}} + \dots + \varphi^{n-t} P_t L_t L_{t+1} \dots L_{n-1} \frac{v_n}{F_n}\\
+    \hat{x}_t &= \mu_t + P_t r_{t-1}
+\end{align*}
+where
+
+\[
+    r_{t-1} = \varphi \frac{v_t}{F_t} + \varphi^2 L_t \frac{v_{t+1}}{F_{t+1}} + \varphi^2 L_t L_{t+1} \frac{v_{t+2}}{F_{t+2}} + \dots + \varphi^{n-t} L_t L_{t+1} \dots L_{n-1} \frac{v_n}{F_n}
+\]
+the value of $r_t$ is therefore
+
+\[
+    r_{t} = \varphi \frac{v_{t+1}}{F_{t+1}} + \varphi^2 L_{t+1} \frac{v_{t+2}}{F_{t+2}} + \dots + \varphi^{(n-t)-1}L_{t+1} L_{t+2} \dots L_{n-1} \frac{v_n}{F_n}
+\]
+and since there are no observations after time $n$, $r_n = 0$.
+It follows that for $t = n, n-1, \dots ,1$, the values of $r_{t-1}$ can be evaluated using the backward recursion
+
+\[
+    r_{t-1} = \varphi \bigg( \frac{v_t}{F_t} + L_t r_t \bigg), 
+\]
+with $r_n = 0$.
+
+We can derive in a similar way the variance of the smoothed state. Again by an extension of the regression lemma to the multivariate case we have the regression relation for the conditional distribution of $x_t$ and $v_t, \dots, v_n$ given $Y_{t-1}$ we have
+
+\[
+    V_t = \var(x_t | Y_n) = \var(x_t | Y_{t-1}, v_t, \dots, v_n) = P_t - \sum^n_{j=t} [\cov(x_t, v_t)]^2F^{-1}_j.
+\]
+where we have already derived the expressions for the covariances. Substituting these value in the previous expression we get
+
+\begin{align*}
+    V_t &= P_t - P^2_t \frac{1}{F_t} - P^2_t L^2_t \frac{1}{F_{t+1}} - \dots - P_t L^2_t L^2_{t+1} \dots L^2_{n-1} \frac{1}{F_n}\\
+    V_t &= P_t - P^2_t N_{t-1}
+\end{align*}
+where
+
+\[
+    N_{t-1} = \frac{1}{F_t} + L^2_t \frac{1}{F_{t+1}} + \dots + L^2_t L^2_{t+1} \dots L^2_{n-1} \frac{1}{F_n}
+\]
+he value of $N_t$ is therefore
+
+\[
+    N_t = \frac{1}{F_{t+1}} + L^2_{t+1} \frac{1}{F_{t+2}} + \dots + L^2_{t+1} L^2_{t+2} \dots L^2_{n-1} \frac{1}{F_n}
+\]
+and again since there are no variances after time $n$, $N_n = 0$. So also the values of $N_{t-1}$ can be evaluated using a backward recursion
+
+\[
+    N_{t-1} = \varphi \bigg( \frac{1}{F_t} + L^2_t N_t \bigg), 
+\]
+
+The smoothed state and its variance can be calculated by the backwards recursions
+
+\begin{align*}
+    \hat{x}_t &= \mu_t + P_t r_{t-1}\\
+    r_{t-1} &= \varphi \bigg( \frac{v_t}{F_t} + L_t r_t \bigg), 
+\end{align*}
+\begin{align*}
+    V_t &= P_t - P^2_t N_{t-1}\\
+    N_{t-1} &= \varphi \bigg( \frac{1}{F_t} + L^2_t N_t \bigg), 
+\end{align*}
+for $t = n, n-1, \dots ,1$ and with $N_n = 0$ and $r_n = 0$.
+
+\subsection{Filter and Smoother for missing observations}
+
+In our model we will have exact observations, but we will also have some completely missing observations. We will want therefore to make estimates of expectation and variance for those missing values $x_j$ for some values of $j$, taking in consideration all the existing observations $Y_m$ where $m < n$. 
+
+Suppose we are missing observations $y_j$, with $j = \tau, \dots, m - 1$, where $1 < \tau < m \leq n$.
+
+For filtering at times $t = \tau, \dots, m - 1 $, we have
+
+\begin{align*}
+    \E[x_t | Y_t] = \E[x_t | Y_{\tau-1}] &= \E\Bigg[\varphi^{(t-\tau)} x_\tau + \sum^{t-1}_{j=\tau} \varphi^{(j-1)}\eta_j \Bigg| Y_{\tau - 1} \Bigg] = \varphi^{(t-\tau)}\mu_\tau,\\
+    \E[x_{t+1} | Y_t] = \E[x_{t+1} | Y_{\tau-1}] &= \E\Bigg[\varphi^{(t-\tau)}  x_\tau + \sum^{t}_{j=\tau} \varphi^{(j-1)} \eta_j \Bigg| Y_{\tau - 1} \Bigg] = \varphi^{(t-\tau)} \mu_\tau,\\
+    \var(x_t | Y_t) = \var(x_t | Y_{\tau-1}) &= \var\Bigg(\varphi^{(t-\tau)} x_\tau + \sum^{t-1}_{j=\tau} \varphi^{(j-1)} \eta_j \Bigg| Y_{\tau - 1} \Bigg) = \varphi^{(t-\tau)} P_\tau + \varphi^{(t-\tau)-1} (t - \tau)\sigma^2_\eta,\\
+    \var(x_{t+1} | Y_t) = \var(x_{t+1} | Y_{\tau-1}) &= \var\Bigg(\varphi^{(t-\tau)}  x_\tau + \sum^t_{j=\tau} \varphi^{(j-1)} \eta_j \Bigg| Y_{\tau - 1} \Bigg) = \varphi^{(t-\tau)} P_\tau + \varphi^{(t-\tau)}(t - \tau + 1)\sigma^2_\eta.
+\end{align*}
+We can compute them recursively by
+
+\begin{align*}
+    \mu_{t|t} &= \mu_t,\\
+    P_{t|t} &= P_t,\\
+    \mu_{t+1} &= \varphi \mu_t,\\
+    P_{t+1} &= P_t + \varphi \sigma^2_\eta
+\end{align*}
+for $t = \tau, \dots, m$. We can therefore use the original filter for all $t$ taking $K_t = 0$ at the missing time points.
+
+For the smoother, since $K_t = 0$ and therefore $L_t = 1$, the forecast error and the estimate error become
+
+\begin{align*}
+    v_t &= \alpha_t + \varepsilon_t,\\
+    \alpha_{t+1} &= \varphi \alpha_t + \eta_t.
+\end{align*}
+The covariances between the states at the missing points and after the missing period are
+
+\begin{align*}
+    \cov(x_t, v_m) &= P_t,\\
+    \cov(x_t, v_j) &= \varphi^{(j-t)} P_t L_m L_{m+1} \dots L_{j-1}
+\end{align*}
+for $j = m+1, \dots, n$, $t = \tau, \dots, m - 1$.
+If we delete the terms associated with the missing points the state space smoothing equation for the missing points will become
+
+\[
+    \hat{x}_t = \mu_t + \sum^n_{j=m}\cov (x_t, v_j)F_j^{-1}v_j
+\]
+for $t = \tau, \dots, m-1$. We can therefore find the backward recursion
+
+\begin{align*}
+    &r_{t-1} = \varphi r_t,\\
+    &\hat{x}_t = \mu_t + P_t r_{t-1},\\
+    &t = \tau, \dots, m-1.
+\end{align*}
+It follows that we can use the smoother that we have derived before for all $t$ taking $K_t = 0$ and therefore $L_t = 1$ at the missing points, and this will hold also for the variance, for which the backward recursion becomes
+
+\begin{align*}
+    &N_{t-1} = \varphi N_t,\\
+    &V_t = P_t + P^2_t N_{t-1},\\
+    &t = \tau, \dots, m-1.
+\end{align*}
+
+
+
+
+
+
+
+
+\begin{thebibliography}{}
+
+\bibitem [\protect\citeauthoryear{Durbin}{2012}]{Durbin}
+Durbin, J., Koopman, S.J.: Time Series Analysis by State Space Methods: Second Edition. Oxford University Press (2012). 
+
+\end{thebibliography}
+
+
+
+\end{document}
+

@@ -1,6 +1,8 @@
 \documentclass[11pt,a4paper]{article}
 
 \usepackage{amsmath}  
+\usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage{amsfonts} 
 \usepackage{graphicx} 
 \usepackage[usenames]{color}
@@ -55,6 +57,7 @@
 \renewcommand{\Re}{\mathrm{Re}}
 \renewcommand{\vec}[1]{\mathbf{#1}}
 \renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
 
 
 \begin{document}
@@ -97,9 +100,6 @@ We will model $b_j^{(i)}$, when $b_j^{(i-1)} = 0$ as Bernoulli with probability 
 \[
 (b_j^{(i)} | b_j^{(i-1)} = 0) \sim Bernoulli(\theta).
 \]
-{\color{red} VVV I think this should be a geometric distribution if I compare this with the code and with the chapter of the thesis}
-
-
 
 
 \subsection{Bayesian inference in a partially observed state space}
@@ -107,46 +107,16 @@ We will model $b_j^{(i)}$, when $b_j^{(i-1)} = 0$ as Bernoulli with probability 
 To perform Bayesian inference in this partially observed state space we want to determine the posterior distribution for the pairs $(\vec{x}^{(t)}, \vec{B}^{(t)})$ in light of observations $\vec{Z}^{(t)}$. Suppose that at time $t$ we have some prior density $q(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t-1)})$ that represents our knowledge about the state before we observe $\vec{z}^{(t)}$. This prior is defined on the subspace $\Omega = \Omega_1 \times \Omega_2$ where $\Omega_1 = \prod_{s=1}^t \mathbb{X}_s^{(t-1)} \subseteq \mathbb{R}^t$ and $\Omega_2 = \prod_{s=1}^t \mathbb{B}_s^{(t-1) \times (t-1)} \subseteq 2^{(t \times t)}$ is such that $\mathbb{X}_s^{(t-1)} = \mathbb{R}$ for $b_s^{(t-1)} = 0$ or $s=t$, and $\mathbb{X}_s^{(t-1)} = \{ x_s \}$ for $b_s^{(t-1)} = 1$. Also, $\vec{b}^{(t)}$ evolves independently of $\vec{x}^{(t)}$, so that the distribution of $\vec{b}^{(t)}$ is a conditional probability of the form $P(\vec{b}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)} ) = P( \vec{b}^{(t)} | \vec{b}^{(t-1)} )$. Under these conditions, the posterior distribution for the pair $(\vec{x}^{(t)}, \vec{B}^{(t)})$ is obtained by re-normalising $q$ over values consistent with $\vec{Z}^{(t)}$. In other words, it has a density on the subspace $\Omega' = \Omega'_1 \times \Omega'_2$ where $\Omega'_1 = \prod_{s=1}^t \mathbb{X}_s^{(t)} \subseteq \mathbb{R}^t$ and and $\Omega'_2 = \prod_{s=1}^t \mathbb{B}_s^{(t \times t)} \subseteq 2^{(t \times t)}$ such that $\mathbb{X}_s^{(t)} = \mathbb{R}$ for $b_s^{(t)} = 0$ and $\mathbb{X}_s^{(t)} = \{ z_s^{(t)}\}$ for $b_s^{(t)} = 1$, given by:
 \[
 p(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t)})  =   
-\frac{ q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)})} {r(\vec{Z}^{(t)} | \vec{Z}^{(t-1)})}
+\frac{ q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)})} {r(\vec{z}^{(t)} | \vec{Z}^{(t-1)})}
 \]
 where 
 \[
-r(\vec{Z}^{(t)} | \vec{Z}^{(t-1)}) = \int q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)}) \prod_{\{s \leq t: b_s^{(t)} = 0\}} dx_s^{(t)}.
+r(\vec{z}^{(t)} | \vec{Z}^{(t-1)}) = \int q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)}) \prod_{\{s \leq t: b_s^{(t)} = 0\}} \diff x_s^{(t)}.
 \]
 
-This follows from Bayes' Rule, but we omit the proof to keep the example simple. A proof for a more general context is provided below (HHH TO DO).
+This follows from Bayes' Rule, but we omit the proof to keep the example simple. A proof provided below.
 
-{\color{red}[VVV 
 
-For Bayes' Rule
-
-\[
-p(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t)}) = \frac{p(\vec{Z}^{(t)} | \vec{x}^{(t)}, \vec{B}^{(t)}) p(\vec{x}^{(t)}, \vec{B}^{(t)})}{p(\vec{Z}^{(t)})}
-\]
-where the prior distribution will depend on the prior vector of observations so that
-
-\[
-p(\vec{x}^{(t)}, \vec{B}^{(t)}) = q(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t-1)})
-\]
-And similarly the marginal distribution is such that
-
-\[
-p(\vec{Z}^{(t)}) = r(\vec{Z}^{(t)} | \vec{Z}^{(t-1)})
-\]
-On the other hand
-\[
-p(\vec{Z}^{(t)} | \vec{x}^{(t)}, \vec{B}^{(t)}) = 1
-\]
-as the observations are made without error.
-
-The marginal distribution is:
-
-\[
-r(\vec{Z}^{(t)} | \vec{Z}^{(t-1)}) = \int_{\Omega} q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)}) d\vec{x}^{(t)}\one{s \leq t: b_s^{(t)} = 0} = \int_{\Omega} q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)}) \prod_{\{s \leq t: b_s^{(t)} = 0\}} dx_s^{(t)}
-\]
-since we cannot consider all the possible sequences of events: at the time points where we have an observation the value of x will be fixed and equal to z.
-
-}
 
 The prior for time $t$, $q(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t-1)})$ represents our knowledge about the state before we observe $\vec{z}^{(t)}$. In our toy example, using the independence of the processes $x$ and $B$, we have
 \begin{equation}
@@ -157,12 +127,11 @@ q(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t-1)}) = q(\vec{x}^{(t-1)},\vec{B}^{(t
 
 
 
-
 \subsection{Sequential importance sampling with an auxiliary variable in a partially observed state space}
 
 We want to approximate the distribution $p(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t)})$ iteratively, as well as related properties including $p(x_{t}, \vec{b}^{(t)} | \vec{Z}^{(t)})$ and expectations of the form:
 \[
-E_{p} \Big[f(\vec{x}^{(t)}, \vec{B}^{(t)}) \Big] = \int f(\vec{x}^{(t)}, \vec{B}^{(t)})\; p(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t)})\; d\vec{x}^{(t)}
+E_{p} \Big[f(\vec{x}^{(t)}, \vec{B}^{(t)}) \Big] = \int f(\vec{x}^{(t)}, \vec{B}^{(t)})\; p(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t)})\; \diff \vec{x}^{(t)}
 \]
 for functions $f: \Omega  \rightarrow \Real$. 
 
@@ -177,21 +146,21 @@ At each iteration, in order to simulate via a two-step process in which we gener
 Our strategy is to define a probability $p^*$ on $\Omega_{\vec{z}^{(t)}}$ such that the marginal distribution of $p^*$ on $\Omega'$ is $p$, that is:
 
 \[
-p(\vec{y'}^{(t)} | \vec{Z}^{(t)}) = \int p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)})\; d\vec{y}^{(t)}
+p(\vec{y'}^{(t)} | \vec{Z}^{(t)}) = \int p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)})\; \diff \vec{y}^{(t)}
 \]
 By the the disintegration theorem there exist a family of measures $\{\nu_{y'}\}_{y' \in \Omega'}$ on $\Omega_{\vec{z}^{(t)}}$ such that for every measurable Borel function $g : \Omega_{\vec{z}^{(t)}} \rightarrow [0,\infty]$:
 
 \[
-\int_{\Omega_{\vec{z}^{(t)}}} g(\vec{y}', \vec{y})d(\vec{y'},\vec{y}) = \int_{\Omega'}\int_{\pi^{-1}} g(\vec{y})d\vec{y}d\vec{\vec{y'}}
+\int_{\Omega_{\vec{z}^{(t)}}} g(\vec{y}', \vec{y})\diff (\vec{y'},\vec{y}) = \int_{\Omega'}\int_{\pi^{-1}} g(\vec{y}) \diff \vec{y} \diff \vec{\vec{y'}}
 \]
 
 \begin{align*}
-E_{p}[f(\vec{y'}^{(t)})]  & = \int_{\Omega'} f(\vec{y'}^{(t)})\; p(\vec{y'}^{(t)} | \vec{Z}^{(t)}) d \vec{y'}^{(t)} = \int_{\Omega'} f(\vec{y'}^{(t)})\Bigg[\int_{\pi^{-1}} p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)}) d\vec{y}^{(t)}\Bigg] d\vec{y'}^{(t)} \\ & = \int_{\Omega_{\vec{Z}^{(t)}}} f(\pi(\vec{y'}^{(t)}, \vec{y}^{(t)}))\; p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)}) d (\vec{y'}^{(t)},\vec{y}^{(t)}) = E_{p^*}[f(\pi (\vec{y'}^{(t)}, \vec{y}^{(t)}))].
+E_{p}[f(\vec{y'}^{(t)})]  & = \int_{\Omega'} f(\vec{y'}^{(t)})\; p(\vec{y'}^{(t)} | \vec{Z}^{(t)}) \diff \vec{y'}^{(t)} = \int_{\Omega'} f(\vec{y'}^{(t)})\Bigg[\int_{\pi^{-1}} p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)}) \diff \vec{y}^{(t)}\Bigg] \diff \vec{y'}^{(t)} \\ & = \int_{\Omega_{\vec{Z}^{(t)}}} f(\pi(\vec{y'}^{(t)}, \vec{y}^{(t)}))\; p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)}) \diff (\vec{y'}^{(t)},\vec{y}^{(t)}) = E_{p^*}[f(\pi (\vec{y'}^{(t)}, \vec{y}^{(t)}))].
 \end{align*}
 Using importance sampling
 
 \begin{align*}
-E_{p^*}[f(\pi (\vec{y'}^{(t)}, \vec{y}^{(t)})] & = \int_{\Omega_{\vec{Z}^{(t)}}} f(\pi(\vec{y'}^{(t)},  \vec{y}^{(t)})) \; \frac{p^*(\vec{y'}^{(t)}, \vec{y}^{(t)}|\vec{Z}^{(t)})}{q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)})} q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)})\; d\vec{y}^{(t)} \\ &\approx \sum_{j=1}^n  w^{(t)_j}f(\pi (\vec{y'}^{(t)_j}, \vec{y}^{(t)_j}))
+E_{p^*}[f(\pi (\vec{y'}^{(t)}, \vec{y}^{(t)})] & = \int_{\Omega_{\vec{Z}^{(t)}}} f(\pi(\vec{y'}^{(t)},  \vec{y}^{(t)})) \; \frac{p^*(\vec{y'}^{(t)}, \vec{y}^{(t)}|\vec{Z}^{(t)})}{q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)})} q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)})\; \diff \vec{y}^{(t)} \\ &\approx \sum_{j=1}^n  w^{(t)_j}f(\pi (\vec{y'}^{(t)_j}, \vec{y}^{(t)_j}))
 \end{align*}
 Where the weights $w^{(t)_j}$ are:
 
@@ -304,6 +273,49 @@ w^{(t)} = \frac{q(\vec{x'}^{(t)_j}, \vec{B'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec
 \]
 
 }
+
+\section{derivation of the posterior for a partially observed state}
+
+\begin{proof}
+
+by conditional probability we have
+
+\[
+p(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t)}) = \frac{p(\vec{x}^{(t)},\vec{B}^{(t)}, \vec{Z}^{(t)})}{p(\vec{Z}^{(t)})} = \frac{p(\vec{x}^{(t)},\vec{B}^{(t)}, \vec{z}^{(t)}, \vec{Z}^{(t-1)})}{p(\vec{z}^{(t)},\vec{Z}^{(t-1)})}
+\]
+the numerator of this equation will be
+
+\begin{multline*}
+p(\vec{x}^{(t)},\vec{B}^{(t)}, \vec{z}^{(t)}, \vec{Z}^{(t-1)}) = p(\vec{z}^{(t)}, \vec{Z}^{(t-1)} | \vec{x}^{(t)},\vec{B}^{(t)})p(\vec{x}^{(t)},\vec{B}^{(t)}) = \\ p(\vec{z}^{(t)} | \vec{x}^{(t)},\vec{B}^{(t)}) p(\vec{Z}^{(t-1)} | \vec{x}^{(t)},\vec{B}^{(t)})p(\vec{x}^{(t)},\vec{B}^{(t)}) = p(\vec{z}^{(t)} | \vec{x}^{(t)},\vec{B}^{(t)}) p(\vec{Z}^{(t-1)}, \vec{x}^{(t)} , \vec{B}^{(t)})
+\end{multline*}
+and the denominator will be
+
+\[
+p(\vec{z}^{(t)},\vec{Z}^{(t-1)}) = p(\vec{z}^{(t)} | \vec{Z}^{(t-1)}) p(\vec{Z}^{(t-1)}) 
+\]
+so the posterior can be written
+
+\begin{multline*}
+p(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t)}) = \frac{p(\vec{z}^{(t)} | \vec{x}^{(t)},\vec{B}^{(t)}) p(\vec{Z}^{(t-1)}, \vec{x}^{(t)} , \vec{B}^{(t)})}{p(\vec{z}^{(t)} | \vec{Z}^{(t-1)}) p(\vec{Z}^{(t-1)}) } = \frac{p(\vec{z}^{(t)} | \vec{x}^{(t)},\vec{B}^{(t)}) p(\vec{x}^{(t)} , \vec{B}^{(t)} | \vec{Z}^{(t-1)})}{p(\vec{z}^{(t)} | \vec{Z}^{(t-1)})}
+\end{multline*}
+Since the observations at time $t$ are made without error and each $z^{(t)}_s = x_s$ for $s = 1 \dots t$ we have
+
+\[
+p(\vec{z}^{(t)} | \vec{x}^{(t)}, \vec{B}^{(t)}) = 1
+\]
+and the posterior becomes
+
+\[
+p(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t)}) = \frac{q(\vec{x}^{(t)} , \vec{B}^{(t)} | \vec{Z}^{(t-1)})}{r(\vec{z}^{(t)} | \vec{Z}^{(t-1)})}
+\]
+with the marginal distribution being:
+
+\[
+r(\vec{z}^{(t)} | \vec{Z}^{(t-1)}) = \int_{\Omega'} q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)}) \diff x_{1:t} = \int q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)}) \prod_{\{s \leq t: b_s^{(t)} = 0\}} \diff x_s^{(t)}
+\]
+since at each time point $s$ where we have an observation we will have $b^{(t)}_s=1$ and the value of $x_s$ will be fixed and equal to $z^{(t)}_s$.
+
+\end{proof}
 
 \end{document}
 
