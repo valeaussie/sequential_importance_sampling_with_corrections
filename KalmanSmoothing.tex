@@ -62,49 +62,47 @@
 
 \section{Kalman filter and smoother for exact observations with missing data}
 
-A Kalman filter is a recursive linear optimal estimator. In its most common form it is an algorithm that uses noisy observations that arrive sequentially in time to estimate the hidden state of a noisy linear system. It is optimal in the sense that if all the noise is additive and Gaussian, it minimises the mean square error of the estimated state.
+A Kalman filter is a recursive linear optimal estimator {\color{blue} which has many applications, from }{\color{red} (HHH used for what purposes? In what fields?)}. In its most common form, it is an algorithm that uses noisy observations that arrive sequentially in time to estimate the hidden state of a linear system. It is optimal in the sense that if the noise is additive and Gaussian, it minimises the mean square error of the estimated state.
 
-The object of filtering is therefore to update the knowledge we have of the system each time we obtain a new observation.
-The object of smoothing, on the other hand, is to estimate the past states of the system using all the available data.
+The object of filtering is to update the knowledge we have of the current state of the system each time we obtain a new observation. The object of smoothing, on the other hand, is to estimate past states of the system using all the available data both before and after the time in question.
 
-Our aim will be to define the smoothing algorithm to obtain an optimal estimation of the state of the system at the time points where we have missing observations, given all the available exact observations. We will then compare the estimates obtained using our new Monte Carlo method, with this optimal estimates. 
+Our aim here is to define the Kalman smoothing algorithm used to obtain an optimal estimate of the state of the system at time points where we have missing observations, given all the available observations, which are assumed to be made without error. We will then use these estimates as a gold standard against which to evaluate our new Monte Carlo method. 
 
 \subsection{Filter and predictor}
 
-We will begin considering a model of this form:
+We consider the following model:
 
 \begin{align*}
     x_{t+1} &= \varphi x_t + \eta_t, & \eta_t &\sim \mathcal{N}(0,\sigma^2_\eta) \\
     y_t &= x_t + \varepsilon_t, & \varepsilon_t &\sim \mathcal{N}(0,\sigma^2_\varepsilon)
 \end{align*}
-In which the state system is an AR(1) stationary model, for which $|\varphi| < 1$. 
-Since the model is stationary, the distribution $p(x_t)$ of each $x_t$, including the one for the initial value $p(x_{1})$, will be the asymptotic distribution
+This is an AR(1) model, and we assume $|\varphi| < 1$ {\color{blue} to ensure that the process is stationary}, so that the marginal distribution $p(x_t)$ at each time $t$, including the distribution of the initial value $p(x_{1})$, is given by the asymptotic distribution
+
+\begin{equation} \label{eq:1}
+      \mathcal{N} \Bigg (0, \frac{\sigma_\eta^2}{1- \varphi^2} \Bigg).
+\end{equation}
+  
+We assume that $\sigma_\eta$ and $\varphi$ are known. {\color{blue} Later we will also explore the case where $\sigma^2_\varepsilon=0$}.
+
+The following arguments will hold also for a random walk in which $\varphi = 1$. For more general cases and applications of the Kalman filter see \cite{Durbin} on which parts of the following discussion are based.
+
+A Kalman filter looks for a linear predictor $\hat{x}_{t|n}$ of $x_t$, given the observations $Y_n = (y_1, \dots, y_n)$:
 
 \[
-    \mathcal{N} \Bigg (0, \frac{\sigma_\eta^2}{1- \varphi^2} \Bigg)
+    \hat{x}_{t|n} = \alpha_0 + \alpha_1 y_1 + \dots +\alpha_n y_n
 \]
-and in our case we assume that $\sigma_\eta$ and $\varphi$ are known.
+where we want $E[(x_t - \hat{x}_{t|n})y_t]$ = 0 for $t = 1, \dots, n$. 
 
-The following arguments will hold also for a random walk in which $\varphi = 1$. For more general cases and applications of the Kalman filter see \cite{Durbin} from which part of the following derivation have been taken.
-
-A Kalman filter looks for a linear predictor $\hat{x}_{l|n}$ of $x_l$, given the observations $Y_n = y_1, \dots, y_n$:
-
-\[
-    \hat{x}_{l|n} = \alpha_0 + \alpha_1 y_1 + \dots +\alpha_n y_n
-\]
-where we want $E[(x_l - \hat{x}_{l|n})y_t]$ = 0 for $t = 1, \dots, n$. 
-
-Notice that since all the distributions in the model are Gaussian, the following distributions will be Gaussian too:
+Notice that since all the distributions in the model are Gaussian, the following distributions are Gaussian too:
 
 \begin{align*}
     p(x_t| Y_{t-1}) &= \mathcal{N} (\mu_t, P_t)\\
-    p(x_t| Y_t) &= \mathcal{N} (\mu_{t|t}, P_{t|t})\\
-    p(x_{t+1}|Y_t) &= \mathcal{N} (\mu_{t+1}, P_{t+1}).
+    p(x_t| Y_t) &= \mathcal{N} (\mu_{t|t}, P_{t|t}).
 \end{align*}
 
-We assume that we know the values $\mu_t$ and $P_t$ from the previous iteration. Our first objective will be to calculate the filtered estimator $\mu_{t|t}$ and its variance $P_{t|t}$, as well as the one-step ahead predictor $\mu_{t+1}$ and its variance $P_{t+1}$ when the new observation $y_t$ becomes available.
+As this is a recursive method, we assume that we know the values $\mu_t$ and $P_t$ from the previous iteration. Our first objective will be to calculate the filtered estimator $\mu_{t|t}$ and its variance $P_{t|t}$, as well as the one-step ahead predictor $\mu_{t+1}$ and its variance $P_{t+1}$ when the new observation $y_t$ becomes available.
 
-let us define the one-step ahead prediction error (or forecast error) $v_t$ of $y_t$ for $t = 1, \dots, n$ :
+Let us define the one-step ahead prediction error (or forecast error) $v_t$ of $y_t$ for $t = 1, \dots, n$ :
 
 \[
     v_t = y_t - \mu_t = x_t + \varepsilon_t - \mu_t
@@ -117,7 +115,7 @@ then
     \E[v_t|x_t, Y_{t-1}] &= \E[x_t + \varepsilon_t - \mu_t |x_t, Y_{t-1}] = x_t - \mu_t,\\
     \var[v_t|x_t, Y_{t-1}] &= \var[x_t + \varepsilon_t - \mu_t |x_t, Y_{t-1}] = \sigma^2_\varepsilon.\\
 \end{align*}
-By Bayes' theorem, and since these are all normal quantities we have
+By Bayes' theorem, and since these are all normally distributed quantities we have
 
 \begin{align*}
     p(x_t|Y_{t-1},v_t) &= p(x_t, v_t|Y_{t-1})/p(v_t|Y_{t-1})\\
@@ -129,12 +127,12 @@ where $c$ is a constant and
 \begin{align*}
     R &= \frac{(x_t - \mu_t)^2}{P_t} + \frac{(v_t - x_t + \mu_t)^2}{\sigma^2_\varepsilon} - \frac{v^2_t}{P_t + \sigma^2_\varepsilon}.
 \end{align*}
-Solving we get
+This can be factorised to obtain
 
 \[
-    R = \frac{P_t + \sigma^2_\varepsilon}{P_t\sigma^2_\varepsilon} \Bigg(x_t - \mu_t - \frac{P_t v_t}{P_t + \sigma^2_\varepsilon} \Bigg).
+    R = \frac{P_t + \sigma^2_\varepsilon}{P_t\sigma^2_\varepsilon} \Bigg(x_t - \mu_t - \frac{P_t v_t}{P_t + \sigma^2_\varepsilon} \Bigg)^2.
 \]
-Fixing $Y_t$ means fixing $Y_{t-1}$ and $y_t$, so also $v_t = y_t - \mu_t$. We can therefore write
+{\color{blue} Knowing $Y_t$ means knowing $Y_{t-1}$ and $y_t$}, so also $v_t = y_t - \mu_t$. We can therefore write
 
 \[
     p(x_t|Y_t) = p(x_t|Y_{t-1}, v_t) = \mathcal{N}\Bigg(\mu_t + \frac{P_t v_t}{P_t + \sigma^2_\varepsilon}, \frac{P_t\sigma^2_\varepsilon}{P_t + \sigma^2_\varepsilon} \Bigg)
@@ -157,7 +155,7 @@ we have that the one-step ahead predictor and its variance are
     \mu_{t+1} &= \varphi \mu_t + \frac{\varphi P_t v_t}{P_t + \sigma^2_\varepsilon},\\
     P_{t+1} &= \frac{\varphi^2  P_t\sigma^2_\varepsilon}{P_t + \sigma^2_\varepsilon} + \sigma^2_\eta.
 \end{align*}
-All this is true for t=2, \dots, n. We can prove this holds for $t=1$ too repeating the calculations without the term $Y_{t-1}$.
+All this is true for t=2, \dots, n. We can prove this holds for $t=1$ too by repeating the calculations without the term $Y_{t-1}$.
 
 Let us now define the Kalman gain:
 
@@ -182,15 +180,49 @@ It follows that we can compute the Kalman filter in steps:
     \item Compute the one-step ahead predictor and its variance $\mu_{t+1}$ and $P_{t+1}$ which will then be used in the next iteration.
 \end{enumerate}
 
-In our simple AR(1) toy model, when we have an observation it will be exact, therefore there will be no uncertainty in the measurements ($\sigma^2_\varepsilon = 0$). It follows that $K_t = \frac{P_t}{P_t + \sigma^2_\varepsilon} = 1$ and there is no error in the one-step ahead prediction error $v_t = 0$ and $x_t = y_t$. The equations will then reduce to:
+{\color{blue} In our simple model, when we have an observation it will be exact, therefore $y_t = x_t$ and it follows that
 
 \begin{align*}
     \mu_{t|t} &= y_t,\\
-    P_{t|t} &= 0,\\
-    \mu_{t+1} &= \varphi y_t,\\
-    P_{t+1} &= \sigma^2_\eta.
+    P_{t|t} &= 0.\\
 \end{align*}
-for $t = 1, \dots, n$
+Also 
+
+\begin{equation} \label{eq:2}
+    p(x_{t+1} | Y_t) = p(x_{t+1} | X_t) = p(x_{t+1} | x_t) \sim \mathcal{N}(\varphi x_t, \sigma^2_\eta)
+\end{equation}
+since this is an AR(1) model. So
+
+\begin{align*}
+    \mu_{t+1} &= \varphi y_t,\\
+    P_{t+1} &= \sigma^2_\eta
+\end{align*}
+for $t = 1, \dots, n$.
+
+If there are no observations after time $t$, we can only estimate the following steps using the observation at time $t$.
+
+\[
+    x_{t+2} = \varphi x_{t+1} + \eta_{t+1} = \varphi (\varphi x_t + \eta_t) + \eta_{t+1}
+\]
+therefore
+
+\[
+    p(x_{t+2}| x_{t}) = \mathcal{N} \Big( \varphi^2 x_t, (1 + \varphi^2)\sigma^2_\eta \Big)
+\]
+and in general
+
+\[
+x_{t+l} = \varphi^l x_t + \sum_{i=0}^{l-1} \varphi^i \eta_{t+(l-1)-i}
+\]
+and
+
+\[
+    p(x_{t+l}| x_{t}) = \mathcal{N} \Bigg( \varphi^l x_t, \sigma^2_\eta \sum_{i=0}^{l-1} \varphi^{2i} \Bigg).
+\]
+for $l = t+1, \dots, m$ where $m \leq n$. As we know, since $|\varphi| < 1$, as $l \rightarrow \infty $ $\varphi^l x_t \rightarrow 0$ and $\sigma^2_\eta \sum_{i=0}^{l-1} \varphi^{2i} \rightarrow \frac{\sigma^2_\eta}{1-\varphi^2}$ which gives us the asymptotic distribution (\ref{eq:1})
+
+
+}
 
 \subsection{Smoother}
 
@@ -206,11 +238,11 @@ Now we will introduce a regression lemma for the bivariate case.
 Suppose that $x$ and $y$ are jointly normally distributed variables with
 
 \[
-\E\begin{pmatrix}a\\b\end{pmatrix} = \begin{pmatrix}\mu_a\\ \mu_b\end{pmatrix}
+    \E\begin{pmatrix}a\\b\end{pmatrix} = \begin{pmatrix}\mu_a\\ \mu_b\end{pmatrix}
 \]
 
 \[
-\var\begin{pmatrix}a\\b\end{pmatrix} = \begin{bmatrix}\sigma^2_a & \sigma_{a b}\\ \sigma_{a b} & \sigma^2_b\end{bmatrix}
+    \var\begin{pmatrix}a\\b\end{pmatrix} = \begin{bmatrix}\sigma^2_a & \sigma_{a b}\\ \sigma_{a b} & \sigma^2_b\end{bmatrix}
 \]
 with means $\mu_a$ and $\mu_b$, variances $\sigma^2_a$ and $\sigma^2_b$ and covariance $\sigma_{a b}$. 
 Then $(a,b)$ is a bivariate Gaussian variable with density
@@ -238,7 +270,7 @@ with expectation and variance
    \var(a|b) &= \sigma^2_a - \frac{\sigma^2_{a b}}{\sigma^2_b}.
 \end{align*}
 
-To apply this lemma to the Kalman filter, remember that $v_t = y_t - \mu_y$ and keep $Y_{t-1}$ fixed. Take $a = x_t$ so that $\mu_a = \mu_x$ and $b = v_t$. It follows that $\mu_b = \E[v_t] = 0$. Then,
+To apply this lemma to the Kalman filter, remember that $v_t = y_t - \mu_y$ and consider $Y_{t-1}$ known. Take $a = x_t$ so that $\mu_a = \mu_t$ and $b = v_t$. It follows that $\mu_b = \E[v_t] = 0$. Then,
 
 \begin{align*}
     \sigma^2_a &= \var(x_t) = P_t, \\
@@ -270,17 +302,17 @@ and
 \begin{align*}
     \alpha_{t+1} &= x_{t+1} - \mu_{t+1}\\
     &= \varphi x_t + \eta_t - \varphi \mu_t - \varphi K_t v_t\\
-    &= \varphi \alpha_t + \eta_t - \varphi K(\alpha_t + \varepsilon_t)\\
+    &= \varphi \alpha_t + \eta_t - \varphi K_t(\alpha_t + \varepsilon_t)\\
     &= \varphi L_t\alpha_t + \eta_t - \varphi K_t\varepsilon_t,
 \end{align*}
 where    $L_t = 1 - K_t$.
 
-Notice now that the forecast errors $v_1, \dots, v_n$ are mutually independent and that $v_t, \dots, v_n$ are independent of $y_1, \dots, y_{t-1}$ with zero means. Moreover, when $y_1, \dots, y_n$ are fixed, $Y_{t-1}$ and $v_t, \dots, v_n$ are fixed.
+Notice now that the forecast errors $v_1, \dots, v_n$ are mutually independent and that $v_t, \dots, v_n$ are independent of $y_1, \dots, y_{t-1}$ with zero means. Moreover, when $y_1, \dots, y_n$ are known, $Y_{t-1}$ and $v_t, \dots, v_n$ are known.
 
-By an extension of the regression lemma to the multivariate case we have the regression relation for the conditional distribution of $x_t$ and $v_t, \dots, v_n$ given $Y_{t-1}$
+By an extension of the regression lemma to the multivariate case, we have the regression relation for the conditional distribution of $x_t$ and $v_t, \dots, v_n$ given $Y_{t-1}$
 
 \[
-    \hat{x_t} = \E[x_t | Y_n] = \E[x_t | Y_{t-1}, v_t, \dots, v_n] = \mu_t + \sum^n_{j=t} \cov(x_t, v_t)F^{-1}_j v_j.
+    \hat{x_t} = \E[x_t | Y_n] = \E[x_t | Y_{t-1}, v_t, \dots, v_n] = \mu_t + \sum^n_{j=t} \cov(x_t, v_j)F^{-1}_j v_j.
 \]
 Notice that
 
@@ -292,76 +324,76 @@ Notice that
 Similarly we have
 
 \begin{align*}
-   \cov(x_t, v_{t+2}) &= \varphi^2 P_t L_t L_{t+1},\\
+   \cov(\alpha_t, v_{t+2}) &= \varphi^2 P_t L_t L_{t+1},\\
    &\vdots\\
-   \cov(x_t, v_n) &= \varphi^{n-t} P_t L_t L_{t+1} \dots L_{n-1},\\
+   \cov(\alpha_t, v_n) &= \varphi^{n-t} P_t L_t L_{t+1} \dots L_{n-1},\\
 \end{align*}
 therefore
 
 \begin{align*}
-    \hat{x}_t &= \mu_t + \varphi P_t \frac{v_t}{F_t} + \varphi^2 P_t L_t \frac{v_{t+1}}{F_{t+1}} + \varphi^3 P_t L_t L_{t+1} \frac{v_{t+2}}{F_{t+2}} + \dots + \varphi^{n-t} P_t L_t L_{t+1} \dots L_{n-1} \frac{v_n}{F_n}\\
+    \hat{x}_t &= \mu_t + P_t \frac{v_t}{F_t} + \varphi P_t L_t \frac{v_{t+1}}{F_{t+1}} + \varphi^2 P_t L_t L_{t+1} \frac{v_{t+2}}{F_{t+2}} + \dots + \varphi^{n-t} P_t L_t L_{t+1} \dots L_{n-1} \frac{v_n}{F_n}\\
     \hat{x}_t &= \mu_t + P_t r_{t-1}
 \end{align*}
 where
 
 \[
-    r_{t-1} = \varphi \frac{v_t}{F_t} + \varphi^2 L_t \frac{v_{t+1}}{F_{t+1}} + \varphi^2 L_t L_{t+1} \frac{v_{t+2}}{F_{t+2}} + \dots + \varphi^{n-t} L_t L_{t+1} \dots L_{n-1} \frac{v_n}{F_n}
+    r_{t-1} = \frac{v_t}{F_t} + \varphi L_t \frac{v_{t+1}}{F_{t+1}} + \varphi^2 L_t L_{t+1} \frac{v_{t+2}}{F_{t+2}} + \dots + \varphi^{n-t} L_t L_{t+1} \dots L_{n-1} \frac{v_n}{F_n}
 \]
 the value of $r_t$ is therefore
 
 \[
-    r_{t} = \varphi \frac{v_{t+1}}{F_{t+1}} + \varphi^2 L_{t+1} \frac{v_{t+2}}{F_{t+2}} + \dots + \varphi^{(n-t)-1}L_{t+1} L_{t+2} \dots L_{n-1} \frac{v_n}{F_n}
+    r_{t} = \frac{v_{t+1}}{F_{t+1}} + \varphi L_{t+1} \frac{v_{t+2}}{F_{t+2}} + \dots + \varphi^{(n-t)-1}L_{t+1} L_{t+2} \dots L_{n-1} \frac{v_n}{F_n}
 \]
 and since there are no observations after time $n$, $r_n = 0$.
 It follows that for $t = n, n-1, \dots ,1$, the values of $r_{t-1}$ can be evaluated using the backward recursion
 
 \[
-    r_{t-1} = \varphi \bigg( \frac{v_t}{F_t} + L_t r_t \bigg), 
+    r_{t-1} = \frac{v_t}{F_t} + \varphi L_t r_t, 
 \]
 with $r_n = 0$.
 
 We can derive in a similar way the variance of the smoothed state. Again by an extension of the regression lemma to the multivariate case we have the regression relation for the conditional distribution of $x_t$ and $v_t, \dots, v_n$ given $Y_{t-1}$ we have
 
 \[
-    V_t = \var(x_t | Y_n) = \var(x_t | Y_{t-1}, v_t, \dots, v_n) = P_t - \sum^n_{j=t} [\cov(x_t, v_t)]^2F^{-1}_j.
+    V_t = \var(x_t | Y_n) = \var(x_t | Y_{t-1}, v_t, \dots, v_n) = P_t - \sum^n_{j=t} [\cov(x_t, v_j)]^2F^{-1}_j.
 \]
-where we have already derived the expressions for the covariances. Substituting these value in the previous expression we get
+where we have already derived the expressions for the covariances. Substituting this value in the previous expression we get
 
 \begin{align*}
-    V_t &= P_t - P^2_t \frac{1}{F_t} - P^2_t L^2_t \frac{1}{F_{t+1}} - \dots - P_t L^2_t L^2_{t+1} \dots L^2_{n-1} \frac{1}{F_n}\\
+    V_t &= P_t - P^2_t \frac{1}{F_t} - \varphi P^2_t L^2_t \frac{1}{F_{t+1}} - \dots - \varphi^{n-t} P^2_t L^2_t L^2_{t+1} \dots L^2_{n-1} \frac{1}{F_n}\\
     V_t &= P_t - P^2_t N_{t-1}
 \end{align*}
 where
 
 \[
-    N_{t-1} = \frac{1}{F_t} + L^2_t \frac{1}{F_{t+1}} + \dots + L^2_t L^2_{t+1} \dots L^2_{n-1} \frac{1}{F_n}
+    N_{t-1} = \frac{1}{F_t} + \varphi L^2_t \frac{1}{F_{t+1}} + \dots + \varphi^{n-t} L^2_t L^2_{t+1} \dots L^2_{n-1} \frac{1}{F_n}.
 \]
-he value of $N_t$ is therefore
+The value of $N_t$ is therefore
 
 \[
-    N_t = \frac{1}{F_{t+1}} + L^2_{t+1} \frac{1}{F_{t+2}} + \dots + L^2_{t+1} L^2_{t+2} \dots L^2_{n-1} \frac{1}{F_n}
+    N_t = \frac{1}{F_{t+1}} + \varphi L^2_{t+1} \frac{1}{F_{t+2}} + \dots + \varphi^{(n-t)-1}L^2_{t+1} L^2_{t+2} \dots L^2_{n-1} \frac{1}{F_n}
 \]
 and again since there are no variances after time $n$, $N_n = 0$. So also the values of $N_{t-1}$ can be evaluated using a backward recursion
 
 \[
-    N_{t-1} = \varphi \bigg( \frac{1}{F_t} + L^2_t N_t \bigg), 
+    N_{t-1} = \frac{1}{F_t} + \varphi L^2_t N_t , 
 \]
 
 The smoothed state and its variance can be calculated by the backwards recursions
 
 \begin{align*}
     \hat{x}_t &= \mu_t + P_t r_{t-1}\\
-    r_{t-1} &= \varphi \bigg( \frac{v_t}{F_t} + L_t r_t \bigg), 
+    r_{t-1} &= \frac{v_t}{F_t} + \varphi L_t r_t, 
 \end{align*}
 \begin{align*}
     V_t &= P_t - P^2_t N_{t-1}\\
-    N_{t-1} &= \varphi \bigg( \frac{1}{F_t} + L^2_t N_t \bigg), 
+    N_{t-1} &= \frac{1}{F_t} + \varphi L^2_t N_t, 
 \end{align*}
 for $t = n, n-1, \dots ,1$ and with $N_n = 0$ and $r_n = 0$.
 
 \subsection{Filter and Smoother for missing observations}
 
-In our model we will have exact observations, but we will also have some completely missing observations. We will want therefore to make estimates of expectation and variance for those missing values $x_j$ for some values of $j$, taking in consideration all the existing observations $Y_m$ where $m < n$. 
+In our model we have some missing observations, want therefore to make estimates of expectation and variance for those missing values $x_j$ for some values of $j$, taking into consideration all the existing observations $Y_m$ where $m \leq n$. 
 
 Suppose we are missing observations $y_j$, with $j = \tau, \dots, m - 1$, where $1 < \tau < m \leq n$.
 
@@ -416,12 +448,120 @@ It follows that we can use the smoother that we have derived before for all $t$ 
     &t = \tau, \dots, m-1.
 \end{align*}
 
+{\color{blue} The Kalman Smoother is not applicable to the situation where the observations are exact since the one-step ahead prediction error $v_t$ cannot be defined.}
 
 
+\subsection{Estimation of missing observations when the available observations are exact}
 
+{\color{blue} Remember that our objective is to find the distribution of all the missing values in light of all the observations
 
+\[
+    p(x_t | y_1, \dots, y_{\tau-1}, y_m, \dots y_n) 
+\]
+supposing we are missing observations $y_j$, with $j = \tau, \dots, m - 1$, where $1 < \tau < m \leq n$.
 
+Again, since this model is Markovian and since the observations are exact, the probability of an event at time $t$ knowing all the previous observations $p(x_t | y_1, \dots, y_{t-1})$ when these observations $y_1, \dots, y_{t-1}$ are exact, will depend only on the last available observation:
 
+\[
+    p(x_t | y_1, \dots ,y_{t-1}) = p(x_t | y_{t-1})
+\]
+Also, we can prove the probability of an event at time $t$, when we know all subsequent observations $p(x_t | y_{t+1}, \dots, y_n)$ and these observations $y_{t+1}, \dots, y_n$ are exact, will depend only on the first available observation.
+
+{\color{red} (HHH It might be helpful to use the terminology of the global Markov property - see here:
+\verb|https://en.wikipedia.org/wiki/Markov_random_field|)}
+
+Since the observations are exact, $y_i = x_i$ for every $i = t+1, \dots, n$.
+
+Using the rule of conditional probability and the fact this is an AR1 model we can write
+
+\begin{align*}
+    p(x_{t+1}, \dots, x_n | x_t) &= p(x_n | x_t, x_{t+1} \dots, x_{n-1}) p(x_{t+1}, \dots, x_{n-1} | x_t)\\
+    &= p(x_n | x_{n-1}) p(x_{n-1} | x_t, \dots x_{n-2}) p(x_{t+1}, \dots, x_{n-2} | x_t)\\
+    &= \dots\\
+    &= p(x_n | x_{n-1})p(x_{n-1} | x_{n-2}) \dots p(x_{t+1} | x_t),
+\end{align*}
+and
+
+\begin{align*}
+    p(x_{t+1}, \dots, x_n) &= p(x_n | x_{t+1}, \dots, x_{n-1}) p(x_{t+1}, \dots, x_{n-1})\\
+    &= p(x_n | x_{n-1}) p(x_{n-1} | x_{t+1}, \dots x_{n-2}) p(x_{t+1}, \dots x_{n-2})\\
+    &= \dots\\
+    &= p(x_n | x_{n-1})p(x_{n-1} | x_{n-2}) \dots p(x_{t+1} | x_t) p(x_{t+1})
+\end{align*}
+therefore
+
+\begin{align*}
+    p(x_t | x_{t+1}, \dots, x_n) &= \frac{p(x_{t+1},\dots, x_n | x_t) p(x_t)}{p(x_{t+1}, \dots, x_n)}\\
+    &= \frac{p(x_n | x_{n-1})\dots p(x_{t+2} | x_{t+1}) p(x_{t+1} | x_t) p(x_t)}{p(x_n | x_{n-1})\dots p(x_{t+2} | x_{t+1}) p(x_{t+1})}\\
+    &= \frac{p(x_{t+1} | x_t) p(x_t)}{p(x_{t+1})}\\
+    &= p(x_t | x_{t+1}).
+\end{align*}
+Also, if we know all the previous and all the following observations we have
+
+\begin{align*}
+    p(x_t | x_1, \dots, x_{t-1}, x_{t+1}, \dots x_n) &= \frac{p(x_1,\dots, x_n)}{p(x_1, \dots, x_{t-1}, x_{t+1}, \dots x_n)}\\
+    &= \frac{p(x_n | x_{n-1})\dots p(x_2 | x_1) p(x_1)}{p(x_n | x_{n-1})\dots p(x_{t+1} | x_{t-1}) \dots p(x_2 | x_1) p(x_1)}\\
+    &= \frac{p(x_{t+1} | x_t) p(x_t | x_{t-1})}{p(x_{t+1} | x_{t-1})}\\
+    &= \frac{p(x_{t-1}, x_t, x_{t+1})}{p(x_{t-1}) p(x_{t+1} | x_{t-1})}\\
+    &= \frac{p(x_{t-1}, x_t, x_{t+1})}{p(x_{t+1}, x_{t-1})}\\
+    &= p(x_t | x_{t-1}, x_{t+1})
+\end{align*}
+It is useful to notice that an AR(1) model is time reversible, i.e. it looks the same back in time as it does forward in time.
+This can be proved using Bayes theorem as follows:
+
+\[
+    p(x_{t-1} | x_t) = \frac{p(x_t | x_{t-1}) p(x_{t-1})}{p(x_t)} = c\times \exp\Big(-\frac{1}{2} R\Big)
+\]
+where $c$ is a constant.
+We know from equations (\ref{eq:1}) and (\ref{eq:2}) that 
+
+\begin{align*}
+    p(x_t | x_{t-1}) &= \mathcal{N}(\varphi x_{t-1}, \sigma^2_\eta)\\
+    p(x_{t-1}) &= p(x_t) = \mathcal{N} \Bigg(0, \frac{\sigma^2_\eta}{1-\varphi^2} \Bigg)\\
+\end{align*}
+and so 
+
+\[
+    R = \frac{(x_t - \varphi x_{t-1})^2}{\sigma^2_\eta} + \frac{x_{t-1}^2}{\sigma^2_\eta / (1-\varphi^2)} - \frac{x_{t}^2}{\sigma^2_\eta / (1-\varphi^2)}.
+\]
+Solving we get
+
+\[
+    R = \frac{x_{t-1}^2 - (2\varphi x_t) x_{t-1}+ (\varphi^2 x_t^2)}{\sigma^2_\eta} = \frac{(x_{t-1} - \varphi x_t)^2}{\sigma^2_\eta}
+\]
+and this shows that
+
+\[
+    p(x_{t-1} | x_t) = \mathcal{N}(\varphi x_t, \sigma^2_\eta) = p(x_t | x_{t-1}).
+\]
+
+We want to find the probability of all the missing elements, knowing all the observations, which we have proven is the probability of all the missing elements knowing the first and the last observations
+
+\begin{align*}
+    p(x_t | x_{\tau-1}, x_m) &= \frac{p(x_{\tau-1}, x_m | x_t) p(x_t)}{p(x_{\tau-1}, x_m)} \\
+    &= \frac{p(x_m | x_{\tau-1}, x_t) p(x_{\tau-1} | x_t) p(x_t)}{p(x_m | x_{\tau-1}) p(x_{\tau-1})}\\
+    &= \frac{p(x_m | x_t) p(x_t | x_{\tau-1})}{p(x_m | x_{\tau-1})} \\
+    &= c\times \exp\Big(-\frac{1}{2} R\Big)
+\end{align*}
+where $R$ is
+
+\[
+    R = \frac{(x_m - \varphi^{m-t} x_t)^2}{\sigma^2_\eta \sum_{i=0}^{m-t-1} \varphi^{2i}} + \frac{(x_t - \varphi^{t-(\tau-1)} x_{\tau-1})^2}{\sigma^2_\eta \sum_{i=0}^{t-\tau} \varphi^{2i}} - \frac{(x_m - \varphi^{m -(\tau-1)} x_{\tau-1})^2}{\sigma^2_\eta \sum_{i=0}^{m-\tau} \varphi^{2i}}.
+\]
+that will factorize to
+
+\[
+    R = \frac{\sum_{i=0}^{m-\tau} \varphi^{2i}}{\sigma^2_\eta \sum_{i=0}^{m-t-1} \varphi^{2i} \sum_{i=0}^{t-\tau} \varphi^{2i}} \Bigg\{ x_t - \Bigg[\frac{\varphi^{m-t} \sum_{i=0}^{t-\tau} \varphi^{2i} x_{m} + \varphi^{t-\tau+1} \sum_{i=0}^{m-t-1} \varphi^{2i} x_{\tau-1}}{\sum_{i=0}^{m-\tau} \varphi^{2i}}\Bigg] \Bigg\}^2.
+\]
+therefore
+
+\[
+    p(x_t | x_{\tau-1}, x_{m}) = \mathcal{N} \Bigg(\frac{\varphi^{m-t} \sum_{i=0}^{t-\tau} \varphi^{2i} x_{m} + \varphi^{t-\tau+1} \sum_{i=0}^{m-t-1} \varphi^{2i} x_{\tau-1}}{\sum_{i=0}^{m-\tau} \varphi^{2i}}, \frac{\sigma^2_\eta \sum_{i=0}^{m-t-1} \varphi^{2i} \sum_{i=0}^{t-\tau} \varphi^{2i}}{\sum_{i=0}^{m-\tau} \varphi^{2i}} \Bigg)
+\]
+
+}
+
+{\color{red} (HHH I find the notation confusing for the final recursive expressions. Maybe the problem is the use of $l = m - t$. Consider leaving it as $m - t$. Also, I was expecting you to use a forward recursion as described on page 4, then a backward recursion. Maybe you don't need to!)}
 
 \begin{thebibliography}{}
 
