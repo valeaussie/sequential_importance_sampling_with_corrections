@@ -393,7 +393,7 @@ for $t = n, n-1, \dots ,1$ and with $N_n = 0$ and $r_n = 0$.
 
 \subsection{Filter and Smoother for missing observations}
 
-In our model we have some missing observations, want therefore to make estimates of expectation and variance for those missing values $x_j$ for some values of $j$, taking into consideration all the existing observations $Y_m$ where $m \leq n$. 
+In our model we have some missing observations and we want to make estimates of expectation and variance for those missing values $x_j$ for some values of $j$, taking into consideration all the existing observations $Y_m$ where $m \leq n$. 
 
 Suppose we are missing observations $y_j$, with $j = \tau, \dots, m - 1$, where $1 < \tau < m \leq n$.
 
@@ -453,26 +453,26 @@ It follows that we can use the smoother that we have derived before for all $t$ 
 
 \subsection{Estimation of missing observations when the available observations are exact}
 
-{\color{blue} Remember that our objective is to find the distribution of all the missing values in light of all the observations
+{\color{blue} Our objective is to find the distribution of all the missing values in light of all the observations
 
 \[
     p(x_t | y_1, \dots, y_{\tau-1}, y_m, \dots y_n) 
 \]
 supposing we are missing observations $y_j$, with $j = \tau, \dots, m - 1$, where $1 < \tau < m \leq n$.
 
-Again, since this model is Markovian and since the observations are exact, the probability of an event at time $t$ knowing all the previous observations $p(x_t | y_1, \dots, y_{t-1})$ when these observations $y_1, \dots, y_{t-1}$ are exact, will depend only on the last available observation:
+As we have seen, since this model is Markovian and the observations are exact, the probability of an event at time $t$ knowing all the previous observations $p(x_t | y_1, \dots, y_{t-1})$ when these observations $y_1, \dots, y_{t-1}$ are exact will depend only on the last available observation:
 
 \[
-    p(x_t | y_1, \dots ,y_{t-1}) = p(x_t | y_{t-1})
+    p(x_t | y_1, \dots ,y_{t-1}) = p(x_t | y_{t-1}).
 \]
-Also, we can prove the probability of an event at time $t$, when we know all subsequent observations $p(x_t | y_{t+1}, \dots, y_n)$ and these observations $y_{t+1}, \dots, y_n$ are exact, will depend only on the first available observation.
+We can then that prove the probability of an event at time $t$, when we know all subsequent observations $p(x_t | y_{t+1}, \dots, y_n)$ and these observations $y_{t+1}, \dots, y_n$ are exact, will depend only on the first available observation:
 
 {\color{red} (HHH It might be helpful to use the terminology of the global Markov property - see here:
 \verb|https://en.wikipedia.org/wiki/Markov_random_field|)}
 
 Since the observations are exact, $y_i = x_i$ for every $i = t+1, \dots, n$.
 
-Using the rule of conditional probability and the fact this is an AR1 model we can write
+Now, using the rule of conditional probability and the fact this is an AR(1) model we can write
 
 \begin{align*}
     p(x_{t+1}, \dots, x_n | x_t) &= p(x_n | x_t, x_{t+1} \dots, x_{n-1}) p(x_{t+1}, \dots, x_{n-1} | x_t)\\
@@ -496,7 +496,7 @@ therefore
     &= \frac{p(x_{t+1} | x_t) p(x_t)}{p(x_{t+1})}\\
     &= p(x_t | x_{t+1}).
 \end{align*}
-Also, if we know all the previous and all the following observations we have
+Similarly, if we know all the previous and all the following observations we have
 
 \begin{align*}
     p(x_t | x_1, \dots, x_{t-1}, x_{t+1}, \dots x_n) &= \frac{p(x_1,\dots, x_n)}{p(x_1, \dots, x_{t-1}, x_{t+1}, \dots x_n)}\\
@@ -506,7 +506,7 @@ Also, if we know all the previous and all the following observations we have
     &= \frac{p(x_{t-1}, x_t, x_{t+1})}{p(x_{t+1}, x_{t-1})}\\
     &= p(x_t | x_{t-1}, x_{t+1})
 \end{align*}
-It is useful to notice that an AR(1) model is time reversible, i.e. it looks the same back in time as it does forward in time.
+Also notice that an AR(1) model is time reversible, i.e. it looks the same back in time as it does forward in time.
 This can be proved using Bayes theorem as follows:
 
 \[
@@ -539,7 +539,7 @@ We want to find the probability of all the missing elements, knowing all the obs
 
 \begin{align*}
     p(x_t | x_{\tau-1}, x_m) &= \frac{p(x_{\tau-1}, x_m | x_t) p(x_t)}{p(x_{\tau-1}, x_m)} \\
-    &= \frac{p(x_m | x_{\tau-1}, x_t) p(x_{\tau-1} | x_t) p(x_t)}{p(x_m | x_{\tau-1}) p(x_{\tau-1})}\\
+    &= \frac{p(x_m | x_{\tau-1}, x_t) p(x_{\tau-1} | x_t) p(x_t)}{p(x_m | x_{\tau-1}) p(x_{\tau-1})} \\
     &= \frac{p(x_m | x_t) p(x_t | x_{\tau-1})}{p(x_m | x_{\tau-1})} \\
     &= c\times \exp\Big(-\frac{1}{2} R\Big)
 \end{align*}
@@ -556,12 +556,13 @@ that will factorize to
 therefore
 
 \[
-    p(x_t | x_{\tau-1}, x_{m}) = \mathcal{N} \Bigg(\frac{\varphi^{m-t} \sum_{i=0}^{t-\tau} \varphi^{2i} x_{m} + \varphi^{t-\tau+1} \sum_{i=0}^{m-t-1} \varphi^{2i} x_{\tau-1}}{\sum_{i=0}^{m-\tau} \varphi^{2i}}, \frac{\sigma^2_\eta \sum_{i=0}^{m-t-1} \varphi^{2i} \sum_{i=0}^{t-\tau} \varphi^{2i}}{\sum_{i=0}^{m-\tau} \varphi^{2i}} \Bigg)
+    p(x_t | x_{\tau-1}, x_{m}) = \mathcal{N} \Bigg(\frac{\varphi^{m-t} \sum_{i=0}^{t-\tau} \varphi^{2i} x_{m} + \varphi^{t-\tau+1} \sum_{i=0}^{m-t-1} \varphi^{2i} x_{\tau-1}}{\sum_{i=0}^{m-\tau} \varphi^{2i}}, \frac{\sigma^2_\eta \sum_{i=0}^{m-t-1} \varphi^{2i} \sum_{i=0}^{t-\tau} \varphi^{2i}}{\sum_{i=0}^{m-\tau} \varphi^{2i}} \Bigg).
 \]
 
-}
 
-{\color{red} (HHH I find the notation confusing for the final recursive expressions. Maybe the problem is the use of $l = m - t$. Consider leaving it as $m - t$. Also, I was expecting you to use a forward recursion as described on page 4, then a backward recursion. Maybe you don't need to!)}
+
+
+}
 
 \begin{thebibliography}{}
 

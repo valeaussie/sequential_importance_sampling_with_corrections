@@ -177,7 +177,7 @@ and
 \[
 q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)}) = q(\vec{y}^{(t)} | \vec{Z}^{(t-1)})
 \]
-therefore the normalised weights $w_t$ will be:
+therefore the normalised weights $w^{(t)_j}$ will be:
 
 \begin{align*}
 w^{(t)_j} & = \frac{q(\vec{y'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{y}^{(t)_j} | \vec{Z}^{(t-1)})}\Bigg( \sum_{j=1}^n  \frac{q(\vec{y'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{y}^{(t)_j} | \vec{Z}^{(t-1)})}\Bigg)^{-1} \\
@@ -192,7 +192,7 @@ For every particle $j$, the unnormalised weights at time $t$ for $b' \in \{0,1\}
 \[
 w^{(t)} = \frac{q(\vec{y'}^{(t)} | \vec{Z}^{(t-1)}) }{q(\vec{y}^{(t)} | \vec{Z}^{(t-1)})} = \frac{\bigg \{ \prod_{i=2}^{N}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x'_{i} - \varphi x'_{i-1})^{2} \bigg ] \bigg \} p(x'_{1}) \prod_{i=1}^{N} p^{b'_i} (1 - p)^{1-b'_{i}}  }{\bigg \{ \prod_{i=2}^{N}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x_{i} - \varphi x_{i-1})^{2} \bigg ] \bigg \} p(x_{1}) \prod_{i=1}^{N} p^{b_i} (1 - p)^{1-b_{i}} }
 \]
-and that we will have terms cancellations in the Gaussian term when both $z_{i-1} \neq 0$ and $z_{i} \neq 0$, while the Bernoulli term will cancel every time that $z_{i} \neq 0$. Also, we will consider that the first event is known a priori, so that $p(x'_1)=p(x_1)$, and those two terms will cancel out as well.
+and that we will have terms cancellations in the Gaussian term when both $z_{i-1} \neq 0$ and $z_{i} \neq 0$, while the Bernoulli term will cancel every time that $z_{i} \neq 0$. Also notice that $p(x'_1) = p(x_1)$, and those two terms will cancel out as well.
 
 
 
