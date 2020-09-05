@@ -76,7 +76,7 @@ with $\eps_{t} \stackrel{iid}{\sim} \mathcal{N}(0, \sigma^{2})$.
 Then
 
 \[
-(x_{t} | x_{t-1}) \sim \mathcal{N} (\varphi x_{t-1}, \sigma^{2}).
+x_{t} | x_{t-1} \sim \mathcal{N} (\varphi x_{t-1}, \sigma^{2}).
 \]
 This process is stationary provided that the initial distribution is
 
@@ -87,7 +87,7 @@ which is valid only if $|\varphi| < 1$.
 
 Suppose that at any time $t$, only some subset of the values $\vec {x}^{(t)} = (x_1, \dots, x_{t})$ have so far been observed. However, those that have been observed are known without error. We collect the values that have been observed at or before time $t$ to form a vector $\vec{z}^{(t)} = (z_1^{(t)}, \dots, z_{t}^{(t)})$, where for each $s \leq t$, $z_s^{(t)} = x_s$ if $x_s$ has been observed at or before time $t$ and $z_s^{(t)} = -$ otherwise. Thus the coordinates of $\vec{z}^{(t)}$ belong to an extension of the reals $\mathbb{R} \cup \{ - \}$.
 
-As time progresses, new observations become available. Thus some dashes in the vector $\vec{z}^{(t)}$ will be replaced by observations in the subsequent vector $\vec{z}^{(t+1)}$. However, the reverse does not occur: if we have $z_s^{(t)} = x_s$ for times $s$ and $t$ where $s \leq t$ then we must also have $z_s^{(t^{\prime})} = x_s$ at all subsequent times $t^{\prime} > t$.
+As time progresses, new observations become available. Thus some dashes in the vector $\vec{z}^{(t)}$ will be replaced by observations in the subsequent vector $\vec{z}^{(t+1)}$. However, the reverse does not occur: if we have $z_s^{(t)} = x_s$ for times $s$ and $t$ where $s \leq t$ then we must also have $z_s^{(t^{*})} = x_s$ at all subsequent times $t^{*} > t$.
 
 We will therefore define a lower triangular $t \times t$ matrix $\vec{Z}^{(t)}$ in which row $i$ is the vector $\vec{z}^{(i)}$.
 
@@ -98,7 +98,7 @@ Note $\vec{b}^{(t)}$ is fully determined by $\vec{z}^{(t)}$.
 
 We will model $b_j^{(i)}$, when $b_j^{(i-1)} = 0$ as Bernoulli with probability $\theta$:
 \[
-(b_j^{(i)} | b_j^{(i-1)} = 0) \sim Bernoulli(\theta).
+b_j^{(i)} | b_j^{(i-1)} = 0 \sim Bernoulli(\theta).
 \]
 
 
@@ -114,7 +114,7 @@ where
 r(\vec{z}^{(t)} | \vec{Z}^{(t-1)}) = \int q(\vec{x}^{(t)}, \vec{B}^{(t)}|\vec{Z}^{(t-1)}) \prod_{\{s \leq t: b_s^{(t)} = 0\}} \diff x_s^{(t)}.
 \]
 
-This follows from Bayes' Rule, but we omit the proof to keep the example simple. A proof provided below.
+This follows from Bayes' Rule, but we omit the proof to keep the example simple. A proof is provided below.
 
 
 
@@ -139,30 +139,33 @@ We take a sequential importance sampling approach, at each iteration using a col
 
 Consider a particle $(\vec{x}^{(t-1)},\vec{B}^{(t-1)})$ constructed at time point $t$, one of $n$ such particles. We generate a new value $x_t$ for this particle by drawing $p(x_t | x_{t-1})$. Similarly, we generate a new value $\vec{b}^{(t)}$ for this particle by drawing from $p(\vec{b}^{(t)} | \vec{b}^{(t-1)})$ (see equation $(1)$). However, the new vector of observations $\vec{z}^{(t)}$ is typically inconsistent with a particle $(\vec{x}^{(t)}, \vec{B}^{(t)})$ thus constructed, in two ways: first, the coordinates at which $\vec{b}^{(t)}$ contains a 0 may not correspond to the coordinates at which $\vec{z}^{(t)}$ contains a `-', and second, the observed values in $\vec{z}^{(t)}$ differ from the corresponding coordinates of $\vec{x}^{(t)}$. We must therefore correct $\vec{x}^{(t)}$ and $\vec{b}^{(t)}$ in light of the new observation $\vec{z}^{(t)}$. The simplest way to do this is to first replace $\vec{b}^{(t)}$ with the unique binary vector $\vec{b'}^{(t)}$ that is consistent with $\vec{z}^{(t)}$, and then replace the coordinates of $\vec{x}^{(t)}$ with the corresponding coordinates of $\vec{z}^{(t)}$ wherever $\vec{b'}^{(t)}$ has a `1', thus generating a corrected term $\vec{x'}^{(t)}$. The corrections thus made at time point $t$ will be carried forward into the particles used at all future times. Note that in this simple example the corrections are deterministic, that is, $\vec{x'}^{(t)}$ and $\vec{b'}^{(t)}$ are deterministic functions of $\vec{x}^{(t)}$ and $\vec{b}^{(t)}$. 
 
-At each iteration, in order to simulate via a two-step process in which we generate a sample and then correct in light of data, we propose to introduce an auxiliary variable into importance sampling. The auxiliary variable will be the yet to be corrected sample $(\vec{x}^{(t)}, \vec{B}^{(t)})$ at time $t$. We will use a projection map $\pi$ to relate the augmented space $\Omega_{\vec{Z}^{(t)}}$ containing the elements $(\vec{x'}^{(t)}, \vec{B'}^{(t)}, \vec{x}^{(t)}, \vec{B}^{(t)})$ to the corrected state space $\Omega'$ containing $(\vec{x'}^{(t)}, \vec{B'}^{(t)})$. Then, we apply importance sampling to be able to estimate the posterior distribution $p(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t)})$ or the expectation $E_{p}[f(\vec{x}^{(t)},\vec{B}^{(t)})]$  sampling from the known distribution $q$.
+At each iteration, in order to simulate via a two-step process in which we generate a sample and then correct in light of data, we propose to introduce an auxiliary variable into importance sampling. The auxiliary variable will be the yet to be corrected sample $(\vec{x}^{(t)}, \vec{B}^{(t)})$ at time $t$. We will use a projection map $\pi$ to relate the augmented space $\Omega_{\vec{Z}^{(t)}}$ {\color{red} (HHH Clarify the definition of $\Omega_{\vec{Z}^{(t)}}$ and explain why it has a subscript $\vec{Z}^{(t)}$)} containing the elements $(\vec{x'}^{(t)}, \vec{B'}^{(t)}, \vec{x}^{(t)}, \vec{B}^{(t)})$ to the corrected state space $\Omega'$ containing $(\vec{x'}^{(t)}, \vec{B'}^{(t)})$. Then, we apply importance sampling to be able to estimate the posterior distribution $p(\vec{x}^{(t)}, \vec{B}^{(t)} | \vec{Z}^{(t)})$ or the expectation $E_{p}[f(\vec{x}^{(t)},\vec{B}^{(t)})]$  sampling from the known distribution $q$.
 
-{\color{red} For simplicity, let us call $(\vec{x}^{(t)}, \vec{B}^{(t)}) = \vec{y}^{(t)}$ and $(\vec{x'}^{(t)}, \vec{B'}^{(t)}) = \vec{y'}^{(t)}$
+For simplicity, let us call $(\vec{x}^{(t)}, \vec{B}^{(t)}) = \vec{y}^{(t)}$ and $(\vec{x'}^{(t)}, \vec{B'}^{(t)}) = \vec{y'}^{(t)}$
 
 Our strategy is to define a probability $p^*$ on $\Omega_{\vec{z}^{(t)}}$ such that the marginal distribution of $p^*$ on $\Omega'$ is $p$, that is:
 
 \[
-p(\vec{y'}^{(t)} | \vec{Z}^{(t)}) = \int p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)})\; \diff \vec{y}^{(t)}
+p(\vec{y'}^{(t)} | \vec{Z}^{(t)}) = \int p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)})\; \diff \vec{y}^{(t)} \vec{y}^{(t)}
 \]
-By the the disintegration theorem there exist a family of measures $\{\nu_{y'}\}_{y' \in \Omega'}$ on $\Omega_{\vec{z}^{(t)}}$ such that for every measurable Borel function $g : \Omega_{\vec{z}^{(t)}} \rightarrow [0,\infty]$:
+By the the disintegration theorem there exist a family of measures $d\nu_{y'}(y)$ on $\Omega_{\vec{z}^{(t)}}$ such that for every measurable Borel function $g : \Omega_{\vec{z}^{(t)}} \rightarrow [0,\infty]$:
 
 \[
-\int_{\Omega_{\vec{z}^{(t)}}} g(\vec{y}', \vec{y})\diff (\vec{y'},\vec{y}) = \int_{\Omega'}\int_{\pi^{-1}} g(\vec{y}) \diff \vec{y} \diff \vec{\vec{y'}}
+\int_{\Omega_{\vec{z}^{(t)}}} g(\vec{y}', \vec{y})\diff (\vec{y'},\vec{y}) = \int_{\Omega'}\int_{\pi^{-1}(\vec{y'})} g(\vec{y}', \vec{y}) \diff \vec{y} \diff \vec{\vec{y'}}
 \]
+therefore
 
 \begin{align*}
-E_{p}[f(\vec{y'}^{(t)})]  & = \int_{\Omega'} f(\vec{y'}^{(t)})\; p(\vec{y'}^{(t)} | \vec{Z}^{(t)}) \diff \vec{y'}^{(t)} = \int_{\Omega'} f(\vec{y'}^{(t)})\Bigg[\int_{\pi^{-1}} p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)}) \diff \vec{y}^{(t)}\Bigg] \diff \vec{y'}^{(t)} \\ & = \int_{\Omega_{\vec{Z}^{(t)}}} f(\pi(\vec{y'}^{(t)}, \vec{y}^{(t)}))\; p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)}) \diff (\vec{y'}^{(t)},\vec{y}^{(t)}) = E_{p^*}[f(\pi (\vec{y'}^{(t)}, \vec{y}^{(t)}))].
+E_{p}[f(\vec{y'}^{(t)})]  & = \int_{\Omega'} f(\vec{y'}^{(t)})\; p(\vec{y'}^{(t)} | \vec{Z}^{(t)}) \diff \vec{y'}^{(t)} = \int_{\Omega'} f(\vec{y'}^{(t)})\Bigg[\int_{\pi^{-1}(\vec{y'})} p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)}) \diff \vec{y}^{(t)}\Bigg] \diff \vec{y'}^{(t)} \\ 
+& = \int_{\Omega_{\vec{Z}^{(t)}}} f(\pi(\vec{y'}^{(t)}, \vec{y}^{(t)}))\; p^*(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t)}) \diff (\vec{y'}^{(t)},\vec{y}^{(t)}) = E_{p^*}[f(\pi (\vec{y'}^{(t)}, \vec{y}^{(t)}))].
 \end{align*}
 Using importance sampling
 
 \begin{align*}
 E_{p^*}[f(\pi (\vec{y'}^{(t)}, \vec{y}^{(t)})] & = \int_{\Omega_{\vec{Z}^{(t)}}} f(\pi(\vec{y'}^{(t)},  \vec{y}^{(t)})) \; \frac{p^*(\vec{y'}^{(t)}, \vec{y}^{(t)}|\vec{Z}^{(t)})}{q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)})} q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)})\; \diff \vec{y}^{(t)} \\ &\approx \sum_{j=1}^n  w^{(t)_j}f(\pi (\vec{y'}^{(t)_j}, \vec{y}^{(t)_j}))
 \end{align*}
-Where the weights $w^{(t)_j}$ are:
+{\color{blue} (HHH Should the particle index $j$ be a subscript on $\vec{y}$ instead of $(t)$?)}
+where the weights $w^{(t)_j}$ are:
 
 \[
 w^{(t)_j} = \frac{p^*(\vec{y'}^{(t)_j}, \vec{y}^{(t)_j} | \vec{Z}^{(t)})} {q(\vec{y'}^{(t)_j}, \vec{y}^{(t)_j}|\vec{Z}^{(t-1)})}
@@ -180,19 +183,20 @@ q(\vec{y'}^{(t)}, \vec{y}^{(t)} | \vec{Z}^{(t-1)}) = q(\vec{y}^{(t)} | \vec{Z}^{
 therefore the normalised weights $w^{(t)_j}$ will be:
 
 \begin{align*}
-w^{(t)_j} & = \frac{q(\vec{y'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{y}^{(t)_j} | \vec{Z}^{(t-1)})}\Bigg( \sum_{j=1}^n  \frac{q(\vec{y'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{y}^{(t)_j} | \vec{Z}^{(t-1)})}\Bigg)^{-1} \\
+W^{(t)_j} & = \frac{q(\vec{y'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{y}^{(t)_j} | \vec{Z}^{(t-1)})}\Bigg( \sum_{j=1}^n  \frac{q(\vec{y'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{y}^{(t)_j} | \vec{Z}^{(t-1)})}\Bigg)^{-1} \\
 & = \frac{q(\vec{x'}^{(t)_j}, \vec{B'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{x}^{(t)_j}, \vec{B}^{(t)_j} | \vec{Z}^{(t-1)})}\Bigg( \sum_{j=1}^n \frac{q(\vec{x'}^{(t)_j}, \vec{B'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{x}^{(t)_j}, \vec{B}^{(t)_j} | \vec{Z}^{(t-1)})}\Bigg)^{-1}
 \end{align*}
 since the constant $r$ of $q(\vec{x}^{(t-1)_j},\vec{B}^{(t-1)_j} | \vec{Z}^{(t-1)})$ cancels out after normalisation.
 
 Notice that since we are correcting every previous event at every iteration, the weights for the previous times too will need to be recalculated at every iteration and that we cannot multiply the weights for the last iteration by the weights calculated at the previous time as we normally do in Sequential Importance Sampling. However, we will now show that there will be many cancellations in the calculation of the weights, making the process manageable and not computationally expensive.
 
-For every particle $j$, the unnormalised weights at time $t$ for $b' \in \{0,1\}$ and $b \in \{0,1\}$ are calculated with the following formula
+For every particle $j$, the unnormalised weights at time $t$ for $b' \in \{0,1\}$ and $b \in \{0,1\}$ are calculated as follows:
 
 \[
-w^{(t)} = \frac{q(\vec{y'}^{(t)} | \vec{Z}^{(t-1)}) }{q(\vec{y}^{(t)} | \vec{Z}^{(t-1)})} = \frac{\bigg \{ \prod_{i=2}^{N}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x'_{i} - \varphi x'_{i-1})^{2} \bigg ] \bigg \} p(x'_{1}) \prod_{i=1}^{N} p^{b'_i} (1 - p)^{1-b'_{i}}  }{\bigg \{ \prod_{i=2}^{N}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x_{i} - \varphi x_{i-1})^{2} \bigg ] \bigg \} p(x_{1}) \prod_{i=1}^{N} p^{b_i} (1 - p)^{1-b_{i}} }
+w^{(t)_j} = \frac{q(\vec{y'}^{(t)} | \vec{Z}^{(t-1)}) }{q(\vec{y}^{(t)} | \vec{Z}^{(t-1)})} = \frac{\bigg \{ \prod_{i=2}^{t}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x'_{i} - \varphi x'_{i-1})^{2} \bigg ] \bigg \} p(x'_{1}) \prod_{i=1}^{t} \theta^{b'_i} (1 - \theta)^{1-b'_{i}}  }{\bigg \{ \prod_{i=2}^{t}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x_{i} - \varphi x_{i-1})^{2} \bigg ] \bigg \} p(x_{1}) \prod_{i=1}^{t} \theta^{b_i} (1 - \theta)^{1-b_{i}} }
 \]
-and that we will have terms cancellations in the Gaussian term when both $z_{i-1} \neq 0$ and $z_{i} \neq 0$, while the Bernoulli term will cancel every time that $z_{i} \neq 0$. Also notice that $p(x'_1) = p(x_1)$, and those two terms will cancel out as well.
+where the normalisation constants will cancel out.
+Notice that we will have terms cancellations in the Gaussian term when both $z_{i-1} \neq 0$ and $z_{i} \neq 0$, while the Bernoulli term will cancel every time that $z_{i} \neq 0$. Also notice that $p(x'_1) = p(x_1)$, and those two terms will cancel out as well.
 
 
 
@@ -272,8 +276,6 @@ This new terms will be introduced in the calculation of the weights:
 w^{(t)} = \frac{q(\vec{x'}^{(t)_j}, \vec{B'}^{(t)_j} | \vec{Z}^{(t-1)}) }{q(\vec{x}^{(t)_j}, \vec{B}^{(t)_j} | \vec{Z}^{(t-1)}) H(\vec{x}^{(t)_j}|\vec{x'}^{(t)_j}) }
 \]
 
-}
-
 \section{derivation of the posterior for a partially observed state}
 
 \begin{proof}
@@ -283,7 +285,7 @@ by conditional probability we have
 \[
 p(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t)}) = \frac{p(\vec{x}^{(t)},\vec{B}^{(t)}, \vec{Z}^{(t)})}{p(\vec{Z}^{(t)})} = \frac{p(\vec{x}^{(t)},\vec{B}^{(t)}, \vec{z}^{(t)}, \vec{Z}^{(t-1)})}{p(\vec{z}^{(t)},\vec{Z}^{(t-1)})}
 \]
-the numerator of this equation will be
+the numerator of this equation can be written as follows:
 
 \begin{multline*}
 p(\vec{x}^{(t)},\vec{B}^{(t)}, \vec{z}^{(t)}, \vec{Z}^{(t-1)}) = p(\vec{z}^{(t)}, \vec{Z}^{(t-1)} | \vec{x}^{(t)},\vec{B}^{(t)})p(\vec{x}^{(t)},\vec{B}^{(t)}) = \\ p(\vec{z}^{(t)} | \vec{x}^{(t)},\vec{B}^{(t)}) p(\vec{Z}^{(t-1)} | \vec{x}^{(t)},\vec{B}^{(t)})p(\vec{x}^{(t)},\vec{B}^{(t)}) = p(\vec{z}^{(t)} | \vec{x}^{(t)},\vec{B}^{(t)}) p(\vec{Z}^{(t-1)}, \vec{x}^{(t)} , \vec{B}^{(t)})
@@ -298,12 +300,12 @@ so the posterior can be written
 \begin{multline*}
 p(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t)}) = \frac{p(\vec{z}^{(t)} | \vec{x}^{(t)},\vec{B}^{(t)}) p(\vec{Z}^{(t-1)}, \vec{x}^{(t)} , \vec{B}^{(t)})}{p(\vec{z}^{(t)} | \vec{Z}^{(t-1)}) p(\vec{Z}^{(t-1)}) } = \frac{p(\vec{z}^{(t)} | \vec{x}^{(t)},\vec{B}^{(t)}) p(\vec{x}^{(t)} , \vec{B}^{(t)} | \vec{Z}^{(t-1)})}{p(\vec{z}^{(t)} | \vec{Z}^{(t-1)})}
 \end{multline*}
-Since the observations at time $t$ are made without error and each $z^{(t)}_s = x_s$ for $s = 1 \dots t$ we have
+Since the observations at time $t$ are made without error and $\vec{z}^{(t)}$ is completely determined by $\vec{x}^{(t)}$ and $\vec{B}^{(t)}$ we have
 
 \[
 p(\vec{z}^{(t)} | \vec{x}^{(t)}, \vec{B}^{(t)}) = 1
 \]
-and the posterior becomes
+The posterior then becomes
 
 \[
 p(\vec{x}^{(t)},\vec{B}^{(t)} | \vec{Z}^{(t)}) = \frac{q(\vec{x}^{(t)} , \vec{B}^{(t)} | \vec{Z}^{(t-1)})}{r(\vec{z}^{(t)} | \vec{Z}^{(t-1)})}

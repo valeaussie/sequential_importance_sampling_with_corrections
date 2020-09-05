@@ -1,0 +1,97 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}  
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+
+ \textwidth=16cm \hoffset = -1.9cm
+ \lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\s}{\mathbb{S}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathscr{D}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+
+\begin{document}
+
+\section{Sequential Importance Sampling}
+
+
+
+\section{Bayesian inference in a partially observed space}
+
+Our system is in a state that can be observed without error, but where only part of the state can be observed. The state space is a topological measure space $(\Omega, \F, \lambda)$ on which a prior probability measure $\Q$ having density $q(x)$ relative to a Borel measure $\lambda$ has been defined. The partial observations are made in a second topological measure space $(\Omega', \F', \lambda')$ such that there is a measurable function $\sigma : \Omega \xrightarrow{} \Omega'$ with $\lambda' = \lambda \circ \sigma^{-1}$. Thus $\sigma$ projects $\Omega$ onto $\Omega'$ \textcolor{red}{$(\sigma(\sigma(x)) = \sigma(z) = z = \sigma(x)$)}, and only the projection is observed. A partial observation $z \in \Omega'$ fixes the value $\sigma(x) = z$, or equivalently, it consists of information that the system is in some state $x \in \sigma^{-1}(z)$.
+
+This scenario is more general than at first appears. A more common circumstance in Bayesian inference is that a state $x \in \Omega$ determines a conditional probability measure $\P(\cdot |x)$ over the observation space $\Omega'$, rather than a specific element $\sigma(x)$. however, \textcolor{red}{for the general space where the observations that are made with error}, we may define an augmented state space $\Omega^\ast= \Omega \times \Omega'$ and then define a projection $\sigma: \Omega^\ast \xrightarrow{}\Omega'$ and then define a projection $\sigma(x, z) = z$. Thus the partially observed framework subsumes the more common circumstance as a special case.
+
+We want to determine the posterior distribution for the state of the system $x$ in light of the observation $z$. \textcolor{red}{To do so we make use of the disintegration theorem, this needs to be proved rigorously and the citations added}
+
+Then the posterior distribution of $x$ in light of the partial observations $z$ has density with respect to $/mu_z$ given by 
+\[
+    p(x|z) \propto = \begin{cases} q(x) & x \in \sigma^{-1}(z) \\ 0 &\mbox{otherwise} \end{cases}
+\]
+with constant of proportionality $r(z)^{-1}$ where
+\[
+    r(z) = \int_{\sigma^{-1}(z)} q(x)d\mu_z(x).
+\]
+Note that $r(z)$ is the density of the pushforward measure $\Q \circ \sigma^{-1}$ with respect to $\lambda'$
+
+\textcolor{red}{why is this important? Is this important to note?}
+
+\section{Bayesian inference in a partially observed space}
+
+
+
+
+\textcolor{red}{do we want to prove that this method is unbiased}
+
+
+\end{document}

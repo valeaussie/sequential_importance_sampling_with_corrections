@@ -1,0 +1,84 @@
+\chapter[Example chapter]{Example chapter}
+%\chaptermark{Example chapter} I actually don't know what this does but Darcy had it
+\label{ch:examplechapter}
+%---------------------------------------------You can put a quote here if you would like
+%%-------------------Quote
+%\hfill\begin{tabular}{r}\toprule
+%            {\it I'm tired} \\
+%            -- Me\\
+%\bottomrule\end{tabular}\vskip25pt
+%-------------------------------------------------------------------------------Example chapter---------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\textcolor{blue}{This is an example chapter. It is a short excerpt of the `background results' section of my introduction chapter.\footnote{Yes the definitions of weak and strong solution are wordy. Welcome to stochastic calculus.} You do not\footnote{and probably should not, as this is heavily dependent on your area!} need to structure your introduction chapter like this. The purpose of this chapter is to show the reader how to write the corresponding syntax in LaTeX. In particular, the associated TeX file for this chapter (ch1.tex) contains syntax for creating section and theorem environments, as well as internally referencing them through the package cleveref. There are also examples on how to cite your references by utilising BibTeX and the package natbib.}
+%-----------------------------------------------------------------------Elements of the general theory-------------------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\section{Elements of the general theory}
+\label{sec:elementsgeneraltheory}
+In this section, we present some well known results from the general theory of stochastic calculus. The purpose of this section is to list results that are pertinent to the rest of this thesis. We make no claims that this is an exhaustive nor comprehensive treatment of either of these subjects. As these are standard theorems from the literature, we do not present the proofs. However, we do provide references to the sources of the original proofs, alongside others. In addition, we refer the reader to the works of \citet{klebaner}, \citet{shreve2004stochastic}, \citet{rogers2000diffusions} and \citet{cherny2005singular} for a comprehensive treatment on these topics. 
+%-----------------------------------------------------------------------------Stochastic calculus---------------------------------------------------------------------------------------
+\subsection{Stochastic calculus} 
+\label{sec:stochasticcalculus}
+Let $(\Omega, \FF, (\FF_t)_{0 \leq t \leq T}, \Pro)$ be a filtered probability space. In the following, consider the one-dimensional SDE
+\begin{align}
+	\dd X_t = \mu(t, X_t) \dd t + \sigma(t, X_t) \dd B_t, \quad X_0 = x_0, \label{SDEgeneraltheory}
+\end{align}
+where $\mu,\sigma: [0, T] \times \reals \to \reals$ are both measurable and $B$ is a $((\FF_t)_{0 \leq t \leq T}, \Pro)$ Brownian motion. Many of the following definitions and results hold for multidimensional SDEs. However, we will only require results concerning one-dimensional SDEs in this thesis.
+%-------Defn: Weak solution
+\begin{definition}[Weak solution]
+\label{def:weaksolution}
+A weak solution to \cref{SDEgeneraltheory} is a pair of processes $(\tilde X, \tilde B)$ on a filtered probability space $(\tilde \Omega, \tilde \FF, (\tilde \FF_t)_{0 \leq t \leq T}, \tilde \Pro)$ where $\tilde B$ is a $((\tilde \FF_t)_{0 \leq t \leq T}, \tilde \Pro)$ Brownian motion  and $\tilde X$ is adapted to $(\tilde \FF_t)_{0 \leq t \leq T}$ such that
+\begin{align*}
+	\tilde X_t = x_0 + \int_0^t \mu(u, \tilde X_u) \dd u + \int_0^t  \sigma(u, \tilde X_u) \dd \tilde B_u.
+\end{align*}
+\end{definition}
+%-------Defn: Strong solution
+\begin{definition}[Strong solution]
+\label{def:strongsolution}
+A strong solution to \cref{SDEgeneraltheory} is a pair of processes $(X,  B)$ on $( \Omega, \FF, ( \FF_t)_{0 \leq t \leq T}, \Pro)$ where $X$ is adapted to $(\FF_t)_{0 \leq t \leq T}$ such that
+\begin{align*}
+	X_t = x_0 + \int_0^t \mu(u, X_u) \dd u + \int_0^t  \sigma(u, X_u) \dd B_u.
+\end{align*}
+\end{definition}
+%-------Remark: Solution means weak or strong
+\begin{remark}
+A solution to \cref{SDEgeneraltheory} can refer to either a weak or strong solution.
+\end{remark}
+%-------Defn: Uniqueness in law
+\begin{definition}[Solution unique in law]
+\label{def:uniqueinlaw}
+Suppose $(X^{(1)}, B^{(1)})$ and $(X^{(2)}, B^{(2)})$ are solutions to \cref{SDEgeneraltheory}. Then the two solutions are unique in law if the finite dimensional distributions of $X^{(1)}$ and $X^{(2)}$ agree.
+\end{definition}
+%-------Defn: Pathwise uniqueness defn
+\begin{definition}[Pathwise unique solution]
+\label{def:pathwiseunique}
+Suppose $(X^{(1)}, B^{(1)})$ and $(X^{(2)}, B^{(2)})$ are solutions to \cref{SDEgeneraltheory} on the same filtered probability space $(\tilde \Omega, \tilde \FF, (\tilde \FF_t)_{0 \leq t \leq T}, \tilde \Pro)$. Then the two solutions are pathwise unique if
+\begin{align*}
+	\tilde \Pro( X^{(1)}_t = X^{(2)}_t, \forall t \in[0,T] ) = 1.
+\end{align*}
+\end{definition}
+%-------Thm: Pathwise uniqueness of SDE
+\begin{theorem}
+\label{thm:pathwiseunique}
+Suppose there exists a solution to \cref{SDEgeneraltheory}. Then the solution is pathwise unique if the following both hold:
+\begin{enumerate}
+\item $|\mu(t,x) - \mu(t,y) | \leq \kappa(|x-y|)$ uniformly in $t$, where $\kappa: \reals_+ \to \reals_+$ is convex, strictly increasing and satisfies $\int_0^{\vep} \left (\kappa(u) \right )^{-1} \dd u = \infty$ for some $\vep >0$.
+\item $|\sigma(t,x) - \sigma(t,y) | \leq \rho(|x-y|)$ uniformly in $t$, where $\rho: \reals_+ \to \reals_+$ is strictly increasing and satisfies $ \int_0^{\vep}  \left (\rho(u) \right )^{-2} \dd u = \infty$ for some $\vep>0$.
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+See \citet{yamada1971uniqueness}.
+\end{proof}
+%-------Cor: Pathwise uniqueness of SDE
+\begin{corollary}
+\label{cor:pathwiseunique}
+Suppose there exists a solution to \cref{SDEgeneraltheory}. Then the solution is pathwise unique if the following both hold:
+\begin{enumerate}
+\item $\mu$ is Lipschitz continuous in $x$, uniformly in $t$.
+\item $\sigma$ is H\"older continuous in $x$ of order $\geq 1/2$, uniformly in $t$.
+\end{enumerate}
+\end{corollary}
+\begin{proof}
+This is just a direct consequence of \Cref{thm:pathwiseunique} with $\kappa(u) = u$ and $\rho(u) = u^{\alpha}$ for $\alpha \geq 1/2$. 
+\end{proof}
+

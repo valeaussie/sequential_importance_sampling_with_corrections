@@ -1,0 +1,363 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{enumitem}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+
+ \textwidth=16cm \hoffset = -1.9cm
+ \lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\s}{\mathbb{S}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\Q}{\mathsf{Q}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathscr{D}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator*{\esssup}{ess~sup}
+\DeclareMathOperator*{\essinf}{ess~inf}
+\DeclareMathOperator*{\diam}{diam}
+\DeclareMathOperator*{\ROC}{ROC}
+\DeclareMathOperator*{\sinc}{sinc}
+\DeclareMathOperator*{\sign}{sign}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\newcommand{\K}{\mathbb{K}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}{Definition}[section]
+
+
+\title{Hawkes Processes}
+
+\begin{document}
+
+\section{The Hawkes Process ans the spatio-temporal self-exciting point process}
+
+Hawkes models were first introduced by Hawkes in 1971 \cite{Hawkes71} and have been since applied to a variety of fields like economic sciences, natural sciences, social sciences and more. These models are well suited to events that would cluster, like for example the aftershocks following earthquakes \cite{Ogata88}, \cite{Mohler}
+
+An Hawkes process is a counting process modelling a sequence of events over time. Each of these events will "excite" the process, meaning that the likelihood of a new event is increased for some time after the first arrival.
+
+We will first consider the one dimensional case.
+Let us first define a counting process as a stochastic process which represents the cumulative count of the number of events in the time interval $[0, t]$. More formally
+
+\begin{definition}
+    A \textbf{counting process} is a stochastic process $(N(t) : t \geq 0)$ such that:
+    \begin{enumerate}[label=(\roman*)]
+        \item $N(t)$ is integer valued.
+        \item If $s<t$, then $N(s) \leq N(t)$.
+    \end{enumerate}
+\end{definition}
+
+This can be also viewed as a simple point process characterised by the sequence of random arrivals times $\vec{T} = \{ t_1, t_2 \dots \}$ at which the counting process has jumped. More formally (definition adapted from Jacobsen \cite{Jacobsen} chapter 2.1)
+
+\begin{definition}
+    A \textbf{simple point process} is a sequence of random variables $\vec{T} = \{ t_1, t_2 \dots \}$ defined on the probability space $(\Omega, \mathcal{F}, \mathbb{P})$ and with values in $\mathbb{R}_{>0} \cup \infty$ such that:
+    \begin{enumerate}[label=(\roman*)]
+        \item $\mathbb{P}(0 < t_0 \leq t_1 \leq \dots) = 1$.
+        \item $\mathbb{P}(t_n < t_{n+1}, t_n < \infty) = \mathbb{P}(t_n < \infty)$ for $n \geq 0$.
+        \item The number of random variables in a bounded region is finite almost surely (a.s.).
+    \end{enumerate}
+\end{definition}
+
+Hence a simple point process is an almost surely increasing sequence of strictly positive, possibly infinite random variables, strictly increasing as long as they are finite and such that only finitely many events can occur in any finite time interval. Notice that no points coincide as they are strictly ordered in time.
+The interpretation of a finite $t_n$ is the timepoint at which the $n$th recording of an event takes place with less than $n$ events occurring all together on the time axis $\mathbb{R}_{>0} \cup \infty$ if $t_n = \infty$. Notice that by definition no event can happen at time $0$.
+
+See Daley and Vere-Jones chapter 3 for a complete explanation on how Point processes on the line can be described. \cite{Daley}.
+
+We can characterise a point process defining the cumulative distribution function of the next arrival time conditioned on the past events $\mathcal{H}_u$
+
+\begin{equation} \label{eq:CumDistPointProc}
+    F(t|\mathcal{H}_u) = \int_u^t \mathbb{P}(t_{n+1} \in [s+\d s] | \mathcal{H}_u) \d s = \int_u^t f(s | \mathcal{H}_u) \d s
+\end{equation}
+were $f(s | \mathcal{H}_u)$ is the probability density function.
+
+By the chain rule the joint density for a realisation $\{ t_1, \dots, t_k\}$ will therefore be
+
+\begin{equation}\label{eq:JointDensHawkes}
+    p(t_1, \dots, t_k) = \prod_{i=1}^k f(t_i | \mathcal{H}_{t_{i-1}}).
+\end{equation}
+A point process is completely defined if the joint probability distributions are known for the number of events in all finite families of disjoint intervals (see Daley and Vere-Jones chapter 5 and 9 \cite{Daley}).
+
+If a point process has a probability distribution function $f(t)$ that is independent of the history $\mathcal{H}_t$ we call this process a \textit{renewal process}. Another way to state this is that $f(t) = g(t - t_k)$ for some p.d.f. $g : \mathbb{R}^+ \rightarrow \mathbb{R}^+$. This way the interarrival times are independent and identically distributed (i.i.d) random variables.
+
+An example of renewal process is the \textit{homogeneous Poisson Process}
+
+\begin{definition}\label{def:HomPoi}
+    Consider a counting process $(N(t):t \geq 0)$ over the half-open interval $(a_i, b_i]$ with $a_i < b_i \leq a_{i+1}$, then a \textit{stationary or homogeneous Poisson Process} on the line is completely defined by
+    \begin{equation}\label{001}
+        \mathbb{P}(\{N(a_i, b_i] = n, i = 1, \dots, k \}) = \prod_{i=1}^k \frac{[\lambda(b_i - a_i)]^{n_i}}{n_i!}e^{-\lambda(b_i-a_i)}.
+    \end{equation}
+\end{definition}
+    
+Therefore for an homogeneous Poisson process the number of points in each finite interval $(a_i, b_i]$ has a Poisson distribution. Also, the number of points in disjoint intervals are independent random variables and the distributions are stationary, meaning that they depend only on the lengths of the intervals $b_i - a_i$.
+
+The likelihood of a finite Poisson Process is the probability of obtaining the given number of observations $N$ in the observation period $(0,T]$, times the joint conditional density for the locations of those observations $t_1, \dots, t_N$, given their number. From equation (\ref{001}) we see that the probability of obtaining one event in $(t_i - \Delta, t_i]$ and no points in the remaining parts of $(0, T]$ is
+
+\begin{equation*}
+    e^{-\lambda T} \prod_{i=1}^N \lambda \Delta.
+\end{equation*}
+Dividing by $\Delta^N$ and letting $\Delta \rightarrow 0$ we obtain the density and therefore find the likelihood
+
+\begin{equation*}
+    L_{(0, T]}(N;t_1, \dots, t_N) = \lambda^N e^{-\lambda T}.
+\end{equation*}
+A Poisson process with time-varying rate $\lambda(t)$ is called \textit{inhomogeneous} Poisson process and can be defined the same way as the homogeneous Poisson process in Definition \ref{def:HomPoi} with the quantities $\lambda(b_i - a_i) = \int_{a_i}^{b_i} \lambda \d x$ replaced by
+
+\begin{equation*}
+    \Lambda(a_i, b_i] = \int_{a_i}^{b_i} \lambda(x) \d x.
+\end{equation*}
+The likelihood of a inhomogeneous Poisson process will then be
+
+\begin{equation} \label{eq:LikInhPoiPro}
+    L_{(0, T]}(N;t_1, \dots, t_N) = e^{-\Lambda(0, T]}\prod_{i=1}^N \lambda(t_i)
+\end{equation}
+and since $N$ is a counting process
+
+\begin{equation*}
+    e^{-\Lambda(0, T]}\prod_{i=1}^N \lambda(t_i) = \exp \Bigg( - \int_0^T \lambda(t)\d t + \int_0^T \log \lambda(t) N (\d t) \Bigg).
+\end{equation*}
+Let us consider now  a time change $t \rightarrow u(t) \equiv \Lambda(0, t]$. For all $t \geq 0$ we write $N(t) = N (0, t]$ and define a new point process by $\tilde{N}(t) = N(u^{-1}(t))$. It follows that this new process has a rate quantity $\tilde{\Lambda}(0, t) = u(u^{-1}(t)) = t$ and is therefore a stationary Poisson process with $\lambda = 1$.
+
+We will show that any point process that stratifies a continuity condition can be transformed into a Poisson  process. 
+
+Let us now define the self-exciting Hawkes model which was introduced by Hawkes in 1971 \cite{Hawkes71}. This model combines a cluster process representation and a simple conditional intensity representation which is moreover linear.
+
+\begin{definition}\label{def:Hawkes}
+    Let us consider a point process $N(t)$ such that
+    \begin{enumerate}[label=(\roman*)]
+        \item $\mathbb{P}(\{ N(t+h) - N(t) = 1 \} | \mathcal{H}_t) = \lambda(t)h + o(h)$
+        \item $\mathbb{P}(\{ N(t+h) - N(t) > 1 \} | \mathcal{H}_t) = o(h)$
+    \end{enumerate}
+    If the quantity $\lambda(t)$ can be written as
+    \begin{equation*}
+        \lambda(t | \mathcal{H}_t) = \mu + \int_{0}^t g(t - u) \d N(u)
+    \end{equation*}
+    for some $\mu \in \mathbb{R^+}$ and $g : \mathbb{R^+} \rightarrow \mathbb{R^+} \cup \{0\}$ then this process is a \textbf{Hawkes process}.
+\end{definition}
+The quantity $\mu$ is called \textit{background intensity} and the function $g$ is called \textit{excitation function}. The quantity $\lambda(t | \mathcal{H}_t)$ representing the rate of events at time $t$ is called \textit{conditional intensity} and can be written as
+
+\begin{equation*}
+    \lambda(t|\mathcal{H}_t) = \mu + \sum_{t_i < t} g(t - t_i)
+\end{equation*}
+where $\{ t_1, \dots, t_k\}$ represents the observed sequence of past events up to time $t$.
+
+The process is called ``self-exciting" because of the dependence of the conditional intensity function on the past history $\mathcal{H}_t$ of the system allowing events to trigger new events. The triggering function $g$ can take many forms, so the process may depend only on the recent history if $g$ decays rapidly or may have longer term effects \cite{Reinhart}. However, we generally require that $\lambda(t | \mathcal{H}_t)  \geq 0$, therefore we must have $g(t) \geq 0$ for every value of $t$ and $g(t) = 0$ for $t < 0$.
+
+{\color{red} define when this process is stationary.}
+
+The general definition for the conditional intensity $\lambda$ for any point process is
+
+\begin{equation*}
+    \lambda(t | \mathcal{H}_t) = \lim_{h \to 0} \frac{\mathbb{E}[N(t+h) - N(t) | \mathcal{H}_t]}{h}
+\end{equation*}
+so it represents the mean number of events in a region conditional on the past.
+Let us rewrite this last equation as \cite{Rasmussen}
+
+\begin{equation*}
+    \lambda(t | \mathcal{H}_t) \d t = \mathbb{E}[N(\d t) | \mathcal{H}_t]
+\end{equation*}
+were $\d t$ is an infinitesimal interval around $t$.
+The intensity function will therefore be:
+
+\begin{align*}
+    \mathbb{E}[N(\d t) | \mathcal{H}_t] &= \mathbb{P}(\textrm{point in} \d t | \mathcal{H}_t) \\
+    & = \mathbb{P}(\textrm{point in} \d t | \textrm{point not before } t, \mathcal{H}_t) \\
+    & = \frac{\mathbb{P}(\textrm{point in} \d t, \textrm{point not before } t | \mathcal{H}_t)}{\mathbb{P}(\textrm{point not before } t | \mathcal{H}_t))} \\
+    & = \frac{\mathbb{P}(\textrm{point in} \d t | \mathcal{H}_t)}{\mathbb{P}(\textrm{point not before } t | \mathcal{H}_t))} \\
+    & = \frac{f(t) \d t}{1 - F(t)}
+\end{align*}
+Where the quantities $f(t)$ and $F(t)$ where defined in equation (\ref{eq:CumDistPointProc}). So the intensity function can be written
+\begin{equation}\label{eq:IntFun}
+    \lambda(t) = \frac{f(t) \d t}{1 - F(t)}.
+\end{equation}
+For ease of notation here and from now on we are omitting the conditioning over the past events $\mathcal{H}_t$.
+
+It has been proved by Hawkes and Oakes \cite{Hawkes74} that any stationary self-exciting point process with finite intensity function can be interpreted as a Poisson cluster process. Then events are partitioned into two disjoint processes: a background process for the cluster centers which is a Poisson process with rate $\mu$, and separate offspring process of the events triggered inside each cluster, whose intensities are determined by $g$. Each triggered event may then trigger new events. The number of offspring of each event is drawn from a Poisson distribution with mean 
+
+\begin{equation*}
+    m = \int_0^\infty g(t) \d t.
+\end{equation*}
+
+So far we have considered only the temporal form of the self-exciting point processes but we can extend this models to spatio-temporal processes. The definition will be analogous to Definition \ref{def:Hawkes} with conditional intensity
+
+\begin{equation*}
+    \lambda(s, t) = \mu(s) + \sum_{i:t_i<t} g(s - s_i, t - t_i),
+\end{equation*}
+where $\{ s_1, \dots, s_n \}$ are the observed locations of events and $\{t_1, \dots t_n \}$ the observed times of events. 
+
+Similarly to the Hawkes' self-exciting temporal processes, the self-exciting spatio-temporal point processes can be treated as Poisson cluster processes with the locations of events $s \in X \subseteq \mathbb{R}^d$ and times $t \in (0, T]$. The mean number of offspring will be
+
+\begin{equation*}
+    m = \int_X \int_0^T g(s, t) \d t \d s.
+\end{equation*}
+So far we have considered the points of a point process as indistinguishable other then by their time and location. Often, however, we need to take in consideration other quantities. For example, one may wish to analyse locations and time of observations of an invasive species plant alongside the age of the organism. Such process may be viewed as a \textit{marked} point process. A marked point process is a point process of events $\{ (s_i, t_i, k_i ) \}$ where  $s_i \in X \subseteq \mathbb{R^d}$, $t_i \in [0, T)$ and $k_i \in \mathcal{K}$ where $K$ is the \textit{marked space} (in our example the space of plants ages).
+
+The \textit{ground process} of a marked point process is the point process of events locations and times without the marks with conditional intensity $\lambda_g(s, t)$. The conditional intensity for the marked point process can be written as
+
+\begin{equation*}
+    \lambda(s, t, k) = \lambda_g(s, t)f(k | s, t),
+\end{equation*}
+where $f(k | s, t)$ is the conditional density of the mark at time $t$ and location $s$ given the history of the process up to time $t$.
+
+\section{The likelihood of a self-exciting point process}
+
+We obtain the Likelihood for a Hawkes process from the following theorem {\color{missing a little introduction parhaps?}}
+
+\begin{theorem}
+    Let $N(\cdot)$ be a regular point process on [0, T] for some positive T, and let $\{ t_1, \dots, t_k \}$ denote the realisation of $N(\cdot)$ over [0, T]. Then, the likelihood $L$ of $N(\cdot)$ is expressible in the form
+    \begin{equation*}
+        L = \Bigg [ \prod_{i=1}^k \lambda(t_i) \Bigg] exp \Bigg( - \int_0^T \lambda(u) \d u \Bigg).
+    \end{equation*}
+\end{theorem}
+
+\begin{proof}
+    From equation \ref{eq:JointDensHawkes} the joint density function is
+    
+    \begin{equation*}
+        L = p(t_1, \dots, t_k) = \prod_{i = 1}^k f(t_i).
+    \end{equation*}
+    From equation (\ref{eq:IntFun}) we have
+    
+    \begin{equation*}
+        \lambda(t) = \frac{f(t)}{1 - F(t)} = \frac{\frac{\mathrm{d} F(t)}{\mathrm{d} t}}{1 - F(t)} = - \frac{\mathrm{d}}{\mathrm{d} t} \log(1 - F(t))
+    \end{equation*}
+    therefore integrating both sides over the interval $(t_k, t)$ we have
+    
+    \begin{equation*}
+        \int_{t_k}^t \lambda (u) \d u = - [\log(1 - F(t)) - \log(1 - F(t_k))].
+    \end{equation*}
+    Since the Hawkes process is a simple process multiple arrivals cannot occur and $F(t_k) = 0$ as the probability that point $t_{k+1}$ falls on top of $t_k$ is zero, therefore we have
+    
+    \begin{equation*}
+        \int_{t_k}^t \lambda (u) \d u = - \log(1 - F(t)).
+    \end{equation*}
+    Rearranging we have
+    
+    \begin{align*}
+        & F(t) = 1 - \exp \Bigg( -\int_{t_k}^t \lambda(u) \d u \Bigg) \\
+        & f(t) = \lambda(t) \exp \Bigg( -\int_{t_k}^t \lambda(u) \d u \Bigg)
+    \end{align*}
+    and the likelihood for observing a process until the time of the $k$th arrival becomes
+    
+    \begin{align*}
+        L &= \prod_{i=1}^k f(t_i) \\
+        &= \prod_{i=1}^k \lambda(t_i) \exp \Bigg( -\int_{t_{i-1}}^{t_i} \lambda(u) \d u \Bigg) \\
+        &= \Bigg[ \prod_{i=1}^k \lambda(t_i) \Bigg]\exp \Bigg( -\int_{0}^{t_k} \lambda(u) \d u \Bigg).
+    \end{align*}
+    When a process is observed over a time period $[0, T] \subset [0, t_k]$ we will need to include in the likelihood the probability of seeing no arrivals in the interval $(t_k, T]$ so the likelihood becomes:
+    
+    \begin{equation*}
+        L = \Bigg[ \prod_{i=1}^k f(t_i) \Bigg] (1 - F(T)) = \Bigg[ \prod_{i=1}^k \lambda(t_i) \Bigg]\exp \Bigg( -\int_{0}^{T} \lambda(u) \d u \Bigg)
+    \end{equation*}
+\end{proof}
+
+Notice that this is the likelihood of an inhomogeneous Poisson process with $\Lambda(0, T] = -\int_{0}^T \lambda(u) \d u$ as in equation (\ref{eq:LikInhPoiPro}).
+
+The likelihood for a temporal point process can also be defined in terms of the Janossy density. Here we make a quick mention of the method but for a full explanation see Daley Chapter 7 \cite{Daley}).
+Here again we have the realisation $(t_1, \dots, t_k)$ for a temporal point process
+Let us call $p_n$ with $n = 0, 1, \dots$ the distribution of the total number of points, with $\sum_{n=0}^\infty p_n = 1$. Let us also define for each integer $n \geq 1$ the probability distribution on $(A_1, \dots, A_n)$ which is a partition of $[0, T]$ with $A_i$ the possible times for event $i$ of the interval define the Janossy measure $J_n$ as
+    \begin{equation*}
+        J_n(A_1, \dots, A_n) = n!p_n\Pi_n^{sym}(A_1 \times \dots \times A_n).
+    \end{equation*}
+    Notice that the Janossy measure is not a probability measure, but it represents the sum of the probabilities of all $n!$ permutations of $n$ points. When derivatives exists we can introduce the density $j_n(t_1, \dots, t_n)$ of the Janossy measure with respect to the Lebesgue measure on $(\mathbb{R})^n$ with $t_i \neq t_j$ for $i \neq j$. Then the quntity $j_n(t_1, \dots, t_n)\d t_1, \dots \d t_n$ can be interpreted as the probability that there are exactly $n$ events in the process, one in each of the infinitesimal intervals $(t_i, t_i+\d t_i)$.
+
+The likelihood of a spatio-temporal self-exciting point process is obtained by treating the spatial locations as marks therefore obtain the log-likelihood (Daley and Vere-Jones (2003) Proposition 7.3.III) \cite{Daley}
+
+\begin{proposition}
+    Let $N$ be a regular marked point process on $[0, T] \times X$ where $X \subset \mathbb{R}^2$ for some positive $T$, and let $(t_1, x_1), \dots, (t_{N_g(T)}, x_{N_g(T)})$ be a realisation of $N$ over the interval $[0, T]$. Then the likelihood $L$ of such a realisation is expressible  in the form
+    
+    \begin{align*}
+        L &= \Bigg[ \prod_{i=1}^{N_g(T)} \lambda(t_i, x_i) \Bigg]\exp \Bigg( -\int_{0}^{T} \int_X \lambda(u, k) \d u \d k \Bigg) \\
+        &= \Bigg[ \prod_{i=1}^{N_g(T)} \lambda_g(t_i) \Bigg] \Bigg[ \prod_{i=1}^{N_g(T)} f(x_i | t_i) \Bigg]\exp \Bigg( -\int_{0}^{T} \lambda_g(u) \d u \Bigg)
+    \end{align*}
+\end{proposition}
+were $\lambda_g(t)$ is the ground process and $f(x | t)$ is the conditional probability of the marks 
+
+\begin{equation*}
+    l = \sum_{i=1}^n log(\lambda(s_i, t_i)) - \int_0^T\int_X \lambda(s,t) \d s \d t
+\end{equation*}
+
+
+(Daley and Vere-Jones (2003) Proposition 7.2.III) \cite{Daley}
+
+\section{Simulation of self-exciting point processes}
+
+A method that uses the cluster structure of a self-exciting point process allow us to eliminate the thinning or repeated evaluation of $\lambda(t, s)$
+
+\begin{thebibliography}{99}
+
+\bibitem{Daley} Daley D and Vere-Jones D (2003) An Introduction to the Theory of Point Processes: Elementary Theory and Methods. \textit{Springer}
+
+\bibitem{Hawkes71} Hawkes A G (1971) Spectra of some self-exciting and mutually exciting point processes. \textit{Biometrika} 58(1): 83-90
+
+\bibitem{Hawkes74} Hawkes A G, Oakes D (1974) A Cluster Process Representation of a Self-Exciting Process. \textit{Journal of Applied Probability} 11(3): 493-503
+
+\bibitem{Jewell} Jewell C P, Kypraios T, Neal P, Roberts G O (2009) Bayesian analysis for emerging infectious diseases. \textit{Bayesian Anal.} 4(3): 465-496
+
+\bibitem{Jacobsen} Jacobsen M (2006) Point Process Theory and Applications. Marked Point and Piecewise Deterministic Processes. \textit{Birkh\"{a}user}
+
+\bibitem{Mohler} Mohler G O (2011) Self-exciting point process modeling of crime. \textit{Journal of the American Statistical Association} 106(493): 100–108
+
+\bibitem{Ogata88} Ogata Y (1988) Statistical models for earthquake occurrences and residual analysis for point processes. \textit{Journal of the American Statistical Association} 83(401): 9–27
+
+\bibitem{Rasmussen} Rasmussen J G (2009) Temporal point processes: the conditional intensity function. \textit{Course notes for ‘rumlige punktprocesser’ (spatial point processes)}.
+
+\bibitem{Reinhart} Reinhart A (2017) A Review of Self-Exciting Spatio-Temporal Point Processes and Their Applications. \textit{Statist. Sci.} 33(3): 299-318
+
+\bibitem{Shoenberg} Shoenberg F P, Brillinger R, Guttorp P (2014). Point Processes, Spatial Temporal. \textit{Encyclopedia of Environmetrics}
+
+\bibitem{Zhuang} Zhuang J, Ogata Y, Vere-Jones D (2004). Analyzing earthquake clustering features by using stochastic reconstruction. \textit{Journal of Geophysical Research: Solid Earth} 109(B05301)
+
+\end{thebibliography}
+
+
+\end{document}

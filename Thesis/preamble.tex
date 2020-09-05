@@ -1,0 +1,356 @@
+% This file includes many commands that Darcy and Kaustav frequently utilise when creating TeX documents. It's a mixture of both our styles (and thus a bit of a mess), so please adjust it for your own needs!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% First of all, we set up the look of the document...
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[a4paper,inner=2.7cm,top=2.3cm,outer=2cm,bottom=2cm]{geometry}
+\usepackage[a4paper,left=2.35cm,top=2.3cm,right=2.35cm,bottom=2cm]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\fancyhead[LO]{}
+\fancyhead[RE]{}
+\fancyhead[RO]{\slshape \rightmark}
+\fancyhead[LE]{\slshape \leftmark}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{15pt}
+
+\makeatletter
+\newcommand\frontmatter{%
+  \cleardoublepage
+  \pagenumbering{roman}
+}
+
+\newcommand\mainmatter{%
+  \cleardoublepage
+  \pagenumbering{arabic}
+}
+
+\newcommand\backmatter{%
+  \if@openright
+    \cleardoublepage
+  \else
+    \clearpage
+  \fi
+  \pagenumbering{alpha}
+}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Packages (alphabetical order)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amstext}
+\usepackage{amsthm}
+\usepackage{array}
+\usepackage{authblk}
+\usepackage{booktabs}
+\usepackage[colorlinks=true, linkcolor = blue, citecolor = dgreen]{hyperref} % Needs to be loaded before cleveref. If you don't like hyperlinks comment this out!
+\usepackage{cleveref}
+%[noabbrev,capitalise]
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{colortbl}
+\usepackage{emptypage}
+\usepackage[shortlabels]{enumitem}
+\usepackage[english]{babel}
+\usepackage{eqparbox}
+\usepackage{extarrows}
+\usepackage{eucal}
+\usepackage{float}
+\usepackage{graphicx} \graphicspath{ {img/} }
+\usepackage{latexsym}
+%-----------------------------------------------------------------------I dunno what these two packages do but they wouldn't run on my PC - Kaustav
+%\usepackage{listings}
+%\usepackage{lstlinebgrd}
+\usepackage{marvosym}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage[numbers]{natbib}
+\usepackage{setspace}
+\usepackage{soul}
+\usepackage{subfigure}
+\usepackage{todonotes}
+%\usepackage{tablefootnote}
+\usepackage{tikz}
+  \usetikzlibrary{matrix,calc}
+  \usetikzlibrary{decorations.markings,decorations.pathreplacing}
+  \usetikzlibrary{patterns}
+\usepackage{url}
+\usepackage{xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% If you prefer the slanted inequalities (Kaustav does not)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\renewcommand{\geq}{\geqslant}
+%\renewcommand{\leq}{\leqslant}
+%\renewcommand{\ge}{\geqslant}
+%\renewcommand{\le}{\leqslant}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% I prefer ``(1)'' to ``Equation (1)'' from cleveref. Update from Kaustav, 'I don't'.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\crefname{equation}{}{}
+%\Crefname{equation}{}{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Useful commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\etal}{\emph{et al.}\xspace}
+\newcommand{\CITE}{{\bf {\color{red} [CITE]}}\xspace}
+\newcommand{\REF}{{\bf {\color{red} [REF]}}\xspace}
+\newcommand{\FIGURE}{{\bf {\color{red} [FIG]}}}
+\newcommand{\NOTE}[1]{\renewcommand{\fboxsep}{1mm}\framebox{\textsf{\em #1}}\marginpar{\bf$\leftarrow$NOTE}}
+\newcommand{\CONTENT}{{\medskip \center{\Huge \ldots} \marginpar{\bf$\leftarrow$MORE} \medskip}}
+\newcommand{\bigO}[1]{\mathcal{O}(#1)\xspace}
+\newcommand{\littleo}[1]{o(#1)\xspace}
+\newcommand{\littleoo}[1]{o_0(#1)\xspace}
+\newcommand{\Gram}{\text{Gram}}
+\newcommand{\tr}{\text{Tr}}
+\newcommand{\aip}[2]{| \langle #1 , #2 \rangle |}
+\newcommand{\BR}{\{e^{\frac{2\pi i}{3}},e^{-\frac{2\pi i}{3}}\}}
+\renewcommand{\bar}[1]{\overline{#1}}    % Overline looks nicer for conjugation...
+\newcommand{\con}{\rightarrow\leftarrow} % Contradiction
+
+% Nicer looking gray
+\definecolor{Gray}{gray}{0.9}
+%---- A better green - Kaustav
+\definecolor{dgreen}{rgb}{0,.8,0}
+
+%------------------------------------------------------------------------Darcy's preferred theorem etc environment----------------------------------------------------------------
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\theoremstyle{definition}
+%\newtheorem{theorem}{Theorem}[chapter]
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{corollary}[theorem]{Corollary}
+%\newtheorem{proposition}[theorem]{Proposition}
+%
+%\theoremstyle{definition}
+%\newtheorem{definition}[theorem]{Definition}
+%\newtheorem{conjecture}[theorem]{Conjecture}
+%\newtheorem{example}[theorem]{Example}
+%\newtheorem{assumption}{Assumption}[section]
+%
+%\Crefname{conjecture}{Conjecture}{Conjectures} %% It doesn't know how to pluralize Conjecture
+%
+%\theoremstyle{remark}
+%\newtheorem{remark}[theorem]{Remark}
+%\newtheorem{notation}[theorem]{Notation}
+%\newtheorem{note}[theorem]{Note}
+%\newtheorem{summary}[theorem]{Summary}
+%\newtheorem{problem}[theorem]{Problem}
+%\newtheorem{construction}[theorem]{Construction}
+
+%---------------------------------------------------------------Kaustav's preferred theorem etc environment----------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{question}{Question}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{remark}{Remark}[section]
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{exercise}{Exercise}[section]
+
+
+
+% I like using arrays to hold equations (lines up the '=' nicely). Update from Kaustav, `I don't'.
+% They need to be vertically spaced different than a normal matrix, though
+% When you make an array for equation, do something like this:
+%   \equationarray
+%   \begin{array}{lcr}
+%     f(x) & = & (x-2)^2 \\
+%          & = & x^2 - 4x + 4
+%   \end{array}
+%   \normalarray
+\newcommand{\equationarray}{\renewcommand{\arraystretch}{1.55}}
+\newcommand{\normalarray}{\renewcommand{\arraystretch}{1.1}}
+\newcommand{\appendixarray}{\renewcommand{\arraystretch}{1}}
+
+\normalarray
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Common mathematical sets.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\A}{\mathbb{A}} % Algebraic Numbers
+\newcommand{\C}{\mathbb{C}} % Complex
+\newcommand{\F}{\mathbb{F}} % Field
+%\newcommand{\N}{\mathbb{N}} % Naturals
+\newcommand{\naturals}{\mathbb{N}} % Naturals (Kaustav's preferred syntax)
+\newcommand{\Q}{\mathbb{Q}} % Rationals
+%\newcommand{\R}{\mathbb{R}} % Reals
+\newcommand{\reals}{\mathbb{R}} % Reals (Kaustav's preferred syntax)
+\newcommand{\exreals}{\mathbb{ \overline R}} % Extended reals
+\newcommand{\T}{\mathbb{T}} % Unimodular
+%\newcommand{\Z}{\mathbb{Z}} % Integers
+\newcommand{\integers}{\mathbb{Z}} % Integers (Kaustav's preferred syntax)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Fancy letters
+%     (Note that A and S are missing --
+%            \AA and \SS are something else)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\alt}{\mathcal{A}} % Alternating group
+\newcommand{\BB}{\mathcal{B}}
+\newcommand{\CE}{\mathcal{C}}
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\EE}{\mathcal{E}}
+\newcommand{\FF}{\mathcal{F}}
+\newcommand{\GG}{\mathcal{G}}
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\JJ}{\mathcal{J}}
+\newcommand{\KK}{\mathcal{K}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\MM}{\mathcal{M}}
+\newcommand{\NN}{\mathcal{N}}
+\newcommand{\OO}{\mathcal{O}}
+\newcommand{\PP}{\mathcal{P}}
+\newcommand{\QQ}{\mathcal{Q}}
+\newcommand{\RR}{\mathcal{R}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\UU}{\mathcal{U}}
+\newcommand{\VV}{\mathcal{V}}
+\newcommand{\WW}{\mathcal{W}}
+\newcommand{\XX}{\mathcal{X}}
+\newcommand{\YY}{\mathcal{Y}}
+\newcommand{\ZZ}{\mathcal{Z}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Common math operators
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\DeclareMathOperator{\per}{per} %Update from Kaustav, `yeah super common'.
+\DeclareMathOperator{\adj}{Adj}
+\DeclareMathOperator{\rank}{rank}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Probability/measure theory
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Pro}{\mathbb{P}}
+\newcommand{\Qro}{\mathbb{Q}}
+\newcommand{\Ex}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Corr}{\mathrm{Corr}}
+\newcommand{\borel}{\mathcal{B}(\mathbb{R})}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Convenience
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\dd}{\mathrm {d}}
+\newcommand{\ep}{\epsilon}
+\newcommand{\vep}{\varepsilon}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Latin terms (i.e., e.g.,
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\ie}{\emph{i.e., }\xspace}
+\newcommand{\eg}{\emph{e.g., }\xspace}
+\newcommand{\cf}{\emph{cf. }\xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  A different look for \begin{list}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newenvironment{myind}[1]%
+ {\begin{list}{}%
+    {\setlength{\leftmargin}{#1}}%
+  \item[]%
+ }
+{\end{list}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Look for Latin squares
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tikzset{square matrix/.style={
+    matrix of nodes,
+    column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+    nodes={draw,
+      minimum height=15pt,
+      anchor=center,
+      text width=13pt,
+      align=center,
+      inner sep=0pt
+    },
+  },
+  square matrix/.default=2cm
+}
+
+\colorlet{trans}{blue!50}
+\colorlet{trans2}{red!20}
+
+
+
+\newcommand{\X}{\times\xspace}
+\newcommand{\x}{$\X$\xspace}
+\newcommand{\BLAH}{{\color{red} BLAH}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Algorithm stuff
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ 
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+
+\newcommand{\myComment}[1]{\Comment{{\color{blue} #1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% What should the code look like?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newcounter{lnum}
+%\lstset{
+%  language=C++,
+%  basicstyle=\scriptsize\ttfamily\bfseries,
+%  numbers=none, 
+%  numberstyle=\tiny, 
+%%  stepnumber=5,
+%  linebackgroundsep={0.11in},
+%  keywordstyle=\color{blue}, 
+%  commentstyle=\color{red},
+%  stringstyle=\ttfamily, % typewriter type for strings
+%  %frame=bt, 
+%  %rulesepcolor=\color{red!20!green!20!blue!20},
+%  %rulecolor=\color{Brown},
+%  escapeinside=``, 
+%  %xleftmargin=2em,xrightmargin=2em, aboveskip=1em,
+%  breaklines=true             % sets automatic line breaking
+%}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Cover paper stuff
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\Urcs{\mathcal{U}_\mathrm{RCS}}
+\def\Urc{\mathcal{U}_\mathrm{RC}}
+\def\Urs{\mathcal{U}_\mathrm{RS}}
+\def\Ucs{\mathcal{U}_\mathrm{CS}}
+\def\Ur{\mathcal{U}_\mathrm{R}}
+\def\Uc{\mathcal{U}_\mathrm{C}}
+\def\Us{\mathcal{U}_\mathrm{S}}
+\def\Vr{\mathcal{V}_\mathrm{R}} % Used in one proof
+\def\Vc{\mathcal{V}_\mathrm{C}} %
+\def\Vs{\mathcal{V}_\mathrm{S}} %
+
+\newcommand{\unkn}{\bullet}
+\newcommand{\pmax}{p_{\text{\normalfont max}}}
+\newcommand{\qmin}{q_{\text{\normalfont min}}}
+
+\def\L{\mathscr{L}}
+\def\G{\mathscr{G}}
+\def\cov{\mathscr{C}}

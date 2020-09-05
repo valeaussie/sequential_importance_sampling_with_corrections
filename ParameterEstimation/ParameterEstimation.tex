@@ -1,0 +1,217 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}  
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+\usepackage[round]{natbib}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+
+ \textwidth=16cm \hoffset = -1.9cm
+ \lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\s}{\mathbb{S}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+\newcommand{\D}{\mathrm{d}}
+
+
+\begin{document}
+
+\section{Parameter Estimation}
+In this section we introduce a modification of our method to estimate the unknown static parameters of the system.
+
+Let us introduce the vector $\Theta$ which contains all unknown static parameters we want to estimate.
+
+The most obvious strategy would be augmenting the state with the parameters. In this case we will want to approximate on-line the sequence of posterior densities $p(\vec{X}^t, \vec{B}^t, \Theta | \vec{Z}^t)$ introducing the augmented state $\vec{y}^t = (\vec{X}^t, \vec{B}^t, \Theta^t)$ with initial density $p(\Theta^1)f(\vec{x}^1)$ and transition density $f(\vec{x}^t | \vec{x}^{t-1}) g(\vec{b}^t | \vec{x}^t, \vec{z}^{t-1}) \delta (\Theta^t | \Theta^{t-1})$ in the sense that $\Theta^t = \Theta^{t-1}$.
+
+For standard particle filters, this algorithm is bound to suffer particle impoverishment\footnote[1]{Sample impoverishment and weight degeneracy are similar inherent defects of only-weight-based sampling. They both lead to effects that can be loosely referred to as premature convergence. The only difference between them is that the computing resource converges prematurely by weights (degeneracy) in the former case and by sample (impoverishment) in the latter case.
+Weight degeneracy is the result of particles being distributed too widely, while sample impoverishment can be viewed as particles being over concentrated. The degeneracy converts to impoverishment as a direct result of resampling (\cite{Wang}).} (\cite{Kantas}) since the parameter space is explored only in the initial step of the algorithm and each successive resampling step reduces the diversity of the sample of $\Theta$ values until the approximation $\hat{p}(\Theta | \vec{Z}^t)$ contains only a value for $\Theta$.
+
+{\color{red}expand and explain the "forgetting" property. Why is the degeneracy not so bad for the variable $\vec{X}^t$, and can this affect the variable $\vec{B}^t$? Explain and cite \cite{Chopin}}
+
+OUR METHOD:
+Using Bayes theorem we have
+
+\begin{equation*}
+    p(\vec{X}^t, \vec{B}^t, \Theta^t | \vec{Z}^t) = \frac{p(\vec{Z}^t | \vec{X}^t, \vec{B}^t, \Theta^t) p(\vec{X}^t, \vec{B}^t, \Theta^t)}{p(\vec{Z}^t)}
+\end{equation*}
+where our prior is
+
+\begin{equation*}
+    p(\vec{X}^t, \vec{B}^t, \Theta^t) = q(\vec{X}^t, \vec{B}^t, \Theta^t | \vec{Z}^{t-1)})
+\end{equation*} 
+and
+
+\begin{equation*}
+    p(\vec{Z}^t) = r(\vec{Z}^t | \vec{Z}^{t-1}).
+\end{equation*}
+Since the observations are exact we will have
+
+\begin{equation*}
+    p(\vec{Z}^t | \vec{X}^t, \vec{B}^t, \Theta^t) =
+    \begin{cases}
+        1, & (\vec{X}^t, \vec{B}^t, \Theta^t) \in \sigma^{-1}(\vec{Z}^t) \\
+        0, & \text{otherwise}
+    \end{cases}
+\end{equation*}
+restricting the possible values for $(\vec{X}^t, \vec{B}^t, \Theta^t)$ to values consistent with the observations $\vec{Z}^t$.
+The posterior will therefore be
+
+\begin{equation*}
+    p(\vec{X}^t, \vec{B}^t, \Theta^t |\vec{Z}^t) \propto 
+    \begin{cases}
+        q(\vec{X}^t, \vec{B}^t, \Theta^t | \vec{Z}^{t-1)}), & (\vec{X}^t, \vec{B}^t, \Theta^t) \in \sigma^{-1}(\vec{Z}^t) \\
+        0, & \text{otherwise}
+    \end{cases}
+\end{equation*}
+with constant of proportionality $r(\vec{Z}^t | \vec{Z}^{t-1})^{-1}$ such that
+\begin{align*}
+    r(\vec{Z}^t | \vec{Z}^{t-1}) &= \int_{\sigma^{-1}(\vec{Z}^t)} q (\vec{X}^t, \vec{B}^t, \Theta^t | \vec{Z}^{t-1}) \D (\vec{X}^t, \vec{B}^t, \Theta^t)\\
+    &= \int q(\vec{X}^t, \vec{B}^t, \Theta^t | \vec{Z}^{t-1}) \prod_{ \{ s \leq t:b^t_s = 0 \} } \D x_s^t.
+\end{align*}
+Notice now that our systems will be such that each step of the evolution will depend only on the previous step, meaning that at each time $i$ the vector $\vec{x}^i$ will only depend on the vector $\vec{x}^{i-1}$ following a certain state transitional density distribution $f$. We will also have that the presence of an observation will depend on the current state of the system and on the observations at the previous time, following a certain distribution $g$:
+\begin{align*}
+    &\vec{x}^i | \vec{x}^{i-1} \sim f(\vec{x}^i | \vec{x}^{i-1})\\
+    &\vec{b}^i | \vec{x}^i, \vec{z}^{i-1} \sim g(\vec{b}^i | \vec{x}^i, \vec{z}^{i-1})\\
+    & \Theta^i \sim \delta (\Theta^i | \Theta^{i-1}).
+\end{align*}
+As before, the processes $x$ and $z$ will be independent and the prior will become 
+\begin{equation*}
+    q(\vec{X}^t, \vec{B}^t, \Theta^t | \vec{Z}^{t-1}) = f(\vec{x}^t | \vec{x}^{t-1}) g(\vec{b}^t | \vec{x}^t, \vec{z}^{t-1}) \delta (\Theta^i | \Theta^{i-1}) p(\vec{X}^{t-1}, \vec{B}^{t-1} | \vec{Z}^{t-1})
+\end{equation*}
+introducing an iterative process such that
+\begin{equation*}
+    q(\vec{X}^t, \vec{B}^t , \Theta^t| \vec{Z}^{t-1}) = \prod_{i=2}^t f(\vec{x}^i | \vec{x}^{i-1}) f(\vec{x}^1) \prod_{i=1}^t g(\vec{b}^i | \vec{x}^i, \vec{z}^{t-1}) t p(\Theta^1)
+\end{equation*}
+and consequently
+\begin{equation*}
+    p(\vec{X}^t, \vec{B}^t, \Theta^t | \vec{Z}^t) \propto \prod_{i=2}^t f(\vec{x}^i | \vec{x}^{i-1}) f(\vec{x}^1) \prod_{i=1}^t g(\vec{b}^i | \vec{x}^i, \vec{z}^{t-1}) t p(\Theta^1).
+\end{equation*}
+We want to approximate the distribution $p(\vec{X}^{t}, \vec{B}^{t}, \Theta| \vec{Z}^{t})$ iteratively:
+
+For simplicity, let us call $(\vec{X}^{t}, \vec{B}^{t}, \Theta^t) = \vec{y}^{t}$ and $(\vec{(X')}^{t}, \vec{(B')}^{t}, \Theta^t) = \vec{(y')}^{t}$.
+
+Again, we define a probability $\P^*$ having density $p^*$ on $\Omega^*$ such that the marginal distribution of $\P^*$ on $\Omega'$ is $\P$, that is $\P = \P^* \circ \pi^{-1}$.
+For any event $A \in \F'$ where $\F'$ is the $\sigma$-algebra over $\Omega'$ we have
+\begin{align*}
+    &\P(A) = \P(\pi^{-1}(A)) = \\
+    &\int_{\Omega^*} I_A(\pi(\vec{(y')}^t, \vec{y}^t)) p^*(\vec{(y')}^t, \vec{y}^t | \vec{Z}^t) \D (\vec{(y')}^t, \vec{y}^t) = \\
+    & \int_{\Omega'} I_A(\pi(\vec{(y')}^t) \Bigg[ \int_{\pi^{-1}(\vec{(y')}^t)} p^*(\vec{(y')}^t, \vec{y}^t | \vec{Z}^t) \D (\vec{(y')}^t, \vec{y}^t) \Bigg] \D (\vec{(y')}^t)
+\end{align*}
+using the disintegration theorem.
+
+It follows that
+\[
+p(\vec{(y')}^t | \vec{Z}^t) = \int_{\pi^{-1}(\vec{(y')}^t)} p^*(\vec{(y')}^t, \vec{y}^t | \vec{Z}^t)\; \D (\vec{(y')}^t, \vec{y}^t).
+\]
+
+Applying importance sampling on the probability space $\Omega^*$ with the probability measures $\P$ and $\Q$ with densities $p$ and $q$ respectively where $\q$ is the known distribution, we get
+\begin{align*}
+p(\vec{X}^{t}, \vec{B}^{t}, \Theta| \vec{Z}^{t}) \approx \sum_{i=1}^n  w^{t}_i \delta(\pi (\vec{(y')}^{t}_i, \vec{y}^{t}_i))
+\end{align*}
+where the weights $w^{t}_i$ are:
+\[
+w^{t}_i = \frac{p^*(\vec{(y')}^{t}_i, \vec{y}^{t}_i | \vec{Z}^{t})} {p(\vec{(y')}^{t}_i, \vec{y}^{t}_i|\vec{Z}^{t-1})}.
+\]
+In our example with deterministic substitutions $p^*$ will simply be:
+\[
+p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) = p(\vec{(y')}^{t} | \vec{Z}^{t}) = \frac{ q(\vec{(y')}^{t}|\vec{Z}^{t-1})} {r(\vec{Z}^{t} | \vec{Z}^{t-1})}
+\]
+and\[
+q(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t-1}) = q(\vec{y}^{t} | \vec{Z}^{t-1})
+\]
+therefore the normalised weights $w^t$ will be:
+
+\begin{equation*}
+w^{t} = C \frac{\prod_{i=2}^t f(\vec{x}^i | \vec{x}^{i-1}) f(\vec{x}^1) \prod_{i=1}^t g(\vec{b}^i | \vec{x}^i, \vec{z}^{t-1}) t p(\Theta^1)}{\prod_{i=2}^t f(\vec{(x')}^i | \vec{(x')}^{i-1}) f(\vec{(x)'}^1) \prod_{i=1}^t g(\vec{(b)'}^i | \vec{(x)'}^i, \vec{z}^{t-1}) t p(\Theta^1)}
+\end{equation*}
+with $C$ the normalisation constant. Notice that the constant $r(\vec{Z}^t | \vec{Z}^{t-1})$ of $q(\vec{x}^{t-1}_i,\vec{B}^{t-1}_i | \vec{Z}^{t-1})$ cancels out after normalisation. 
+We can see that also the quantity $n p(\Theta^1)$ cancel out.
+
+It follows that the parameters don't contribute in the calculation of the weights :-(
+
+
+
+Another method used in classic particle filters to estimate the parameters of the system consists in adding dynamics for the parameter $\Theta$ as done by \cite{Flury}
+
+\begin{equation*}
+    \Theta^{t+1} = \Theta^t + \varepsilon^{t+1}
+\end{equation*}
+were $\{\varepsilon^t\}_{t\geq 0}$ is an artificial dynamic noise with decreasing variance.
+
+It is difficult to quantify how much bias is introduced in the estimate with this approach \cite{Kantas}. In our method we want to keep the amount of fine-tuning, like having to choose the variance of the noise, to a minimum.
+
+{\color{red} list other existing workarounds using Kantas}
+%%%%%%%%%%%%%%%%%%
+
+Can we consider this method for Tumor detection?
+
+ISSUE: too many time points can lead to degeneracy. 
+Tumor detection is done through sequential biopsies. There won't be hundreds of times to consider.
+
+https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/1471-2288-11-129#:~:text=Missing%20data%20on%20tumour%20stage,of%20missing%20data%20is%20applied.
+
+
+\begin{thebibliography}{}
+
+\bibitem [\protect\citeauthoryear{Chopin}{2004}]{Chopin} 
+Chopin N.: Central limit theorem for sequential Monte Carlo methods and its application to Bayesian inference. Ann. Statist. 32(6), 2385-2411 (2004)
+
+\bibitem [\protect\citeauthoryear{Flury}{2011}]{Flury} 
+Flury T., Shephard N.: Bayesian inference based only on simulated likelihood: Particle filter analysis of dynamic economic models. Econometric Theory 27, 933-956 (2011)
+
+\bibitem [\protect\citeauthoryear{Kantas}{2015}]{Kantas} 
+Kantas N. et al.: On Particle Methods for Parameter Estimation in State-Space Models. Statist. Sci. 30(3), 328-351 (2015)
+
+\bibitem [\protect\citeauthoryear{Wang}{2017}]{Wang} 
+Wang X. et al.: A Survey of Recent Advances in Particle Filters and Remaining Challenges for Multitarget Tracking. Sensors. 17(12), 27027 (2017)
+
+
+
+
+\end{thebibliography}
+
+\end{document}

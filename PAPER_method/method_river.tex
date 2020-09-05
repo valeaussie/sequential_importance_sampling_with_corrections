@@ -1,0 +1,148 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}  
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+
+ \textwidth=16cm \hoffset = -1.9cm
+ \lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\s}{\mathbb{S}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathscr{D}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+
+\begin{document}
+
+
+\section{SIS with corrections applied to the the algae invasion of a river}
+
+We are now going to apply our methodology to another example that can have real life applications. 
+
+In this example we are going to consider a river infested by some form of alien algae. We will consider the river as one dimensional as the expansion of the invasion will happen along the length of the river. For simplicity we will consider the section of a river without tributary or confluences. 
+
+We will divide the length of the river in $N$ sections or cells and we will consider the first invasion to start in the cell with index $m$.
+From the cell indexed by $m$ the invasion can propagate only in the immediately adjacent section of the river, namely the cells indexed by $m-1$ and $m+1$, with probability $\theta$. Following this rule we introduce the binary vectors $\vec{x}^{(i)} = (x_1^{(i)}, \dots, x_{N}^{(i)})$ of the state of the invasion at time $i = 1, \dots, t$. These vectors will all have length $N$, and their elements will define the state of each cell at time $i$: 1 if the cell is invaded and 0 if the cell has not been invaded yet. The invasion will be complete, and all the cells will be invaded, at an unknown time $T$. 
+The invasion will expand in two directions (left and right) and the elements of the vector $\vec{x}$ that are adjacent to an infested cell on the right and on the left will have the same probability $\theta$ of being invaded. These vectors will define a $t\times N$ matrix $\vec{X}^{(t)}$, in which each row $i$ is a vector $\vec{x}^{(i)}$
+
+We will store the information about the cells that have been observed at or before time $i = 1, \dots, t$ in binary vectors $\vec{z}^{(i)} = (z_1^{(i)}, \dots, z_{N}^{(i)})$, where $z_s^{(i)} = 1$ if $x_s^{(i)} = 1$ and the invasive species has been detected at location $s$ at or before time $i$, and $z_s^{(i)} = 0$ otherwise. As for the AR(1) model example, once a cell has been observed it will remain observed at all subsequent times, therefore if $z_s^{(i)} = 1$ at time $i$, then we must also have $z_s^{(i^{*})} = 1$ at all subsequent times $i^{*} > i$. These vectors will define a $t \times N$ matrix $\vec{Z}^{(t)}$, in which each row $i$ is a vector $\vec{z}^{(i)}$.
+
+We will model the new observations on the left and on the right of the previously observed nests in two ways: Firstly, we will consider observations made by a a probe that will check each unobserved cell in sequence. For example, if a cell is observed as invaded at time $t-1$, at time $t$ the probe will start checking the adjacent cell for which we previously did not detect any invader. If that cell is invaded and observed, the probe will proceed to check the subsequent section and so on until there will be a cell where the probe cannot find any invader. The probe might or might not be able to observe the invasion as the algae might not be easy to detect, and will stop searching when it will find the first uninvaded cell. The probability of observing a cell as invaded will be $\theta$.
+
+
+We will then model the observations as if done randomly by the population reporting on the invasion. In this case, the invaded cells will all have the same probability $\theta'$ of being observed. Notice that we will have observations in cells that are not adjacent to a previously observed one. When this happens, all the uninvaded cells between the newly observed one and the one observed at time $t-1$ will be automatically considered as invaded. {\color{blue} HHH we have not developed the model of the second type of observations. The observation with the probe seem to work ok although it is a bit of a strange machine I have invented :-). Do we want to model the second option too? I almost think it would be more beneficial to spend time working on the weights for non deterministic corrections, but this will take more time to do. As things are now, when we are going to prove the theory in the first chapter of the paper, we will not need to include the non deterministic observations... can we discuss this in our next call?}
+
+In this example, as for the AR(1) model, our observations are going to be deterministic.
+
+\subsection{Bayesian inference in a partially observed state space}
+We want to determine the posterior distribution in light of observations $p(\vec{X}^{(t)} | \vec{Z}^{(t)})$ and this is obtained, as for the AR(1) model, renormalising the prior at time $t$, $q(\vec{X}^{(t)}, \vec{z}^{(t)} | \vec{Z}^{(t-1)})$, over values consistent with the observations $\vec{Z}^{(t)}$.
+
+\[
+    p(\vec{X}^{(t)} | \vec{Z}^{(t)})  =  \frac{q(\vec{X}^{(t)}, \vec{z}^{(t)} | \vec{Z}^{(t-1)})}{r(\vec{z}^{(t)} | \vec{Z}^{(t-1)})}
+\]
+where 
+\[
+    r(\vec{z}^{(t)} | \vec{Z}^{(t-1)}) = \sum_{x_s^{(t)}} q(\vec{X}^{(t)}, \vec{z}^{(t)} | \vec{Z}^{(t-1)}).
+\]
+for $s = 0, \dots, N$ such that $z_s^{(t)}=0$.
+The prior for time $t$, $q(\vec{X}^{(t)}, \vec{z}^{(t)} | \vec{Z}^{(t-1)})$ represents our knowledge about the state before we observe $\vec{z}^{(t)}$ and can be written as:
+\begin{align}
+    q(\vec{X}^{(t)}, \vec{z}^{(t)} | \vec{Z}^{(t-1)}) = p(\vec{z}^{(t)} | \vec{X}^{(t)}, \vec{Z}^{(t-1)}) p(\vec{x}^{(t)} | \vec{X}^{(t-1)}) p(\vec{X}^{(t-1)} | \vec{Z}^{(t-1)})
+    \label{eq:1}
+\end{align}
+Since the process $x$ does not depend on the observations, so $p(\vec{x}^{(t)} | \vec{X}^{(t-1)}, \vec{Z}^{(t-1)}) = p(\vec{x}^{(t)} | \vec{X}^{(t-1)})$.
+
+The distribution for the observations will be:
+\[
+    p(\vec{z}^{(t)} | \vec{X}^{(t)}, \vec{Z}^{(t-1)}) = p(\vec{z}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)}) = p_R(\vec{z}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)}) p_L(\vec{z}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)})
+\]
+where $p_R(\vec{z}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)})$ is the probability of the new detections on the right of the cells previously observed invaded and $p_L(\vec{z}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)})$ is the probability of the new detections on the left of the cells previously observed invaded. These two processes are independent.
+
+Let $a^{(t)}$ be the largest integer in the set $\{ s : z_s^{(t)} = 1 \}$, that is, the index of the highest numbered cell at which the invader has been observed at time $t$ on the right of the invasion. Then the number of new probes at which the invader is successfully detected at time $t$ is $a^{(t)} - a^{(t-1)}$. Probing on the right can stop in two ways: either because all invaded sites on the right have been found, in which case $p_R(\vec{z}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)}) = \varphi^{a^{(t)} - a^{(t-1)}}$, or because the last probe on the right failed to detect an invaded cell, in which case $p_R(\vec{z}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)}) = \varphi^{a^{(t)} - a^{(t-1)}} (1 - \varphi)$.
+
+Similarly, let now $c^{(t)}$ be the smallest integer in the set $\{ s : z_s^{(t)} = 1 \}$, that is, the index of the smallest cell at which the invader has been observed at time $t$ on the left of the invasion. Then the number of new probes at which the invader is successfully detected at time $t$ is $c^{(t)} - c^{(t-1)}$.
+
+The distribution for the observation will therefore be:
+\begin{align*}
+    & p(\vec{z}^{(t)} | \vec{x}^{(t)}, \vec{z}^{(t-1)}) = \varphi^{(a^{(t)} - a^{(t-1)})} \bigg(1 - \varphi \bigg)^{1-\one {a^{(t)}=\gamma^{(t)}}} \varphi^{(c^{(t)} - c^{(t-1)})} \bigg( 1 - \varphi \bigg)^{1-\one {c^{(t)}=\beta^{(t)}}}
+\end{align*}
+were $\gamma^{(t)}$ is the limit of the invasion on the right and $\beta^{(t)}$ is the limit of the invasion on the left.
+Notice that for simplicity we will assume that we observe the beginning of the invasion at time $t=1$. 
+
+The distribution for the invasion if the expansion can happen in two directions is:
+\[
+    p(\vec{x}^{(t)} | \vec{X}^{(t-1)}) = p(\vec{x}^{(t)} | \vec{x}^{(t-1)}) = p_R(\vec{x}^{(t)} | \vec{x}^{(t-1)}) p_L(\vec{x}^{(t)} | \vec{x}^{(t-1)}) 
+\]
+separating the expansion on the left and on the right of the invasion.
+These two expansions are independent. Then, $p_R(\vec{x}^{(t)} | \vec{x}^{(t-1)}) = \theta$ if the invasion has expanded one cell to the right, and $p_R(\vec{x}^{(t)} | \vec{x}^{(t-1)}) = 1 - \theta$ if no expansion to the right has occurred, and it's 0 for any other $\vec{x}^{(t)}$. The same applies to the expansion on the left.
+
+Therefore,
+\[
+    p(\vec{x}^{(t)} | \vec{X}^{(t-1)}) = p_R(\vec{x}^{(t)} | \vec{x}^{(t-1)}) p_L(\vec{x}^{(t)} | \vec{x}^{(t-1)}) = \theta^{k} (1-\theta)^{1-k}\theta^{h} (1-\theta)^{1-h}
+\]
+with $k \in \{0,1\}$ and $h \in \{0,1\}$.
+
+Substituting and expanding the recursion in equation \eqref{eq:1} we have
+\begin{align*}
+        & q(\vec{X}^{(t)},\vec{z}^{(t)} | \vec{Z}^{(t-1)}) = \alpha \prod_{i=2}^{t} \varphi^{(a^{(i)} - a^{(i-1)})} \bigg(1 - \varphi\bigg)^{1-\one {a^{(i)}=\gamma^{(t)}}} \\
+        &\varphi^{(c^{(i)} - c^{(i-1)})} \bigg(1 - \varphi\bigg)^{1-\one {c^{(i)}=\beta^{(t)}}} \prod_{i=2}^{r-1} \theta^{k_i} (1-\theta)^{1-k_i} \prod_{i=2}^{l-1} \theta^{h_i} (1-\theta)^{1-h_i}
+\end{align*}
+where $l$ is the time where the invasion has reached the end of the river on the left, $r$ is the time where the invasion has reached the end of river on the right, and $\alpha$ is the constant of normalization that will cancel out when at the calculation of the weights. 
+
+Similarly to the AR(1) model, since our corrections are deterministic, the unnormalised weights are calculated as follows:
+\[
+    w^{(t)_j} = \frac{q(\vec{X'}^{(t)},\vec{z'}^{(t)} | \vec{Z}^{(t-1)})}{q(\vec{X}^{(t)},\vec{z}^{(t)} | \vec{Z}^{(t-1)})}
+\]
+where the primed are the corrected terms. Again, we will have many cancellations in the calculations of the weights.
+
+
+\end{document}
+
