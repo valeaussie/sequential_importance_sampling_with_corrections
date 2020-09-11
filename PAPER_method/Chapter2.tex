@@ -1,0 +1,270 @@
+%%%%%%%%%%%%%%%%%%%%%%% file template.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is a general template file for the LaTeX package SVJour3
+% for Springer journals.          Springer Heidelberg 2010/09/16
+%
+% Copy it to a new file with a new name and use it as the basis
+% for your article. Delete % signs as needed.
+%
+% This template includes a few options for different layouts and
+% content for various journals. Please consult a previous issue of
+% your journal as needed.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% First comes an example EPS file -- just ignore it and
+% proceed on the \documentclass line
+% your LaTeX will extract the file if required
+\begin{filecontents*}{example.eps}
+%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 19 19 221 221
+%%CreationDate: Mon Sep 29 1997
+%%Creator: programmed by hand (JK)
+%%EndComments
+gsave
+newpath
+  20 20 moveto
+  20 220 lineto
+  220 220 lineto
+  220 20 lineto
+closepath
+2 setlinewidth
+gsave
+  .4 setgray fill
+grestore
+stroke
+grestore
+\end{filecontents*}
+%
+\RequirePackage{fix-cm}
+%
+%\documentclass{svjour3}                     % onecolumn (standard format)
+%\documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
+%\documentclass[smallextended]{svjour3}       % onecolumn (second format)
+\documentclass[twocolumn]{svjour3}          % twocolumn
+%
+\smartqed  % flush right qed marks, e.g. at end of proof
+%
+
+%
+\usepackage{mathptmx}      % use Times fonts if available on your TeX system
+%
+% insert here the call for the packages your document requires
+%\usepackage{latexsym}
+\usepackage[demo]{graphicx}
+%\usepackage{graphicx}
+\usepackage[caption = false]{subfig}
+\graphicspath{ {./images/} }
+\usepackage[round]{natbib}
+\usepackage{amsmath}  
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+\usepackage[toc,title,page]{appendix}
+
+\newcommand{\Real}{\mathbb R}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\s}{\mathbb{S}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Qm}{\mathcal{Q}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathrm{d}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+\journalname{Statistics and Computing}
+
+\begin{document} \sloppy
+\bibliographystyle{plainnat}
+
+\title{Chapter 2 draft}
+
+\author{Valentina Di Marco \and
+        Jonathan Keith \and
+        Daniel Spring}
+
+\institute{Valentina Di Marco \at
+              School of Mathematical Science, Monash University, Clayton Campus, VIC 3800, Australia \\
+              Tel.: +61-4-23330509\\
+              \email{valentina.dimarco@monash.edu}      
+              \and
+              Jonathan Keith \at
+              School of Mathematical Science, Monash University, Clayton Campus, VIC 3800, Australia
+              \and
+              Daniel Spring \at
+              School of Ecosystem and Forest Sciences, The University of Melbourne, Parkville, Victoria 3010, Australia}
+
+\maketitle
+
+\begin{abstract}
+% \PACS{PACS code1 \and PACS code2 \and more}
+% \subclass{MSC code1 \and MSC code2 \and more}
+\end{abstract}
+
+
+
+\section{Sequential Importance Sampling with corrections}
+\label{sec:2}
+
+{\color{red} (Notes) I think the problem is in the way I have defined $B^t$ and its interpretation. We say that the matrix $B^t$ represents the state of the knowledge we have of the trajectory of the system. What I believe this means that when $b^i_m = 1$ there is for sure an invader in the cell $m$ at the time $i$, while when $b^i_j = 0$ means that there is for sure no invader in the cell $m$ at time $i$. If I observe an invader then $b^i_m = 1$, however if I don't observe it does not mean that there is no invader, it just means that I have not detected one, so $b^i_m$ is not necessarily $0$. Also $B^t$ represents the state of the knowledge we have of the trajectory of the system up to time $t$ before we get the next set of observations at time $t$. Once we acquire the observations at time $t$ we correct $B^t$ to obtain a new matrix $(B')^t$. For these reasons perhaps it is wrong to say that $Z^t$ completely defines $B^t$. 
+
+Now when we consider the matrix of the corrections maybe those terms would cancel out, however, during the calculation of the weights we would have the elements $r(\vec{Z^i} | \vec{Z^{i-1}})$ in the nominator and the denominator also canceling out.
+
+I am also not so sure why do we need to use 3 indexes for $b$ and $z$, perhaps we can talk about this during the call Friday.}
+
+
+Consider an $M$-dimensional system, evolving in discrete time. The states of this system at times $t = 1, \dots, T$ are represented by random vectors $\vec{x}^t = (x^t_1, \dots, x^t_M) \in \Real^M$ defined on a probability space $(\Omega, \F, \P)$. The trajectory of the system up to time $t$ we represent by a random matrix $\vec{X}^t = (\vec{x}^1, \ldots, \vec{x}^t)$. We also represent our state of knowledge regarding the trajectory of the system up to time $t$ by a random binary matrix $\vec{B}^t = (b^t_{i}) \in 2^{T \times M}$ whose rows are the random vectors $\vec{b}^t = (b_1^t, \dots, b_M^t)$ where $b^t_{i} = 1$ if the value of $x^{t-1}_i$ is known by time $t-1$. Note that once a past system coordinate $x^t_m$ is known, it cannot become unknown, so $b^t_m = 1$ implies $b^{t^\prime}_m = 1$ at all later times $t^{\prime} > t$, and similarly $b^t_m = 0$ implies $b^{t^{\prime}}_m = 0$ at all earlier times $t^{\prime} < t$.
+
+It will also be useful to define an {\em observation matrix} $\vec{Z}^t = (z^t_m)$, where $z^t_m = x^t_m$ if I have an observation at time $t$ for the element $m$, and $z^t_m = -$ if I don't have an observation at time $t$ for the element $m$. Thus the symbol `$-$' is used to represent an unknown system coordinate. We assume that observations are made without error, so that each element $b^t_m = 1$ if $z^t_m = 1$. We therefore define a function $\sigma: \Real^{T \times M} \times 2^{T \times M} \rightarrow (\Real \cup \{ - \})^{T \times M}$ such that $\vec{Z}^t = \sigma(\vec{X}^t, \vec{B}^t)$.
+
+For each past system coordinate $x^{t}_m$ that has not been observed by time $t-1$ (so that $z^{t-1}_m = 0$) we can derive information from the observations and a model of the system. We take a Bayesian approach to quantify this information. At time $t=1$, our knowledge of the system is represented by a prior distribution with density $q(\vec{X}^1, \vec{B}^1)$ on $\Real^M \times 2^M$ and the posterior distribution after observing $\vec{Z}^1$ has a density on $\sigma^{-1}(\vec{Z}^1)$ given by:
+\begin{equation*}
+    p(\vec{X}^1, \vec{B}^1 |\vec{Z}^1) =
+        \frac{q(\vec{X}^1, \vec{B}^1)}
+        {r(\vec{Z}^1)} 
+\end{equation*}
+where
+\begin{align*}
+    r(\vec{Z}^1)  &= \int q(\vec{X}^1, \vec{B}^1) \prod_{ \{m \in \{1, \ldots, t \} : z^1_m = - \} } \D x^1_m.
+\end{align*}
+
+Our knowledge of the trajectory of the system at time $t \geq 2$, before we acquire the next observation matrix $\vec{Z}^t$, is represented by a prior distribution with density $q(\vec{X}^t, \vec{B}^t | \vec{Z}^{t-1})$ on the subspace {\color{red}$\sigma^{-1}(\vec{Z}^{t-1}) \times \Real^M \times 2^M \subseteq \Real^{tM} \times 2^{tM}$ VVV I am not sure I understand the last superscript}. After observing $\vec{Z}^t$, certain pairs $(\vec{X}^t, \vec{B}^t)$ with non-zero prior density will be incompatible with the new observations, and the posterior density must therefore restrict $(\vec{X}^t, \vec{B}^t)$ to $\sigma^{-1}(\vec{Z}^t)$. The posterior density over $\sigma^{-1}(\vec{Z}^t)$ must therefore be
+\begin{equation*}
+    p(\vec{X}^t, \vec{B}^t |\vec{Z}^t) =
+        \frac{q(\vec{X}^t, \vec{B}^t | \vec{Z}^{t-1})}
+        {r(\vec{Z}^t | \vec{Z}^{t-1})} 
+\end{equation*}
+where $q$ is restricted to $\sigma^{-1}(\vec{Z}^t)$ and
+\begin{align*}
+    r(\vec{Z}^t | \vec{Z}^{t-1})  &= \int q(\vec{X}^t, \vec{B}^t | \vec{Z}^{t-1}) \prod_{ \{ i \leq t, m \in \{1, \ldots, t \} : z^t_m = - \} } \D x^i_m.
+\end{align*}
+
+In this paper we focus on Markovian systems, that is, systems in which each $\vec{x}^t$ is conditionally independent of $\vec{X}^{t-2} = (\vec{x}^1, \ldots,\vec{x}^{t-2})$, given $\vec{x}^{t-1}$. Let $f(\vec{x}^t | \vec{x}^{t-1})$ be the state transitional density distribution characterising the system. We also suppose that our current state of knowledge regarding the trajectory of the system up to and including the current time depends on the current state and our state of knowledge at the previous time step, as follows:
+\begin{align*}
+    &\vec{x}^t | \vec{x}^{t-1} \sim f(\vec{x}^t | \vec{x}^{t-1})\\
+    &(b_m^t | b_m^{t-1} = 0) \sim g(b_m^t | b_m^{t-1} = 0)
+\end{align*}
+
+$(b_m^t | b_m^{t-1} = 0) \sim g(b_m^t | b_m^{t-1} = 0)$
+for $t \geq 2$, with densities of the initial states $f(\vec{x}^1)$ and $g(\vec{B}^1)$.
+Thus the joint prior distribution for $(\vec{X}^t,\vec{B}^t)$ when $t=1$ is given by 
+\[
+q(\vec{X}^1,\vec{B}^1) = f(\vec{x}^1)g(\vec{b}^1)
+\]
+and when $t \geq 2$: 
+\begin{eqnarray*}
+    q(\vec{X}^t, \vec{B}^t | \vec{Z}^{t-1}) &=& f(\vec{x}^t | \vec{x}^{t-1}) g(\vec{b}^t | \vec{b}^{t-1}) p(\vec{X}^{t-1}, \vec{B}^{t-1} | \vec{Z}^{t-1}) \\
+    & = & \frac{f(\vec{x}^1)g(\vec{b}^1)}{r(\vec{Z}^1)} \prod_{i=2}^{t-1} \frac{f(\vec{x}^i | \vec{x}^{i-1}) g(\vec{b}^i | \vec{b}^{i-1})}{r(\vec{Z}^i | \vec{Z}^{i-1})} \\
+    & & \times f(\vec{x}^t | \vec{x}^{t-1}) g(\vec{B}^t | \vec{B}^{t-1})
+\end{eqnarray*}
+on $\sigma^{-1}(\vec{Z}^{t-1}) \times \Real^M \times 2^M$, and the joint posterior distribution is given by:
+\begin{eqnarray*}
+    p(\vec{X}^t, \vec{B}^t | \vec{Z}^t) 
+& = & \frac{f(\vec{x}^1)g(\vec{B}^1)}{r(\vec{Z}^1)} \prod_{i=2}^t \frac{f(\vec{x}^i | \vec{x}^{i-1}) g(\vec{B}^i | \vec{B}^{i-1})}{r(\vec{Z}^t | \vec{Z}^{t-1})} 
+\end{eqnarray*}
+on $\sigma^{-1}(\vec{Z}^t)$.
+
+
+We want to approximate the distribution $p(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t})$ by iterative sampling, and thus obtain Monte Carlo estimates of expectations of the form:
+\begin{equation*}
+    E_{p} \Big[h(\vec{X}^{t}, \vec{B}^{t} ) \Big] = \int h(\vec{X}^{t}, \vec{B}^{t})\; p(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t})\; \D \vec{X}^{t}
+\end{equation*}
+for functions $h: \Real^m  \rightarrow \Real$. 
+
+We take a sequential importance sampling approach, at each iteration using a collection of weighted particles to represent $p(\vec{X}^{t-1}, \vec{B}^{t-1} | \vec{Z}^{t-1})$ from the previous iteration, in the sense that these particles can be used to construct weighted Monte Carlo estimates for integrals of the above form. We evolve these under the model to create a new set of weighted particles representing the prior for iteration $t$, namely $q(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t-1})$. We then modify these particles to be consistent with the observations $\vec{Z}^{t}$, and adjust the weights to ensure the resulting weighted particles represent our posterior $p(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t})$.
+
+Consider a particle $(\vec{X}^{t-1},\vec{B}^{t-1})$ constructed at time point $t$, one of $n$ such particles. {\color{red} (HHH Consider adding a particle index as a subscript.)} We generate $\vec{x}^t$ for this particle by sampling from $f(\vec{x}^t | \vec{x}^{t-1})$. Similarly, we generate $\vec{b}^{t}$ for this particle by sampling from $g(\vec{b}^{t} | \vec{x}^t, \vec{b}^{t-1})$. However, the new vector of observations $\vec{z}^{t}$ is typically inconsistent with a particle $(\vec{X}^{t}, \vec{B}^{t})$ thus constructed, in two ways: first, the coordinates at which $\vec{b}^{t}$ contains a 0 may not correspond to the coordinates at which $\vec{z}^{t}$ contains a `$-$', and second, the observed values in $\vec{z}^{t}$ differ from the corresponding coordinates of $\vec{x}^{t}$. We must therefore correct $\vec{x}^{t}$ and $\vec{b}^{t}$ in light of the new observations $\vec{z}^{t}$. The simplest way to do this is to first replace $\vec{b}^{t}$ with the unique binary vector $\vec{(b')}^{t}$ that is consistent with $\vec{z}^{t}$, and then replace the coordinates of $\vec{x}^{t}$ with the corresponding coordinates of $\vec{z}^{t}$ wherever $\vec{(b')}^{t}$ has a `1', thus generating a corrected term $\vec{(x')}^{t}$. The corrections thus made at time point $t$ will be carried forward into the particles used at all future times. Note that we are considering the corrections to be deterministic, that is, $\vec{(x')}^{t}$ and $\vec{(b')}^{t}$ are deterministic functions of $\vec{x}^{t}$ and $\vec{b}^{t}$.
+
+At each iteration, in order to simulate via a two-step process in which we generate a sample and then correct in light of data, we propose to introduce an auxiliary variable into importance sampling. The auxiliary variable will be the yet to be corrected sample $(\vec{X}^{t}, \vec{B}^{t})$ at time $t$. Since the corrections are deterministic, the simulated pair $\vec{x}^t, \vec{b}^t \in \Omega$ can only be corrected in one way $(\vec{(x')}^t, \vec{(b')}^t) \in \sigma^{-1}(\vec{Z}^t)$. We will use a projection map $\pi$ to relate the augmented space $\Omega^{*} = \Omega \times \Omega'$ containing the elements $(\vec{(x')}^{t}, \vec{(B')}^{t}, \vec{x}^{t}, \vec{B}^{t})$ to the corrected state space $\Omega'$ containing $(\vec{(x')}^{t}, \vec{(B')}^{t})$. Then, we apply importance sampling to be able to estimate the posterior distribution $p(\vec{(X')}^{t}, \vec{(B')}^{t} | \vec{Z}^{t})$ or the expectation $E_{p}[f(\vec{(X')}^{t},\vec{(B')}^{t})]$ sampling from the known distribution $q$.
+
+For simplicity, let us call $(\vec{X}^{t}, \vec{B}^{t}) = \vec{y}^{t}$ and $(\vec{(X')}^{t}, \vec{(B')}^{t}) = \vec{(y')}^{t}$.
+
+Our strategy is to define a probability $\P^*$ having density $p^*$ on $\Omega^*$ such that the marginal distribution of $\P^*$ on $\Omega'$ is $\P$, that is $\P = \P^* \circ \pi^{-1}$. By the the disintegration theorem (see \cite{Rohlin}) it follows that there exist a family of measures $\{ \nu_{\vec{(y')}^t} \}_{\vec{(y')}^t \in \Omega'}$ on $\Omega^*$ such that for every measurable Borel function $l:\Omega^* \rightarrow [0, \infty]$
+\begin{align*}
+    &\int_{\Omega^*} l(\vec{(y')}^t, \vec{y}^t)\diff (\vec{(y')}^t,\vec{y}^t) = \\
+    & \int_{\Omega'}\int_{\pi^{-1}(\vec{(y')}^t)} l(\vec{(y')}^t, \vec{y}^t) \diff (\vec{(y')}^t, \vec{y}^t) \diff \vec{\vec{y'}}
+\end{align*}
+It follows that for any event $A \in \F'$ where $\F'$ is the $\sigma$-algebra over $\Omega'$,
+\begin{align*}
+    &\P(A) = \P(\pi^{-1}(A)) = \\
+    &\int_{\Omega^*} I_A(\pi(\vec{(y')}^t, \vec{y}^t)) p^*(\vec{(y')}^t, \vec{y}^t | \vec{Z}^t) \D (\vec{(y')}^t, \vec{y}^t) = \\
+    & \int_{\Omega'} I_A(\pi(\vec{(y')}^t) \Bigg[ \int_{\pi^{-1}(\vec{(y')}^t)} p^*(\vec{(y')}^t, \vec{y}^t | \vec{Z}^t) \D (\vec{(y')}^t, \vec{y}^t) \Bigg] \D (\vec{(y')}^t)
+\end{align*}
+and hence
+\begin{equation*}
+    p(\vec{(y')}^t | \vec{Z}^t) = \int_{\pi^{-1}((\vec{y}')^t)} p^*(\vec{(y')}^t, \vec{y}^t | \vec{Z}^t)\; \D (\vec{(y')}^t, \vec{y}^t).
+\end{equation*}
+Moreover,
+\begin{align*}
+    &E_{p}[h(\vec{(y')}^{t})]  = \int_{\Omega'} h(\vec{(y')}^{t})\; p(\vec{(y')}^{t} | \vec{Z}^{t}) \D \vec{(y')}^{t} \\
+    &= \int_{\Omega'} h(\vec{(y')}^{t})\Bigg[\int_{\pi^{-1}(\vec(y'))} p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) \D (\vec{(y')}^t, \vec{y}^t) \Bigg] \D \vec{(y')}^{t} \\ 
+    &= \int_{\Omega^*} h(\pi(\vec{(y')}^{t}, \vec{y}^{t}))\; p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) \D (\vec{(y')}^t, \vec{y}^t) \\ 
+    &= E_{p^*}[h(\pi (\vec{(y')}^{t}, \vec{y}^{t}))].
+\end{align*}
+Applying importance sampling on the probability space $\Omega^*$ with the probability measures $\P$ and $\Q$ with densities $p$ and $q$ respectively where $q$ is the known distribution, we get
+\begin{align*}
+    E_{p^*}[h(\pi (\vec{(y')}^{t}, \vec{y}^{t})] = \int_{\Omega^*} h(\pi(\vec{(y')}^{t}, \vec{y}^{t})) \frac{p^*(\vec{(y')}^{t}, \vec{y}^{t}|\vec{Z}^{t})} {q(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t-1})} \\
+    q(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t-1}) \; \D \vec{y}^{t} \approx \sum_{i=1}^n  w^{t}_i h(\pi (\vec{(y')}^{t}_i, \vec{y}^{t}_i))
+\end{align*}
+where the weights $w^{t}_i$ are:
+\begin{equation*}
+    w^{t}_i = \frac{p^*(\vec{(y')}^{t}_i, \vec{y}^{t}_i | \vec{Z}^{t})} {p(\vec{(y')}^{t}_i, \vec{y}^{t}_i|\vec{Z}^{t-1})}.
+\end{equation*}
+In our example with deterministic substitutions $p^*$ will simply be:
+\begin{equation*}
+    p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) = p(\vec{(y')}^{t} | \vec{Z}^{t}) = \frac{ q(\vec{(y')}^{t}|\vec{Z}^{t-1})} {r(\vec{Z}^{t} | \vec{Z}^{t-1})}
+\end{equation*}
+and
+\begin{equation*}
+    q(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t-1}) = q(\vec{y}^{t} | \vec{Z}^{t-1})
+\end{equation*}
+therefore the normalised weights $w^t$ will be:
+
+\begin{multline*}
+    w^{t} = \frac{q(\vec{(y')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_i | \vec{Z}^{t-1})}\Bigg( \sum_{i=1}^n  \frac{q(\vec{(y')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_i | \vec{Z}^{t-1})}\Bigg)^{-1} = \\
+    \frac{q(\vec{(x')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{x}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg( \sum_{i=1}^n \frac{q(\vec{(x')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{x}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg)^{-1}
+\end{multline*}
+since the constant $r(\vec{Z}^t | \vec{Z}^{t-1})$ of $q(\vec{x}^{t-1}_i,\vec{B}^{t-1}_i | \vec{Z}^{t-1})$ cancels out after normalisation.
+
+In order to be able to apply importance sampling we will need to prove that $\esssupp(p^*) \subseteq \esssupp(q)$
+which is obvious when we consider deterministic substitutions where $p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) \propto q(\vec{(y')}^{t}|\vec{Z}^{t-1})$.
+
+
+
+\end{document}
+
