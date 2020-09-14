@@ -131,11 +131,11 @@ m (f - f') =
 \]
 where $f$ is the founding time of the new nest and $f'$ is the founding time of the parent nest.
 
-For the newly founded nests we will consider a radial distance from the parent nest with a {\color{red}l\'evy distribution}. The distribution over the angular direction will be uniform as it is equally possible to found a nest in every direction from the parent nest.
-{\color{red}
+For the newly founded nests we will consider a radial distance from the parent nest with an exponential distribution. The distribution over the angular direction will be uniform as it is equally possible to found a nest in every direction from the parent nest.
+
 \begin{equation}
-l(x - x', y - y')= J \bigg(\sqrt{\frac{\sigma}{2 \pi}} \frac{e^{- \frac{\sigma}{ 2 r}}}{r^{3/2}}\bigg)
-\end{equation}}
+l(x - x', y - y')= J \bigg(\frac{1}{2 \pi} \sigma e^{- \sigma r}\bigg)
+\end{equation}
 where $J$ is the Jacobian
 
 \[
@@ -172,14 +172,14 @@ I (t' - t) =
 where $t'$ represents the time of detection. So the conditional intensity function will be
 
 \[
-\lambda(x, y, t, f) = \int_{0}^{t} \int_{0}^{f} \iint_{S} m(f - f') \cdot I(t' - t)\cdot J \sqrt{\frac{\sigma}{2 \pi}} \frac{e^{- \frac{\sigma}{ 2 r}}}{r^{3/2}} \d N(x',y',t',f')
+\lambda(x, y, t, f) = \int_{0}^{t} \int_{0}^{f} \iint_{S} m(f - f') \cdot I(t' - t)\cdot \frac{\sigma J }{2 \pi} e^{- \sigma r} \d N(x',y',t',f')
 \]
 where now the term $\d N(x',y',t',f')$ is 1 if a nest was founded in an infinitesimal time about $f'$ at a location in an infinitesimal region about $(x', y')$ and was detected in an infinitesimal time around $t'$ and is $0$ otherwise. Note that we must have $\d N(x',y',t',f')=0$ whenever $f' \geq t'$.
 
 {\color{red} Equivalently, since N is a counting measure, we can write
 
 \[
-\lambda(x, y, t, f) = \sum_{ k: t_k < t } m(f - f_k) \cdot I(t_k - t)\cdot \sqrt{\frac{\sigma}{2 \pi}} [{(x - x_k)^{2} + (y - y_k)^{2}}]^{-1/2} \frac{e^{- \frac{\sigma}{2} [(x - x_k)^{2} + (y - y_k)^{2}]^{-1/2}}}{[(x - x_k)^{2} + (y - y_k)^{2}]^{3/4}}
+\lambda(x, y, t, f) = \sum_{ k: t_k < t } m(f - f_k) \cdot I(t_k - t)\cdot \frac{\sigma}{2 \pi} \frac{1}{\sqrt{(x - x_k)^{2} + (y - y_k)^{2}}} e^{- \sigma \sqrt{(x - x_k)^{2} + (y - y_k)^{2}}}
 \]
 where the sum is over all the $k$ parent nests $(x_k, y_k, t_k, f_k)$ with $t_k < t$.
 
@@ -250,14 +250,16 @@ For the simulation of the process in a time interval $(givanametotheinterval)$ w
     \item Check that the parent nest simulated in the previus step have not been observed before time $T$. If the parent nest have been observed eliminate the point else check that the parent nest is mature (older than 8 months), if younger eliminate else add to the catalogue of events $G^{(t<T)}$.
     \item Simulate the number of offspring $n$ for each parent nests from the previous time from a Poisson distribution with parameter $ m = \zeta T$. Each offspring will be saved in $O^l$ with $m$  defined in \ref{eq:NumOffsp}.
     \item Simulate for each of the offspring the time of founding from a uniform distribution that is $1/(T-f)$ if $t_m \leq f - f' \leq T $ and $0$ otherwise.
-    \item Simulate for each parent nest the location of the $n$ first generation offspring. This is done simulating the angular direction from a uniform distribution in the interval $(0, 2\pi]$ and the radial direction form a L\'evy distribution with parameter $\sigma$ then calculating the coordinates $x$ and $y$.
+    \item Simulate for each parent nest the location of the $n$ first generation offspring. This is done simulating the angular direction from a uniform distribution in the interval $(0, 2\pi]$ and the radial direction form a decaying exponential distribution with parameter $\sigma$ then calculating the coordinates $x$ and $y$.
+    \item Simulate the jumps from a L\'evy distribution (?).
     \item Let $G^{l+1} = \cup_{i\in G^l} O_i^l$.
     \item If $G^l$ is not empty, set $l = l+1$ and return to step 1. Otherwise return $\cup_{j=0}^l G^j$ as the final set of simulated events.
 \end{enumerate}
 
-At each time $T_j$ we will have $m_{j-1}$ nests mature and ready to produce new nests from the previous iteration. These nests indexed $i = 1, \dots, m_{j-1}$ will be older than 8 months, so $f_i < T$. Each of these nests will produce descendants from and inhomogeneous Poisson process. The kth descendant will be founded with intensity ...
+Since we don't simulate the background
 
-(note: what is a good parameter for the L\'evy distribution? is $\sigma = 1/2$ a good parameter? I need also a citation for the L\'evy distribution, why is this consistent with what we are doing? are there papers that have been used in this case before for ants invasions?)
+
+At each time $T_j$ we will have $m_{j-1}$ nests mature and ready to produce new nests from the previous iteration. These nests indexed $i = 1, \dots, m_{j-1}$ will be older than 8 months, so $f_i < T$. Each of these nests will produce descendants from and inhomogeneous Poisson process. The kth descendant will be founded with intensity 
 
 
 \section{Sequential Importance sampling with corrections applied to the self-exciting point process}

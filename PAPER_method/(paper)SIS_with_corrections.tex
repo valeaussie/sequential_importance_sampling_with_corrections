@@ -211,8 +211,8 @@ It will also be useful to define an {\em observation matrix} $\vec{Z}^t = (z^t_{
 For each past system coordinate $x^i_m$ that has not been observed by time $t$ (so that $b^t_{im} = 0$) there may nevertheless be some information that can be derived from the observations and a model of the system. We take a Bayesian approach to quantify this information. At time $t=1$, our knowledge of the system is represented by a prior distribution with density $q(\vec{X}^1, \vec{B}^1)$ on $\Real^M \times 2^M$ and the posterior distribution after observing $\vec{Z}^1$ has a density on $\sigma^{-1}(\vec{Z}^1)$ given by:
 \begin{equation*}
     p(\vec{X}^1, \vec{B}^1 |\vec{Z}^1) =
-        \frac{q(\vec{X}^1, \vec{B}^t)}
-        {r(\vec{Z}^t)} 
+        \frac{q(\vec{X}^1, \vec{B}^1)}
+        {r(\vec{Z}^1)} 
 \end{equation*}
 where
 \begin{align*}
@@ -230,7 +230,7 @@ where $q$ is restricted to $\sigma^{-1}(\vec{Z}^t)$ and
 \begin{align*}
     r(\vec{Z}^t | \vec{Z}^{t-1})  &= \int q(\vec{X}^t, \vec{B}^t | \vec{Z}^{t-1}) \prod_{ \{ i \leq t, m \in \{1, \ldots, t \} : z^t_{im} = - \} } \D x^i_m.
 \end{align*}
-Again $\vec{B}^t$ is fully determined by $\vec{Z}^t$, since $b^t_{im} = 0$ wherever $z^t_{im} = -$ and $b^t_{im} = 1$ otherwise.
+Note that $\vec{Z}^t$ fully determines $\vec{B}^t$ and those elements $x_m^i$ of $\vec{X}^t$ for which $b_{im}^t = 1$, and that the preceding equation integrates over the remaining elements of $\vec{X}^t$. Thus $r(\vec{Z}^t | \vec{Z}^{t-1})$ is effectively the integral of $q(\vec{X}^t, \vec{B}^t | \vec{Z}^{t-1})$ over $\sigma^{-1}(\vec{Z}^t)$, where $\vec{Z}^{t} = \sigma(\vec{X}^t, \vec{B}^t)$.
 
 In this paper we focus on Markovian systems, that is, systems in which each $\vec{x}^t$ is conditionally independent of $\vec{X}^{t-2} = (\vec{x}^1, \ldots,\vec{x}^{t-2})$, given $\vec{x}^{t-1}$. Let $f(\vec{x}^t | \vec{x}^{t-1})$ be the state transitional density distribution characterising the system. We also suppose that our current state of knowledge regarding the trajectory of the system up to and including the current time depends on the current state and our state of knowledge at the previous time step, as follows:
 \begin{align*}
@@ -255,7 +255,15 @@ on $\sigma^{-1}(\vec{Z}^{t-1}) \times \Real^M \times 2^M$, and the joint posteri
 \end{eqnarray*}
 on $\sigma^{-1}(\vec{Z}^t)$.
 
-In light of the fact that $\vec{Z}^t$ fully determines $\vec{B}^t$ and $\vec{B}^t$ is independent of $\vec{X}^t$, the $g$ terms cancel or can be integrated out to give the following prior and posterior densities:
+In light of the fact that $\vec{B}^t$ is independent of $\vec{X}^t$, the $g$ terms can be brought outside the integral in the definitions of $r(\vec{Z}^1)$ and $r(\vec{Z}^t | \vec{Z}^{t-1})$ above. Thus all $g$ terms cancel in the above expression for $p(\vec{X}^t, \vec{B}^t | \vec{Z}^t)$. Moreover, all $g$ terms except the final term $g(\vec{B}^t | \vec{B}^{t-1})$ cancel in the above expression for $q(\vec{X}^t, \vec{B}^t | \vec{Z}^{t-1})$ and this last term may be removed by summing over $\vec{B}^t$. We will therefore abuse notation slightly by reinterpreting $\sigma^{-1}(\vec{Z}^t)$ as a subset of $\Real^{tM}$, since the second co-ordinate $\vec{B}^t$ is the same for all $(\vec{X}^t, \vec{B}^t) \in \sigma^{-1}(\vec{Z}^t)$. Moreover, it will be convenient to redefine
+\begin{align*}
+    r(\vec{Z}^1)  &= \int f(\vec{x}^1) \prod_{ \{m \in \{1, \ldots, t \} : z^1_{1m} = - \} } \D x^1_m
+\end{align*}
+and
+\begin{align*}
+    r(\vec{Z}^t | \vec{Z}^{t-1})  &= \int q(\vec{X}^t | \vec{Z}^{t-1}) \prod_{ \{ i \leq t, m \in \{1, \ldots, t \} : z^t_{im} = - \} } \D x^i_m.
+\end{align*}
+With this modified notation, we can now write:
 \[
 q(\vec{X}^1) = f(\vec{x}^1),
 \]
@@ -268,14 +276,11 @@ on $\sigma^{-1}(\vec{Z}^{t-1}) \times \Real^M $ and
     p(\vec{X}^t | \vec{Z}^t) 
 & = & \frac{f(\vec{x}^1)}{r(\vec{Z}^1)} \prod_{i=2}^t \frac{f(\vec{x}^i | \vec{x}^{i-1}) }{r(\vec{Z}^t | \vec{Z}^{t-1})} 
 \end{eqnarray*}
-on $\sigma^{-1}(\vec{Z}^t)$, where we have somewhat abused notation by redefining
-\begin{align*}
-    r(\vec{Z}^1)  &= \int f(\vec{x}^1) \prod_{ \{m \in \{1, \ldots, t \} : z^1_{1m} = - \} } \D x^1_m
-\end{align*}
-and
-\begin{align*}
-    r(\vec{Z}^t | \vec{Z}^{t-1})  &= \int q(\vec{X}^t | \vec{Z}^{t-1}) \prod_{ \{ i \leq t, m \in \{1, \ldots, t \} : z^t_{im} = - \} } \D x^i_m.
-\end{align*}
+on $\sigma^{-1}(\vec{Z}^t)$.
+
+
+
+
 
 
 
