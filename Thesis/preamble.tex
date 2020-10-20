@@ -59,6 +59,7 @@
 \usepackage{emptypage}
 \usepackage[shortlabels]{enumitem}
 \usepackage[english]{babel}
+\usepackage{enumitem}
 \usepackage{eqparbox}
 \usepackage{extarrows}
 \usepackage{eucal}
@@ -82,8 +83,11 @@
   \usetikzlibrary{matrix,calc}
   \usetikzlibrary{decorations.markings,decorations.pathreplacing}
   \usetikzlibrary{patterns}
+\usepackage[usenames]{color}
 \usepackage{url}
+\usepackage{xcolor}
 \usepackage{xspace}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % If you prefer the slanted inequalities (Kaustav does not)
@@ -118,6 +122,44 @@
 \newcommand{\BR}{\{e^{\frac{2\pi i}{3}},e^{-\frac{2\pi i}{3}}\}}
 \renewcommand{\bar}[1]{\overline{#1}}    % Overline looks nicer for conjugation...
 \newcommand{\con}{\rightarrow\leftarrow} % Contradiction
+
+\newcommand{\Real}{\mathbb R}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\s}{\mathbb{S}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\Q}{\mathsf{Q}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathscr{D}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\newcommand{\K}{\mathbb{K}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
 
 % Nicer looking gray
 \definecolor{Gray}{gray}{0.9}
