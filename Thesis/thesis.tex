@@ -1,8 +1,4 @@
 \documentclass[a4paper,12pt,onesided]{report}
-%---This thesis template was created by Darcy Best. It was adapted by Kaustav Das for mathematics PhD students at Monash University.
-
-
-%---This is your master file. Compile this TeX file to obtain the PDF output. Remember to save your other TeX files before you compile!
 
 \input{preamble}
 
@@ -14,7 +10,7 @@
 \input{Thesis/frontpages/copyright}
 \input{Thesis/frontpages/abstract}
 \input{Thesis/frontpages/declaration}
-\input{Thesis/frontpages/publications}
+%\input{Thesis/frontpages/publications}
 \input{Thesis/frontpages/dedication}
 \input{Thesis/frontpages/acknowledgements}
 
@@ -24,25 +20,27 @@
 
 
 \mainmatter
-%---Put chapters into chapters folder!
 
-\input{chapters/ch1}
-\input{chapters/ch2}
-%\input{chapters/ch3}
-%\input{chapters/ch4}
-%\input{chapters/ch5}
-%\input{chapters/ch6}
-%\input{chapters/ch7}
+\input{Thesis/chapters/chIntro}
+\input{Thesis/chapters/chPF}
+\input{Thesis/chapters/chSIScorr}
+\input{Thesis/chapters/chHawkes}
+\input{Thesis/chapters/chModel}
+\input{Thesis/chapters/chRIFA}
+\input{Thesis/chapters/chConclusion}
 
-\bibliographystyle{apalike}
-\bibliography{thesis-refs} % References come BEFORE appendices.
+
+\bibliographystyle{abbrvnat}
+\bibliography{thesis-refs} 
+
+% References come BEFORE appendices.
 
 
 %---Put appendices into chapters folder!
 \appendix
 
-\input{Thesis/chapters/app1}
-%\input{chapters/app2}
+\input{Thesis/chapters/appAlgo}
+\input{Thesis/chapters/appDisint}
 %\input{chapters/app3}
 
 \end{document}

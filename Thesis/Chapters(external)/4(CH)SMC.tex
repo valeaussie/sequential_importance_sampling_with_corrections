@@ -1,0 +1,268 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{enumitem}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+
+ \textwidth=16cm \hoffset = -1.9cm
+ \lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\s}{\mathbb{S}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\Q}{\mathsf{Q}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathscr{D}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\widesim}[2][1.5]{
+  \mathrel{\overset{#2}{\scalebox{#1}[1]{$\sim$}}}
+}
+
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator*{\esssup}{ess~sup}
+\DeclareMathOperator*{\essinf}{ess~inf}
+\DeclareMathOperator*{\diam}{diam}
+\DeclareMathOperator*{\ROC}{ROC}
+\DeclareMathOperator*{\sinc}{sinc}
+\DeclareMathOperator*{\sign}{sign}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\newcommand{\K}{\mathbb{K}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}{Definition}[section]
+
+
+\title{Particle filters}
+
+\begin{document}
+
+\section{State Space Models}
+
+In many data analysis tasks we will want to estimate unknown quantities from some give observations. We usually also have some prior information about the phenomenon we want to analyse, and this allow us to formulate Bayesian models to make inferences on the unknown quantities from the posterior distribution of those models. However, this posterior distribution often does not have a closed form and cannot be evaluated analytically. When this happens we can employ Monte Carlo methods, a class of computational algorithms used to generate approximate solutions through repeated random sampling to problems where analytical solutions don't exist or are hard to implement.
+
+Often the observations that we receive arrive sequentially in time and we will want to perform inference on-line, i.e. updating our predictions each time we receive new data. Sequential Monte Carlo (SMC) methods are a set of Monte Carlo algorithms that deal with this kind of problems. 
+Different SMC algorithms like boostrap filters, condensation, particle filters, Monte Carlo Filters, interacting particle approximations and survival of the fittest have been applied to a wide range of problems in many fields. For example in economics (cite), signal processing (cite), target tracking (cite), neuroscience (cite), and biology (cite) ... to name a few. In particular for invasive species ...
+
+Stochastic Particle Algorithms are a type of SMC methods used for solving State Space Models also called Hidden Markov Models (HMM). State space models will contain two sequence of random variable: the hidden or unobserved state and a sequence of noisy observations. The hidden states, $\{ X_t \}$ with $t \in \mathbb{N}$ and $X_t \in \mathcal{X}$ will be modelled from a discrete-time Markov process with initial distribution $\mu(x_1)$ and transition equation $f(x_t | x_{t-1})$ representing the probability distribution associated with moving from one state to the next. Notice that the densities are all with respect to a dominating measure that we will denote, with abuse of notation $\d x_t$. The observations $\{ Y_t \}$ with $t \in \mathbb{N}$ and $Y_t \in \mathcal{Y}$ will depend only on $x_t$ and will have marginal distribution $g(y_t | x_t)$ with respect to a dominating measure $\d y_t$. For simplicity we will consider only the homogeneous case where the transition and the observation densities are independent of the time index $t$. The generalization to the non homogeneous case is straightforward. In summary the model is described by
+
+\begin{align}
+    & X_1 \sim \mu(x_1), \nonumber \\
+    & X_t | (X_{t-1} = x_{t-1}) \sim f(x_t | x_{t-1}) \quad \text{for} \quad t\geq 1, \label{eq:1X_t} \\ 
+    & Y_t | (X_t = x_t) \sim g(y_t | x_t) \quad \text{for} \quad t\geq 1. \label{eq:1Y_t}
+\end{align}
+Equations (\ref{eq:1X_t}) and (\ref{eq:1Y_t}) determine a Bayesian model in which the first two define a prior distribution of the hidden process $\{ X_t \}$ and the last one defines the likelihood function:
+
+\begin{align*}
+    & p(x_1, \dots, x_t) = \mu(x_1) \prod_{k=2}^t f(x_k | x_{k-1}), \\
+    & p(y_1, \dots, y_t | x_1, \dots, x_t) = \prod_{k=1}^t g(y_k | x_k).
+\end{align*}
+In particular for a linear and Gaussian model we have $\mathcal{X} = \mathbb{R}^{t_x}$ and $\mathcal{Y} = \mathbb{R}^{t_y}$ with
+
+\begin{align*}
+    X_1 &\sim \mathcal{N}(0, \Sigma),\\
+    X_t & = A X_{t-1} + B V_t, \\
+    Y_t & = C X_t + D W_t
+\end{align*}
+where $V_t \widesim{i.i.d.} \mathcal{N}(0, I_{t_v})$, $W_t \widesim{i.i.d.} \mathcal{N}(0, I_{t_w})$ and $A, B, C, D$ are matrices of appropriate dimensions. 
+
+We generally look to address three classes of problems with SMC methods: filtering, smoothing and parameter estimation:
+
+\begin{itemize}
+    \item Filtering and Marginal likelihood computation: we will want to sequentially approximate the distributions $\{ p(x_1, \dots, x_t | y_1, \dots, y_t) \}$ and the marginal likelihood $\{ p(y_1, \dots, y_t) \}$.
+    \item Smoothing: we will want to estimate the past states of all available data, so we attempt to sample from a joint distribution $p(x_1, \dots, x_T | y_1, \dots, y_T)$ and approximate the associated marginals $\{ p(x_n | y_1, \dots, y_T)\}$ with $n = 1, \dots, T$. Notice that in general particle filtering technique can be used to solve this problems but perfomr poorly when $T$ is large \cite{DoucetTutorial}.
+    \item Parameter estimation: in addition to estimate the states we might also want to estimate the unknown parameter from the data.
+\end{itemize}
+
+Here we will focus on the filtering problem which is the what our new method addresses. The inference about the hidden values $(X_1, \dots, X_t)$ given the observations $(Y_1 = y_1, \dots, Y_t = y_t)$ relies on the evaluation of the posterior
+
+\begin{equation*}
+    p(x_1, \dots, x_t | y_1, \dots, y_t) = \frac{p(x_1, \dots, x_t, y_1, \dots, y_t)}{p(y_1, \dots, y_t)}
+\end{equation*}
+where
+
+\begin{align*}
+    p(x_1, \dots, x_t, y_1, \dots, y_t) &= p(x_1, \dots, x_t) p(y_1, \dots, y_t | x_1, \dots, x_t), \\
+    p(y_1, \dots, y_t) &= \int p(x_1, \dots, x_t, y_1, \dots, y_t) \d (x_1, \dots, x_t).
+\end{align*}
+The unnormalised posterior distribution is such that
+
+\begin{equation*}
+    p(x_1, \dots, x_t, y_1, \dots, y_t) = p(x_1, \dots, x_{t-1}, y_1, \dots, y_{t-1})f(x_t|x_{t-1})g(y_t|x_t)
+\end{equation*}
+thus the posterior can be written recursively as follows
+
+\begin{equation} \label{eq:recpost}
+    p(x_1, \dots, x_t | y_1, \dots, y_t) = p(x_1, \dots, x_{t-1}| y_1, \dots, y_{t-1})\frac{f(x_t|x_{t-1})g(y_t|x_t)}{p(y_t | y_1, \dots, y_{t-1})}
+\end{equation}
+with
+
+\begin{equation} \label{eq:condobs}
+    p(y_t | y_1, \dots, y_{t-1}) = \int p(x_1, \dots, x_{t-1}| y_1, \dots, y_{t-1}) f(x_t|x_{t-1})g(y_t|x_t) \d (x_{t-1}, x_t).
+\end{equation}
+We can also introduce the prediction distribution $p(x_t | y_1, \dots, y_{t-1})$ integrating out $x_1, \dots, x_{t-1}$ in (\ref{eq:recpost}) obtaining
+
+\begin{equation*}
+    p(x_t | y_1, \dots, y_t) = \frac{g(y_t | x_t) p(x_t | y_1, \dots, y_{t-1})}{p(y_t | y_1, \dots, y_{t-1})}
+\end{equation*}
+where
+
+\begin{equation*}
+    p(x_t | y_1, \dots, y_{t-1}) = \int f(x_t | x_{t-1}) p(x_{t-1} | y_1, \dots, y_{t-1}) \d x_{t-1}.
+\end{equation*}
+We have seen that $\{ p(x_1, \dots, x_t | y_1, \dots, y_t) \}$ can be computed sequentially, it follows that also $\{ p(x_t | y_1, \dots, y_t) \}$ can be computed sequentially and the marginal likelihood $p(y_1, \dots, y_t)$ can be written
+
+\begin{equation*}
+    p(y_1, \dots, y_t) = p(y_1)\prod_{k=2}^t p(y_t | y_1, \dots, y_{t-1})
+\end{equation*}
+were $p(y_t | y_1, \dots, y_{t-1})$ was defined in (\ref{eq:condobs}).
+For finite state-spaces HMM where $Pr(X_1 = k) = \mu(k)$ and $Pr(X_t = k | X_{t-1} = l) = f(k|l)$ the integrals correspond to finite sums ant the discrete probability distributions can be computed exactly. 
+
+When data can be modelled by a linear Gaussian state-space model we can derive exact analytical solutions using the Kalman Filter introduced by Rudolf Emil K\'alm\'an in 1960 \cite{Kalman}. However, data is often non-linear and non-Gaussian and therefore other methods have been developed to solve analytically this kind of models, like the Extendend Kalman Filter \cite{Anderson} \cite{Jazwinski}, the Gaussian sum approximation \cite{Soreson} and the grid-based filters \cite{Bucy}. The first two methods can lead to poor results, while the grid based one can lead to accurate results but can be hard to implement (while there is a citation here, it might be useful to understand and explain why those methods are not ideal in some settings). SMC methods offer an alternative method that is flexible, easy to implement, parallelisable and applicable in general settings\cite{DoucetBook}. The price to pay for this flexibility is the high computational cost that these algorithm require.
+
+Particle filters (PF), introduced in 1993 by Gordon et al. \cite{Gordon} are a set of SMC methods that deal with filtering problems. In particular, here we will focus on describing the Sequential Importance Sampling (SIS) algorithm, which is the particle filter methodology of which our method is a modification.
+
+We want to underline again that SMC methods are a general class of Monte Carlo Methods, and particle methods for filtering and smoothing are only examples, although the most common perhaps, of SMC algorithms \cite{DoucetTutorial}. SMC method sample sequentially from a succession of target probability densities $\{ \pi_t(x_1, \dots, x_t) \}$ of increasing dimension where each distribution $\pi_t(x_1, \dots, x_t)$ is defined on the product space $\mathcal{X}^t$. If we can write
+
+\begin{equation*}
+    \pi_t(x_1, \dots, x_t) = \frac{\gamma_t(x_1, \dots, x_t)}{Z_t}
+\end{equation*}
+were
+
+\begin{equation*}
+    Z_t = \int \gamma_t(x_1, \dots, x_t) \d (x_1, \dots, x_t)
+\end{equation*}
+might be unknown and we require that $\gamma_t : \mathcal{X}^t \rightarrow \mathbb{R}^+$ is known pointwise, SMC provide an approximation for $\pi_1(x_1)$ and an estimate of $Z_1$ at time 1 then an approximation of $\pi_2(x_1, x_2)$ and an estimate of $Z_2$ at time 2 and so on.
+
+So, in the context of filtering we could have $\gamma_t(x_1, \dots, x_t) = p(x_1, \dots, x_t, y_1, \dots, y_t)$, $Z_t = p(y_1, \dots, y_t)$ and $\pi(x_1, \dots, x_t) = p(x_1, \dots, x_t | y_1, \dots, y_t)$, but this is only one possible choice of the target distribution.
+
+The literature on Sequential Monte Carlo methods and Particle Filters in particular is vast and continuously evolving. Here we want to mention \cite{} as only a few useful reference material on the subject.
+
+\section{Monte Carlo Method}
+
+Let us first assume that we can sample $N$ independent random variables form the density $\pi_t(x_1, \dots, x_t)$ for some fixed $t$, obtaining $N$ independent random variables $(X_1, \dots, X_t)^i \sim \pi_t(x_1, \dots, x_t)$ for $i = 1, \dots, N$. We can then approximate $\pi_t(x_1, \dots, x_t)$ with the empirical measure
+
+\begin{equation*}
+    \hat{\pi}_t(x_1, \dots, x_t) = \frac{1}{N} \sum_{i=1}^N \delta_{(X_1, \dots, X_t)^i}(x_1, \dots, x_t),
+\end{equation*}
+where $\delta_{X^l}(x)$ is the Dirac delta function located at $X^l$. Similarly we can approximate $\pi_t(x_k)$ so that
+
+\begin{equation*}
+    \hat{\pi}_t(x_k) = \frac{1}{N} \sum_{i=1}^N \delta_{X_t^i}(x_k),
+\end{equation*}
+or the expectation of any function $\varphi_t : \mathcal{X}^t \rightarrow \mathbb{R}$ given by
+
+\begin{equation*}
+    I_t(\varphi_t) = \int \varphi_t (x_1, \dots, x_t) \pi_t (x_1, \dots, x_t) \d (x_1, \dots, x_t)
+\end{equation*}
+can be estimated by
+
+\begin{equation*}
+    I^{MC}_t(\varphi_t) \coloneqq \int \varphi_t(x_1, \dots, x_t) \hat{\pi} (x_1, \dots, x_t) \d (x_1, \dots, x_t) = \frac{1}{N} \sum_{i=1}^N \varphi_t((X_1, \dots, X_t)^i).
+\end{equation*}
+This estimate is unbiased as
+
+\begin{equation*}
+    E[I^{MC}_t(\varphi_t)] = \frac{1}{N}\sum_{i=1}^N E[\varphi_t((X_1, \dots, X_t)^i)] = \frac{1}{N} \sum_{i=1}^N I_t(\varphi_t) = I_t(\varphi_t)
+\end{equation*}
+and is similarly easy to check that
+
+\begin{equation*}
+    Var(I^{MC}_t(\varphi_t)) = \frac{1}{N} \bigg( \int \varphi^2(x_1, \dots, x_t) \pi(x_1, \dots, x_t) \d (x_1, \dots, x_t) - I^2_t(\varphi_t)\bigg).
+\end{equation*}
+
+\section{Importance Sampling}
+
+Often, we cannot sample from $\pi_t (x_1, \dots, x_t)$. This problem can be solved using Importance Sampling, which is a form of Monte Carlo integration used to evaluate an intractable density that has the same support of a density from which we can sample. We will introduce an \textit{importance density} $q_t(x_1, \dots, x_t)$ such that
+
+\begin{equation*}
+    \pi_t(x_1, \dots, x_t) > 0 \Rightarrow q_t(x_1, \dots, x_t) > 0.
+\end{equation*}
+In this case we have
+
+\begin{align*}
+    &\pi_t(x_1, \dots, x_t) = \frac{w_t(x_1, \dots, x_t)q_t(x_1, \dots, x_t)}{Z_t}, \\
+    &Z_t = \int w_t(x_1, \dots, x_t)q_t(x_1, \dots, x_t) \d (x_1, \dots, x_t)
+\end{align*}
+were $w_t(x_1, \dots, x_t)$ is the unnormalised weight function
+
+\begin{equation*}
+    w_t(x_1, \dots, x_t) = \frac{\gamma_t(x_1, \dots, x_t)}{q_t(x_1, \dots, x_t)}.
+\end{equation*}
+So we can choose the importance density from which it is easy to sample. Assume we draw $N$ independent samples $X^i_j \sim q_t(x_1, \dots, x_t)$ with $i = 1, \dots, N$ and $j = 1, \dots, t$. Then the empirical measure of the samples $X^i_j$ is  then the Monte Carlo estimator approximate the expectation $\mathbb{E(X)}$
+
+
+
+\subsection{Sequential Importance Sampling}
+
+Moreover, if we can sample from $\pi_t (x_1, \dots, x_t)$ but we will want to do it sequentially for each value of $t$, the algorithm will have a computational complexity which will increase at least linearly with $t$. 
+
+\subsection{Degeneracy and choice of importance function}
+
+\section{Other SMC methods}
+
+
+
+
+\begin{thebibliography}{99}
+
+\bibitem{DoucetBook} Ducet A, de Freitas N, Gordon N (2001) Sequential Monte Carlo Methods in Practice. \textit{Springer-Verlag New York}
+
+\bibitem{DoucetTutorial} Ducet A, Johansen A M (2011) A Tutorial on Particle Filtering and Smoothing: Fifteen Years Later. In Crisan D & Rozovskii B (Eds.) \textit{Oxford Handbook of Nonlinear Filtering} (pp. 656-704). Oxford University Press.
+
+\bibitem{Gordon} Gordon N J, Salmond D J, Smith A F M (1993) Novel approach to nonlinear/non-Gaussian Bayesian state estimation. \textit{IEE-Proceedings-F} 140:107-113.
+
+\bibitem{Kalman} Kalman R E (1960) A New Approach to Linear Filtering and Prediction Problems. \textit{Transactions of the ASME-Journal of Basic Engineering} 82(Series D): 34-45
+
+
+
+\end{thebibliography}
+
+
+\end{document}

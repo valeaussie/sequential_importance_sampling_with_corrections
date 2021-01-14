@@ -1,9 +1,9 @@
 \chapter[Hawkes Processes and Spatio-temporal self-exciting point processes]{Hawkes Processes and Spatio-temporal self-exciting point processes}
 \label{ch:Hawkes}
 
-The idea of self-exciting point processes was first introduced by Hawkes in 1971 \cite{Hawkes71} and has been since applied to a variety of fields like economic sciences, natural sciences, social sciences and more. These models are well suited to events that would cluster, like for example the aftershocks following earthquakes \cite{Ogata88}, \cite{Mohler}. We will utilise a self-exciting spatial-temporal point process to model the RIFA invasion as in general invasive species involve clustering. This model will alos allow us to disregard the phylogeny of the nests making the simulations faster than for some existing models for this invasion. The phylogeny could be reconstructed if needed.
+The idea of self-exciting point processes was first introduced by \cite{Hawkes71} and has been since applied to a variety of fields like economic sciences, natural sciences, social sciences and more. These models are well suited to events that would cluster, like for example the aftershocks following earthquakes (see \cite{Ogata88} and \cite{Mohler}). We will utilise a self-exciting spatial-temporal point process to model the RIFA invasion as in general invasive species involve clustering. This model will alos allow us to disregard the phylogeny of the nests making the simulations faster than for some existing models for this invasion. The phylogeny could be reconstructed if needed.
 
-In this chapter we aim to introduce self-exciting point process in a general manner. This is not an in depth presentation of the subject which can be found in several books like Daily and Vere-Jones ``An Introduction to the Theory of Point Processes: Elementary Theory and Methods" \cite{Daley} or Snyder``Random Point Process in Time and Space" \cite{Snyder}.
+In this chapter we aim to introduce self-exciting point process in a general manner. This is not an in depth presentation of the subject which can be found in several books like Daily and Vere-Jones ``An Introduction to the Theory of Point Processes: Elementary Theory and Methods" (\cite{Daley}) or Snyder``Random Point Process in Time and Space" (\cite{Snyder}).
 
 A self-exciting point process is a counting process modelling a sequence of events over time. Each of these events will ``excite" the process, meaning that the likelihood of a new event is increased for some time after the first arrival. We will first consider the one dimensional case also known as Hawkes process.
 
@@ -17,7 +17,7 @@ Let us first define a counting process as a stochastic process which represents 
     \end{enumerate}
 \end{definition}
 
-This can be also viewed as a simple point process characterised by the sequence of random arrivals times $\vec{T} = \{ t_1, t_2 \dots \}$ at which the counting process has jumped. More formally (definition adapted from Jacobsen \cite{Jacobsen} chapter 2.1)
+This can be also viewed as a simple point process characterised by the sequence of random arrivals times $\vec{T} = \{ t_1, t_2 \dots \}$ at which the counting process has jumped. More formally (definition adapted from \cite{Jacobsen} chapter 2.1)
 
 \begin{definition}
     A \textbf{simple point process} is a sequence of random variables $\vec{T} = \{ t_1, t_2 \dots \}$ defined on the probability space $(\Omega, \mathcal{F}, \mathbb{P})$ and with values in $\mathbb{R}_{>0} \cup \infty$ such that:
@@ -29,7 +29,7 @@ This can be also viewed as a simple point process characterised by the sequence 
 \end{definition}
 
 Hence a simple point process is an almost surely increasing sequence of strictly positive, possibly infinite random variables, strictly increasing as long as they are finite and such that only finitely many events can occur in any finite time interval. Notice that no points coincide as they are strictly ordered in time.
-The interpretation of a finite $t_n$ is the timepoint at which the $n$th recording of an event takes place with less than $n$ events occurring all together on the time axis $\mathbb{R}_{>0} \cup \infty$ if $t_n = \infty$. By definition no event can happen at time $0$. See Daley and Vere-Jones chapter 3 for a complete explanation on how Point processes on the line can be described \cite{Daley}.
+The interpretation of a finite $t_n$ is the timepoint at which the $n$th recording of an event takes place with less than $n$ events occurring all together on the time axis $\mathbb{R}_{>0} \cup \infty$ if $t_n = \infty$. By definition no event can happen at time $0$. See Daley and Vere-Jones chapter 3 (\cite{Daley}) for a complete explanation on how Point processes on the line can be described.
 
 We can characterise a point process defining the cumulative distribution function of the next arrival time conditioned on the past events $\mathcal{H}_u$
 
@@ -43,7 +43,7 @@ By the chain rule the joint density for a realisation $\{ t_1, \dots, t_k\}$ wil
 \begin{equation}\label{eq:JointDensHawkes}
     p(t_1, \dots, t_k) = \prod_{i=1}^k f(t_i | \mathcal{H}_{t_{i-1}}).
 \end{equation}
-A point process is completely defined if the joint probability distributions are known for the number of events in all finite families of disjoint intervals (see Daley and Vere-Jones chapter 5 and 9 \cite{Daley}).
+A point process is completely defined if the joint probability distributions are known for the number of events in all finite families of disjoint intervals (see  \cite{Daley} chapter 5 and 9).
 
 If a point process has a probability distribution function $f(t)$ that is independent of the history $\mathcal{H}_t$ we call this process a \textit{renewal process}. Another way to state this is that $f(t) = g(t - t_k)$ for some p.d.f. $g : \mathbb{R}^+ \rightarrow \mathbb{R}^+$. This way the interarrival times are independent and identically distributed (i.i.d) random variables.
 
@@ -108,7 +108,7 @@ The quantity $\mu$ is called \textit{background intensity} and the function $g$ 
 \end{equation*}
 where $\{ t_1, \dots, t_k\}$ represents the observed sequence of past events up to time $t$.
 
-The process is called ``self-exciting" because of the dependence of the conditional intensity function on the past history $\mathcal{H}_t$ of the system allowing events to trigger new events. The triggering function $g$ can take many forms, so the process may depend only on the recent history if $g$ decays rapidly or may have longer term effects \cite{Reinhart}. However, we generally require that $\lambda(t | \mathcal{H}_t)  \geq 0$, therefore we must have $g(t) \geq 0$ for every value of $t$ and $g(t) = 0$ for $t < 0$.
+The process is called ``self-exciting" because of the dependence of the conditional intensity function on the past history $\mathcal{H}_t$ of the system allowing events to trigger new events. The triggering function $g$ can take many forms, so the process may depend only on the recent history if $g$ decays rapidly or may have longer term effects (\cite{Reinhart}). However, we generally require that $\lambda(t | \mathcal{H}_t)  \geq 0$, therefore we must have $g(t) \geq 0$ for every value of $t$ and $g(t) = 0$ for $t < 0$.
 
 The general definition for the conditional intensity $\lambda$ for any point process is
 
@@ -116,7 +116,7 @@ The general definition for the conditional intensity $\lambda$ for any point pro
     \lambda(t | \mathcal{H}_t) = \lim_{h \to 0} \frac{\mathbb{E}[N(t+h) - N(t) | \mathcal{H}_t]}{h}
 \end{equation*}
 so it represents the mean number of events in a region conditional on the past.
-Let us rewrite this last equation as \cite{Rasmussen}
+Let us rewrite this last equation (\cite{Rasmussen})
 
 \begin{equation*}
     \lambda(t | \mathcal{H}_t) \d t = \mathbb{E}[N(\d t) | \mathcal{H}_t]
@@ -137,7 +137,7 @@ Where the quantities $f(t)$ and $F(t)$ where defined in equation (\ref{eq:CumDis
 \end{equation}
 For ease of notation here and from now on we are omitting the conditioning over the past events $\mathcal{H}_t$.
 
-It has been proved by Hawkes and Oakes \cite{Hawkes74} that any stationary self-exciting point process with finite intensity function can be interpreted as a Poisson cluster process. Then events are partitioned into two disjoint processes: a background process for the cluster centers which is a Poisson process with rate $\mu$, and separate offspring process of the events triggered inside each cluster, whose intensities are determined by $g$. Each triggered event may then trigger new events. The number of offspring of each event is drawn from a Poisson distribution with mean 
+It has been proved by \cite{Hawkes74} that any stationary self-exciting point process with finite intensity function can be interpreted as a Poisson cluster process. Then events are partitioned into two disjoint processes: a background process for the cluster centers which is a Poisson process with rate $\mu$, and separate offspring process of the events triggered inside each cluster, whose intensities are determined by $g$. Each triggered event may then trigger new events. The number of offspring of each event is drawn from a Poisson distribution with mean 
 
 \begin{equation*}
     m = \int_0^\infty g(t) \d t.
@@ -155,7 +155,7 @@ Similarly to the Hawkes' self-exciting temporal processes, the self-exciting spa
 \begin{equation}\label{eq:meanoffsp}
     m = \int_X \int_0^T g(s, t) \d t \d s.
 \end{equation}
-So far we have considered the points of a point process as indistinguishable other then by their time and location. Often, however, we need to take in consideration other quantities. For example, one may wish to analyse locations and time of observations of an invasive species plant alongside the age of the organism. Such process may be viewed as a \textit{marked} point process. A marked point process is a point process of events $\{ (s_i, t_i, k_i ) \}$ where  $s_i \in X \subseteq \mathbb{R^d}$, $t_i \in [0, T)$ and $k_i \in \mathcal{K}$ where $K$ is the \textit{marked space} (in our example the space of plants ages).
+We have considered the points of a point process as indistinguishable other then by their time and location. Often, however, we need to take in consideration other quantities. For example, one may wish to analyse locations and time of observations of an invasive species plant alongside the age of the organism. Such process may be viewed as a \textit{marked} point process. A marked point process is a point process of events $\{ (s_i, t_i, k_i ) \}$ where  $s_i \in X \subseteq \mathbb{R^d}$, $t_i \in [0, T)$ and $k_i \in \mathcal{K}$ where $K$ is the \textit{marked space} (in our example the space of plants ages).
 
 The \textit{ground process} of a marked point process is the point process of events locations and times without the marks with conditional intensity $\lambda_g(s, t)$. The conditional intensity for the marked point process can be written as
 
@@ -217,7 +217,7 @@ We obtain the Likelihood for a Hawkes process from the following theorem {\color
 \end{proof}
 Notice that this is the likelihood of an inhomogeneous Poisson process with $\Lambda(0, T] = -\int_{0}^T \lambda(u) \d u$ as in equation (\ref{eq:LikInhPoiPro}).
 
-The likelihood for a temporal point process can also be defined in terms of the Janossy density. Here we only make a quick mention of the method. For a full explanation see Daley Chapter 7 \cite{Daley}).
+The likelihood for a temporal point process can also be defined in terms of the Janossy density. Here we only make a quick mention of the method. For a full explanation see Daley Chapter 7 (\cite{Daley})).
 Let $(A_1, \dots, A_k)$ be a partition of $[0, T]$ with $A_i$ the possible times for event $i$ and let us call $p_k$ with $k = 0, 1, \dots$ the distribution of the total number of points, with $\sum_{k=0}^\infty p_k = 1$. Let us also define for each integer $k \geq 1$ the probability distribution $\Pi_k^{sym}(\cdot)$ determining the joint distribution of the times of events in the process, given there are $k$ total events. This distribution is symmetric because we consider unordered sets and this distribution should therefore give equal weights to all $k!$. We define the Janossy measure $J_k$ as
 \begin{equation*}
     J_k(A_1 \times \dots \times A_k) = k!p_k\Pi_k^{sym}(A_1 \times \dots \times A_k).
@@ -229,7 +229,7 @@ When derivatives exists we can introduce the density $j_k(t_1, \dots, t_k)$ of t
 \end{equation*}
 were $j_k(t_1, \dots, t_k | T)$ is the local Janossy density interpreted as the probability that there are exactly $k$ events in the process before time $T$, one in each of the infinitesimal intervals.
 
-The likelihood of a spatio-temporal self-exciting point process is obtained by treating the spatial locations as marks therefore obtain the log-likelihood (Daley and Vere-Jones (2003) Proposition 7.3.III) \cite{Daley}
+The likelihood of a spatio-temporal self-exciting point process is obtained by treating the spatial locations as marks therefore obtain the log-likelihood (Daley and Vere-Jones (2003) Proposition 7.3.III) (\cite{Daley})
 
 \begin{proposition}
     Let $N$ be a regular marked point process on $[0, T] \times X$ where $X \subset \mathbb{R}^2$ for some positive $T$, and let $(t_1, x_1), \dots, (t_{N_g(T)}, x_{N_g(T)})$ be a realisation of $N$ over the interval $[0, T]$. Then the likelihood $L$ of such a realisation is expressible  in the form
@@ -249,7 +249,7 @@ were $\lambda_g(t)$ is the ground process and $f(x | t)$ is the conditional prob
 
 The simulation of the likelihood of a self-exciting spatial-temporal point process will be necessary in the application of the new SIS methodology to the RIFA model that we will encounter in future chapters.
 
-For Hawkes processes an algorithm to generate data from the model was introduced by Ozaki in 1979 (\cite{Ozaki}). This focuses on equation (\ref{logCDF})
+For Hawkes processes an algorithm to generate data from the model was introduced by \cite{Ozaki}. This focuses on equation (\ref{logCDF})
 
 \begin{equation*}
     \int_{t_k}^t \lambda (u) \d u = - \log(1 - F(t)).
@@ -260,10 +260,10 @@ From this equation we can see that the next arrival time $T_{k+1}$ can be genera
 \end{equation*}
 Solving for $t_{k+1}$ can be done numerically using Newton-Raphson method, however, this entails a significant computational effort.
 
-Ogata (\cite{Ogata81}) introduced a simulation algorithm for Point processes which is based on the thinning algorithm introduced by Lewis and Shedler (\cite{Lewis}) for inhomogeneous Poisson processes. In this process we simulate a ``faster" homogeneous Poisson Process whose rate cannot be less than $\lambda(\cdot)$ over $[0,T]$,  we then remove point probabilistically in such a way that the remaining points satisfy the intensity function $\lambda(\cdot)$.
+\cite{Ogata81} introduced a simulation algorithm for Point processes which is based on the thinning algorithm introduced by \cite{Lewis} for inhomogeneous Poisson processes. In this process we simulate a ``faster" homogeneous Poisson Process whose rate cannot be less than $\lambda(\cdot)$ over $[0,T]$,  we then remove point probabilistically in such a way that the remaining points satisfy the intensity function $\lambda(\cdot)$.
 To apply this method to an Hawkes process we notice that while the intensity for this process does not have an almost surely upper bound, it is common for the intensity to be non-increasing in period without any arrivals. In this case for $t \in [T_i, T_{i+1}]$ we have $\lambda(t) \leq \lambda (T^+_i)$ where with $T^+_i$ we mean the time just after $T_i$ when that arrival has been registered. So the value of the ``faster" process rate can be updated at each simulation.
 
-A Simulation process based on the branching structure of a self-exciting spatial-temporal point process was introduced by Zhuang in 2004 (\cite{Zhuang}). This is a simpler and faster procedure compared to the thinning process as it does not require the repeated evaluation of $\lambda(t, s)$. This will be the algorithm we will use in our method.
+A Simulation process based on the branching structure of a self-exciting spatial-temporal point process was introduced by \cite{Zhuang}. This is a simpler and faster procedure compared to the thinning process as it does not require the repeated evaluation of $\lambda(t, s)$. This will be the algorithm we will use in our method.
 
 As we have seen, immigrants form a homogeneous Poisson process with rate $mu$, therefore the number of immigrants over an interval $[0, T]$ is $\text{Pois}(\mu T)$. We can therefore simulate the background process using a method for homogeneous Point processes. For example, conditional on the number of immigrants $k$ the arrival times $C_1, \dots, C_k$ are distributed as the order statistics from a uniform distribution supported on $[0, T]$.
 

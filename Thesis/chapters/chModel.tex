@@ -1,0 +1,161 @@
+\chapter[A novel Spatio-temporal self-exciting point process to model invasive species]{a novel Spatio-temporal self-exciting point process to model invasive speciess}
+\label{ch:Model}
+
+We are proposing a new model for the RIFA invasion based on a self-exciting point process.
+
+In this new approach we are seeking to simplify and improve on Keith and Spring agent-based model \cite{Keith} with the aim to reduce the running time without compromising on flexibility and completeness.
+
+The model of Keith and Spring focused on reconstructing the historical trajectory of the invasion to determine if the current eradication strategy was successful. Their method consisted of constructing a likelihood model in terms of some unknown parameters that included, among other things, the phylogeny, jump type, founding type and treatment success rate. They then constructed the dependencies among the known and unknown parameters and defined all conditional distributions.
+
+The posterior distribution was then sampled using a generalised Gibbs technique that enables transdimensional sampling, which is used when the number of parameters is unknown, as in their case.
+
+A key feature of our model is that it will not need to include the phylogeny of the nests in the likelihood, which will result in a much lower computational time when running the inference code.
+
+This will also allow the model to be adapted to other type of invasions where control strategies will have to be decided rapidly as new data is acquired.
+
+We have been also considering the detection processes in parallel with the founding events in a similar way as in Jewell's model for infectious diseases \cite{Jewell}.
+
+We then included unobserved nests alongside observed nests in the detection likelihood to fully model the missing data.
+
+Finally, we have considered events as happening continuously in time.
+
+Let us consider a self-exciting spatial-temporal point process $N$ as a generalization of an Hawkes model. We can then specify an intensity function $\lambda(x, y, t)$ which represents the infinitesimal expected  rate of events at time $t$ and location $(x, y)$  given all the events up to time $t$.
+
+Here $\mathcal{F}$ is a $\sigma$-algebra on $S \times [0, \infty )$, where $S$ is a bounded region of $\mathbb{R}$ and $[0, \infty)$ is the time interval. $N: \mathcal{F} \to \mathbb{R}$ and $N(A)$ is the number of points in $A$ for $A \in \mathcal{F}$
+
+We will consider $N$ to be an inhomogeneous Poisson process, for which $\lambda(x, y, t)$ depends only on $(x, y)$ and $t$ \cite{Schoenberg}. The function $g(x - x', y - y', f - f')$ is the clustering density, where $f'$ are the times of founding of parents nests and the spatial coordinates $(x', y')$ will specify the location $s'$ of a parent nest.
+
+
+We can then write the conditional intensity function for new nests considering the full past history in term of a stocastic integral:
+
+\[
+\lambda(x, y, t) = \mu(x, y, t) + \int_{0}^{t} \iint_{S} g(x - x', y - y', f - f') \d N(x', y', f')
+\]
+$\d N(x', y', f') = 1$ if the infinitesimal element $\d N(x', y', f')$ contains a parent and is 0 otherwise. We consider the temporal behavior of the process as independent of the spatial behavior so we can write
+
+\[
+\lambda(x, y, t) = \mu(x, y, t) + \int_{0}^{t} \iint_{S} m(f-f') \cdot l((x - x'), (y - y')) \d N(x', y', f')
+\]
+Where $\mu$ is a background term, while $m$ and $l$ are the triggering functions for time and space respectively. 
+
+New individuals from the invasive species can be introduced at any time by carriers like animals or humans. For simplicity, in the RIFA invasion we will assume that these exogenous introductions are not happening. Also we assume to know time and location of the first nest.  We will therefore set the background term $\mu(x, y, f) $ equal to 0.
+
+Each parent nest will be able to found more than one nest, with the number of nests founded per nest per month being a parameter $\zeta$, therefore the temporal triggering kernel will be a step function. Also the nest will have a maturation time $t_m$ of 8 months. Before this time they will not be able to produce new nests. 
+
+The step function will be:
+
+
+\[
+m (f - f') =
+\begin{cases}
+0, & \mbox{if} \quad f - f' < t_{m} \\
+\zeta, & \mbox{if} \quad f - f' \geq t_{m}
+\end{cases}
+\]
+Where $f$ is the founding time of the new nest and $f'$ is the founding time of the parent nest.
+
+For the newly founded nests we will consider a radial distance from the parent nest with an exponential distribution. The distribution over the angular direction will be uniform as it is equally possible to found a nest in every direction from the parent nest.
+
+\begin{equation}
+l(x - x', y - y')= J \bigg(\frac{1}{2 \pi} \sigma e^{- \sigma r}\bigg)
+\end{equation}
+where $J$ is the Jacobian
+
+\[
+J =  
+\begin{vmatrix}
+	\frac{\partial r}{\partial x} & \frac{\partial r}{\partial y} \\
+	\frac{\partial \theta}{\partial x} & \frac{\partial \theta}{\partial y} \\
+\end{vmatrix}
+\]
+where
+
+\[
+r^{2} = (x - x')^{2} + (y - y')^{2}
+\]
+and
+
+\[
+\theta = tan^{-1} \Bigg [\frac{y - y'}{x - x'} \Bigg ]
+\]
+therefore
+
+\[
+J = \frac{1}{\sqrt{(x - x')^{2} + (y - y')^{2}}}.
+\]
+We also make the assumption that nests are killed as soon as they are detected, so we introduce an indicator function $I(t' - t)$ such that
+
+\[
+I (t' - t) =
+\begin{cases}
+1, & \mbox{if} \quad t' -  t> 0 \\
+0, & \mbox{otherwise}
+\end{cases}
+\]
+where $t'$ represents the time of detection. So the conditional intensity function will be
+
+\[
+\lambda(x, y, t) = \int_{0}^{t} \int_{0}^{t} \iint_{S} m(f - f') \cdot I(t' - t)\cdot \frac{\sigma J }{2 \pi} e^{- \sigma r} \d N(x',y',t',f')
+\]
+where now the term $\d N(x',y',t',f')$ is 1 if a nest was founded in an infinitesimal time about $f'$ at a location in an infinitesimal region about $(x', y')$ and was detected in an infinitesimal time around $t'$ and is $0$ otherwise. Note that we must have $\d N(x',y',t',f')=0$ whenever $f' \geq t'$.
+
+The likelihood at time $T$ will then be that of  an inhomogeneous Poisson process for the founding process with intensity $\lambda(x, y, t)$.
+
+Also, the discovery time $t$ of a nest is known, but it is unknown when the nest was founded. So the time from establishment to notification $(t - f)$ of a nest $i$ is a random variable which we will consider exponentially distributed.
+
+\[
+h(t_{i} - f_{i}) = \gamma \exp (- \gamma(t_{i} - f_{i}))
+\]
+The Likelihood for a set of $n$ locations $(s_{1}, ... , s_{n})$, a set of founding times $f_{1}, ... , f_{n}$, and detection times $(t_{1},  ... , t_{n})$ will then be:
+
+\[
+\begin{aligned}
+L(s_{1}, ..., s_{n}, f_{1}, ..., f_{n}, t_{1}, ..., t_{n} | \Theta) = & \Bigg[ \prod_{j=1}^{n} \lambda(s_{j}, t_{j}) \Bigg] \times \exp \Bigg(- \int_{0}^{T} \int_{S} \lambda(s, t) \d s \d t \Bigg) \times \\ 
+& \times \prod_{\{ i : t_{i} < T \} } h (t_{i} - f_{i}) \times \prod_{ \{ i : t_{i} = \infty \} } \int_{T}^{\infty} h(t - f_{i}) \d t
+\end{aligned}
+\]
+where $t_{i} = \infty$ if nest $i$ has not been detected at time $T$. $h(t_{i} - f_{i})$ is the contribution of the observed nests, while $\int_{T}^{\infty} h(t - f_{i}) dt$ is the contribution of the unobserved nest. $\Theta= ( \sigma, \gamma, \zeta)$ is the vector of the unknown parameters and $n$ is the number of nests founded.
+
+The term 
+
+\begin{equation}
+\exp \bigg(- \int_{0}^{T} \int_{S} \lambda(s, t)\d s \d t \bigg)
+\end{equation}
+in the likelihood will evaluate to 
+
+
+\[
+\exp \bigg(- \zeta \sum_{i=1}^{n} (min\{ T, t_i \} - f_i) \bigg)
+\]
+as the spatial part evaluates to 1 and the temporal part is constant over the lifetime of each nest.
+
+The likelihood can then be rewritten:
+
+\[
+\begin{aligned}
+L(s_{1}, ..., s_{n}, f_{1}, ..., f_{n}, t_{1}, ..., t_{n} | \Theta) = & \Bigg[ \prod_{j=1}^{n} \lambda(s_{j},f_{j}, t_{j}) \Bigg] \times \exp \bigg(-\zeta \sum_{i=1}^{n} (min\{ T, t_i \} - f_i) \bigg)  \times \\
+& \times \prod_{\{ i : t_{i} < T \} }  h (t_{i} - f_{i}) \times \prod_{ \{ i : t_{i} = \infty \} } \int_{T}^{\infty} h(t - f_{i}) \d t
+\end{aligned}
+\]
+And the log-likelihood:
+
+\[
+\begin{aligned}
+l(s_{1}, ..., s_{n}, f_{1}, ..., f_{n}, t_{1}, ..., t_{n} | \Theta) = & \Bigg[ \sum_{j=1}^{n} \log \lambda(s_{j},f_{j}, t_{j}) \Bigg] - \bigg(\zeta \sum_{i=1}^{n} (min\{ T, t_i \} - f_i) \bigg)  + \\
+& + \sum_{\{ i : t_{i} < T \} }  \log h (t_{i} - f_{i}) + \sum_{ \{ i : t_{i} = \infty \} } \log \int_{T}^{\infty} h(t - f_{i}) \d t
+\end{aligned}
+\]
+Substituting $h$ and evaluating the last integral we get 
+
+\[
+\begin{aligned}
+l = & \Bigg[ \sum_{j=1}^{n} \log \lambda(s_{j},f_{j}, t_{j}) \Bigg] - \bigg(\zeta \sum_{i=1}^{n} (min\{ T, t_i \} - f_i) \bigg)  + \sum_{\{ i : t_{i} < T \} }  \bigg[\log (\gamma) -\gamma(t_{i} - f_{i}) \bigg] \\
++ & \sum_{ \{ i : t_{i} = \infty \} } \bigg[\log \bigg(\frac{1}{\gamma}\bigg) -\gamma(T - f_{i}) \bigg]
+\end{aligned}
+\]
+In Bayesian statistics, we begin with prior distributions $P(\Theta)$ which encodes all that is known about $\Theta$ based on previous knowledge. After analyzing the data, the posterior distribution encodes all information about $\Theta$ based on both the prior and the data. In our case we want to keep the priors uninformative, therefore we choose gamma distributions with scale and shape equal to 1. The posterior distribution then is give by:
+
+\[
+P(\Theta | s_{1}, ..., s_{n}, f_{1}, ... , f_{n}, t_{1}, ..., t_{n}) \propto L(s_{1}, ..., s_{n}, f_{1}, ... , f_{n}, t_{1}, ..., t_{n} | \Theta) \times P(\Theta)
+\]
+

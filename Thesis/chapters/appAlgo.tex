@@ -1,0 +1,127 @@
+\chapter{Algorithms}
+%\chaptermark{Example appendix} I actually don't know what this does but Darcy had it
+\label{appen:algorithms}
+
+\begin{algorithm}[H]
+\caption{SIR with corrections for an AR(1) model}\label{euclid}
+ \begin{algorithmic}
+
+ \State  \bf{Initialize:} \normalfont At time t = 1
+            
+\begin{enumerate}
+	\item For $i = 1, \dots , n$
+	\begin{enumerate}
+		\item Sample $(x_{1})_i \sim \mathcal{N} \Bigg (0, \frac{\sigma^2}{1- \varphi^2} \Bigg)$ and $(b_1)_i \sim Bernoulli(\theta)$
+		\item Evaluate the importance weights up to a normalising constant:
+		\[
+		\tilde{w}^{1}_{i} = 1
+		\]
+	\end{enumerate}
+	\item For $i = 1, \dots , n$ normalise the importance weights: 
+	\[
+	w^{1}_{i} = \frac{1}{n}
+	\]
+\end{enumerate}
+
+ \State  \bf{Iterate:} \normalfont For $t$ from 2 to $N$
+
+\begin{enumerate}
+	\item For $i = 1, \dots , n$
+	\begin{enumerate}
+  		\item sample $(x_t)_i \sim \mathcal{N} (\varphi (x_{t-1})_i, \sigma^{2})$ and $b^t_{i} \sim Bernoulli(\theta)$.
+		\item {Correct every element of $\vec{x}^t_i$ in light of the data $\vec{z}^t$ to obtain new samples $(\vec{x'})^t_i$ directly substituting the new data: for $s = 1, \dots ,t$ if $(z^t)_s \neq -$, $((x')_i^t)_s = (z^t)_s$ else if $(z^t)_s = -$, $((x')_i^t)_s = (x^t_i)_s$.}
+		\item Correct every element of $\vec{b}_i^t$ in light of the data $\vec{z}^t$ to obtain new samples $(\vec{b'})^t_i$ substituting 0s when $(z^t)_s = -$ and 1s otherwise for $s = 1, \dots, t$.
+		\item Evaluate the weights up to a normalising constant using equation (\ref{eq:2}):
+		\[
+		\tilde{w}^{t}_{i} = \frac{q(\vec{(x')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1})}{q(\vec{x}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}
+		\]
+	\end{enumerate}
+	\item For $i = 1, \dots , n$ normalise the importance weights:
+	\[
+	w^{t}_{i} = \frac{\tilde{w}^t_i}{\sum_{k=1}^{n}\tilde{w}^{t}_k}
+	\]
+	\item Perform resampling
+	\begin{enumerate}
+	    \item Draw $n$ particles from the current particle set with probabilities proportional to their weights. Replace the current particle set with the new $n$ particles.
+	    \item Set $w^t_i=1/n$
+	\end{enumerate}
+\end{enumerate}
+  
+ \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{SIR with corrections for an river invasion}\label{euclid}
+ \begin{algorithmic}
+
+ \State  \bf{Initialize:} \normalfont At time t = 1
+            
+\begin{enumerate}
+	\item For $i = 1, \dots , n$
+	\begin{enumerate}
+	    \item For $s = 1, \dots, N$
+		First observation $z_m$ known: For each particle, at time 1, fill the invasion vector of $\vec{x}_i^t$ size N with $(x_{m})^1_i = 1$ and $(x_{s})^1_i = 0$ if $s \neq m$. 
+		For each particle, at time 1, fill the invasion vector $\vec{z}_i^t$ of size N with $(z_m)^1_i = 1$ and $(z_{s})^1_i = 0$ if $s \neq m$.
+		\item Evaluate the importance weights up to a normalising constant:
+		\[
+		\tilde{w}^{1}_{i} = 1
+		\]
+	\end{enumerate}
+	\item For $i = 1, \dots , n$ normalise the importance weights: 
+	\[
+	w^{1}_{i} = \frac{1}{n}
+	\]
+\end{enumerate}
+
+ \State  \bf{Iterate:} \normalfont For $t$ from 2 to $T$
+
+\begin{enumerate}
+	\item For $i = 1, \dots , n$
+	\begin{enumerate}
+  		\item Sample $(r)^t_i \sim Bernoulli(\theta)$ and $(l)^t_i \sim Bernoulli(\theta)$. For $s = 1, \dots, N$ for each particle, at time t, fill the invasion vector $\vec{x}_i^t$ of size N with the values of $\vec{x}_i^{t-1}$ then substitute $(x_s)^t_i = (r)^t_i$ for $s$ s.t. $(x_{s-1})^{t-1}_i = 1$ and $(x_s)^{t-1}_i = 0$ and substitute $(x_s)^t_i = (l)^t_i$ for $s$ s.t. $(x_s)^{t-1}_i = 0$ and $(x_{s+1})^{t-1}_i = 1$.
+  		\item Sample k elements $(a_k)^t_i \sim Bernoulli(\varphi)$ until the first 0 is sampled, and h elements $(b_h)^t_i \sim Bernoulli(\varphi)$ until the first 0 is sampled. For $s = 1, \dots, N$ for each particle, at time t, fill the observation vector $\vec{z}_i^t$ of size N with the values of $\vec{z}_i^{t-1}$ then substitute the k elements $(z_{s+k})^t_i = (r)^t_i$ for $s$ s.t. $(z_{s-1})^{t-1}_i = 1$ and $(z_s)^{t-1}_i = 0$ and substitute the h elements $(z_{s-h})^t_i = (l)^t_i$ for $s$ s.t. $(z_s)^{t-1}_i = 0$ and $(z_{s+1})^{t-1}_i = 1$.
+		\item Correct every element of $\vec{x}^t_i$ in light of the data $\vec{z}^t$ to obtain new samples $(\vec{x'})^t_i$ directly substituting the new data: for $s = 1, \dots ,N$ if $(z^t)_s = 1$, $((x')_i^t)_s = 1$ else if $(z^t)_s = 0$, $((x')_i^t)_s = (x^t_i)_s$. Correct every element of $\vec{z}^t_i$ in light of the data $\vec{z}^t$ to obtain $(\vec{z'})^t_i$ simply substituting $(\vec{z'})^t_i$ with $\vec{z}^t$.
+		\item Evaluate the weights up to a normalising constant using the values for $q$ from equation (\ref{eq:4}):
+		\[
+		\tilde{w}^{t}_{i} = \frac{q(\vec{(X')}^{t}_i, \vec{(z')}^{t}_i | \vec{Z}^{t-1})}{q(\vec{X}^{t}_i, \vec{z}^{t}_i | \vec{Z}^{t-1})}
+		\]
+	\end{enumerate}
+	\item For $i = 1, \dots , n$ normalise the importance weights:
+	\[
+	w^{t}_{i} = \frac{\tilde{w}^t_i}{\sum_{k=1}^{n}\tilde{w}^{t}_k}
+	\]
+	\item Perform resampling
+	\begin{enumerate}
+	    \item Draw $n$ particles from the current particle set with probabilities proportional to their weights. Replace the current particle set with the new $n$ particles.
+	    \item Set $w^t_i=1/n$
+	\end{enumerate}
+\end{enumerate}
+  
+ \end{algorithmic}
+\end{algorithm}
+
+
+Define a probability measure $\P^*$ having density $p^*$ on $\Omega^*_t$ such that the marginal distribution of $\P^*$ on $\Omega_t'$ is $\P$, that is $\P = \P^* \circ \pi^{-1}$, where $\P$ is the measure with density $p$ on $\Omega_t'$. (Here the measurable sets in $\Omega_t$, $\Omega_t'$ and $\Omega_t^*$, are constructed from Borel sets on $\Real^M$ and subsets of $2^M$ in the manner implied by the sequence of cross-products and restrictions used to define $\Omega_t$, $\Omega_t'$ and $\Omega_t^*$. Similarly, reference measures are constructed from Lebesgue measure on $\Real^M$ and counting measure on $2^M$.)
+
+By the disintegration theorem (see \cite{Rohlin}) there exists a family of measures $\{ \nu_{\vec{(y')}^t} \}_{\vec{(y')}^t \in \Omega'{\color{red}_t}}$ on $\Omega^*{\color{red}_t}$ such that for every measurable Borel function $m : \Omega^*_t \rightarrow [0, \infty]$
+\begin{align*}
+    &\int_{\Omega^*_t} m(\vec{(y')}^t, \vec{y}^t)\diff \P^* = \\
+    & \int_{\Omega_t'} \bigg( \int_{\pi^{-1}(\vec{(y')}^t)} m(\vec{(y')}^t, \vec{y}^t) \diff \nu_{\vec{(y')}^t}  \bigg) \diff \P((\vec{y'})^t).
+\end{align*}
+It follows that for any event $A$,
+\begin{align*}
+    &\P(A) = \P^{*}(\pi^{-1}(A)) = \\
+    &\int_{\Omega_t^*} I_A(\pi(\vec{(y')}^t, \vec{y}^t)) p^*(\vec{(y')}^t, \vec{y}^t | \vec{Z}^t) \D \P^*  = \\
+    & \int_{\Omega_t'} I_A(\vec{(y')}^t) \Bigg[ \int_{\pi^{-1}(\vec{(y')}^t)} p^*(\vec{(y')}^t, \vec{y}^t | \vec{Z}^t) \D \nu_{\vec{(y')}^t} (\vec{y}^t) \Bigg] \D \P (\vec{(y')}^t)
+\end{align*}
+and hence
+\begin{equation*}
+    p(\vec{(y')}^t | \vec{Z}^t) = \int_{\pi^{-1}(\vec{(y')}^t)} p^*(\vec{(y')}^t, \vec{y}^t | \vec{Z}^t) \D \nu_{\vec{(y')}^t}(\vec{y}^t).
+\end{equation*}
+Moreover,
+\begin{align*}
+    &E_{p}[l(\vec{(y')}^{t})]  = \int_{\Omega_t'} l(\vec{(y')}^{t})\; p(\vec{(y')}^{t} | \vec{Z}^{t}) \D \P (\vec{(y')}^{t}) \\
+    &= \int_{\Omega_t'} l(\vec{(y')}^{t})\Bigg[\int_{\pi^{-1}(\vec(y'))} p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) \D \nu_{\vec{(y')}^t}(\vec{y}^t) \Bigg] \D \P \vec{(y')}^{t} \\ 
+    &= \int_{\Omega_t^*} l(\pi(\vec{(y')}^{t}, \vec{y}^{t}))\; p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) \D \P^*(\vec{(y')}^t, \vec{y}^t) \\ 
+    &= E_{p^*}[l(\pi (\vec{(y')}^{t}, \vec{y}^{t}))].
+\end{align*}

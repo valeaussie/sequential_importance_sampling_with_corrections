@@ -1,4 +1,4 @@
-Version history for the SVJour3 LaTeX2e package
+MonashLogo.pngVersion history for the SVJour3 LaTeX2e package
 
 date      filename   version  action/reason/acknowledgements
 -----------------------------------------------------------------

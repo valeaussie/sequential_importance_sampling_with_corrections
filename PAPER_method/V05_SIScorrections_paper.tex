@@ -140,11 +140,11 @@ grestore
 
 \begin{abstract}
 
-We consider an evolving system for which a sequence of observations is being made, with each observation revealing additional information about current and past states of the system. We suppose each observation is made without error, but does not fully determine the state of the system at the time it is made. 
+We consider an evolving system for which a sequence of observations is being made, with each observation revealing additional information about current and past states of the system. We suppose each observation is made without error, but does not fully determine the state of the system at the time it is made. Our motivating example is drawn from invasive species biology, where it is common to know the precise location of invasive organisms that have been detected by a surveillance program, but at any time during the program there are invaders that have not been detected.
 
-Our motivating example is drawn from invasive species biology, where it is common to know the precise location of invasive organisms that have been detected by a surveillance program, but at any time during the program there are invaders that have not been detected.
+We propose a sequential importance sampling strategy to infer the state of the invasion under a Bayesian model of such a system. The strategy involves simulating multiple alternative states consistent with current knowledge of the system, as revealed by the observations. However, a difficult problem that arises is that observations made at a later time are invariably incompatible with previously simulated states.
 
-We propose a sequential importance sampling strategy to infer the state of the invasion under a Bayesian model of such a system. The strategy involves simulating multiple alternative states consistent with current knowledge of the system, as revealed by the observations. However, a difficult problem that arises is that observations made at a later time are invariably incompatible with previously simulated states. To solve this problem, we propose a two-step iterative process in which states of the system are alternately simulated in accordance with past observations, then corrected in light of new observations. We identify criteria under which such corrections can be made while maintaining appropriate importance weights.
+To solve this problem, we propose a two-step iterative process in which states of the system are alternately simulated in accordance with past observations, then corrected in light of new observations. We identify criteria under which such corrections can be made while maintaining appropriate importance weights.
 
 \keywords{ Sequential Importance Sampling \and Filtering \and Bayesian estimation \and Partially observed spaces \and Missing data}
 % \PACS{PACS code1 \and PACS code2 \and more}
@@ -157,47 +157,56 @@ We propose a sequential importance sampling strategy to infer the state of the i
 
 This paper considers the problem of imputing missing data in the presence of incomplete observations made sequentially in time. We thus envisage data that consists of a series of correlated observations made sequentially, each of which is correct but only partially reveals the true state of the system. The main difficulty that arises in this context is that data missing at one time point can be revealed at a later time point, so that imputed missing values must later be corrected in light of new information.
 
-Our original motivation for considering this problem was to facilitate analysis of invasive species, where in an ongoing surveillance program the locations of invaders are regularly being detected. For detected invaders, the location can be precisely determined, but at any given time there is an unknown number of undetected organisms, each with an unknown location. To infer the current extent of the invasion, we aim to impute plausible locations of undetected individuals, but these imputations are only informed guesses, and will require constant correction as new observations come to light. In addition, new nests are constantly being produced: the unseen state of the system is thus constantly evolving. Knowing the location of at least some of the invaders at some time $t$, we can simulate the evolution of this system. However, again the imputed locations of simulated nests will require constant correction as more information about the true state of the system becomes available.
+Our original motivation for considering this problem was to facilitate analysis of {\color{blue} invasive species, where in an ongoing surveillance program the locations of invaders are regularly being detected. For detected invaders, the location can be precisely determined, but at any given time there is an unknown number of undetected organisms}, each with an unknown location. To infer the current extent of the invasion, we aim to impute plausible locations of undetected individuals, but these imputations are only informed guesses, and will require constant correction as new detections come to light.
+
+In addition, new nests are constantly being produced: the unseen state of the system is thus constantly evolving. Knowing the location of at least some of the invaders at time $t$, we can simulate the evolution of this system. However, again the imputed locations of simulated nests will require constant correction as more information about the true state of the system becomes available.
 
 Here we propose a new approach to problems of this type. Although our approach is ultimately aimed at inference for invasive species, we will illustrate the method for less complex evolving systems in which correct but partial observations are being made in real time.
 
-In the first chapter of this paper we introduce our Bayesian approach that uses a new sequential importance sampling (SIS) strategy. As is typical of SIS methods, we generate a population of particles, each representing a plausible sequence of system states, and we evolve each particle at each time step according to a model of system dynamics. Again in a manner typical of SIS methods, new observations arrive in real time, and we use these observations to adjust the weights assigned to particles. However, a crucial new element in our method is that we allow missing values imputed at earlier time steps to be corrected so that they are consistent with the new observations. We test our method with two simple models in chapter 2 and 3. Firstly, we apply the method to an AR(1) model where we simulate a set of observations then reconstruct the system. These results are subsequently compared with the analytical solutions obtained directly applying the AR(1) model definition. In order to test the applicability of our method to a simple invasive species problem, we therefore introduce a model for a partially observed river invasion and impute the missing data.
+To handle problems of this kind, we introduce a Bayesian approach that uses a new sequential importance sampling (SIS) strategy. As is typical of SIS methods, we generate a population of particles, each representing a plausible sequence of system states, and we evolve each particle at each time step according to a model of system dynamics. Again in a manner typical of SIS methods, new observations arrive in real time, and we use these observations to adjust the weights assigned to particles. However, a crucial new element in our method is that we allow missing values imputed at earlier time steps to be corrected so that they are consistent with the new observations.
 
-Our method addresses a problem that is common in practice: new observations made in real time can render previously imputed missing values implausible, and may even conflict with what has been simulated. For example, in the invasive species context described above, undetected individuals imputed to geographic areas that do not contain any invaders become increasingly implausible as time passes without any detection being made in those regions. In standard SIS approaches, such particles receive low weights and are eventually eliminated by resampling, but a common problem is that all particles can become implausible, if not inconsistent, with observations.
+Our method thus addresses a problem that is common in practice: new observations made in real time can render previously imputed missing values implausible, and may even conflict with what has been simulated. For example, in the invasive species context described above, undetected {\color{blue} invaders} imputed to geographic areas that do not contain any {\color{blue}invaders} become increasingly implausible as time passes without detections being made in those regions. In standard SIS approaches, such particles receive low weights and are eventually eliminated by resampling, but a common problem is that all particles can become implausible, if not inconsistent, with observations.
 
-Problems of this kind arise in many contexts other than invasive species detection. We can envisage the approach being used to study the evolution of a species' geographic range, for both invasive and non-invasive species. The algorithm could also be applied to a variety of other missing data problems where new incomplete data is continuously acquired, such as in crime prediction, (\cite{Malathy}) or bushfire modeling (\cite{Beer}). Another potential application is in the study of the spread of infectious diseases, where observations are made in the form of diagnosed cases, but there is missing data in the form of undiagnosed cases (\cite{O'Neill}). 
+Problems of this kind arise in many contexts. We can envisage the approach being used to study the evolution of a species' geographic range, for both invasive and non-invasive species. The algorithm could also be applied to a variety of other missing data problems where new incomplete data is continuously acquired, such as in crime prediction, (\cite{Malathy}) or bushfire modeling (\cite{Beer}). Another potential application is in the study of the spread of infectious diseases, where observations are made in the form of diagnosed cases, but there is missing data in the form of undiagnosed cases (\cite{O'Neill}). 
 
-Missing data problems are ubiquitous in ecological and evolutionary data sets as in many other branches of science. Two common methods used to deal with missing data are to delete rows of a data matrix (corresponding to individuals or cases) that contain missing data, or to use the mean to fill in missing values. However, these methods result in biased estimation of parameters and uncertainty, and reduction in statistical power. Better missing data procedures such as data augmentation (\cite{Tanner}) and multiple imputation (\cite{RubinMI}) are available  (\cite{Nakagawa}).
-For an up-to-date treatment of missing data in statistics see \cite{Little}.
-However, techniques like multiple imputations and data augmentation generally do not make use of past observations and the state transition equation of the system when estimating the probability of the hidden state in light of the observations. This can result in poor performance when the problem can be well modelled, for example, by a Markov structure (\cite{Zhang}).
+Missing data are ubiquitous in ecological and evolutionary data sets as in many other branches of science. Two common methods used to deal with missing data are to delete rows of a data matrix (corresponding to individuals or cases) that are missing data, or to use the mean to fill in missing values. However, these methods result in biased estimation of parameters and uncertainty, and reduction in statistical power. Better missing data procedures such as data augmentation (\cite{Tanner}) and multiple imputation (\cite{RubinMI}) are available  (\cite{Nakagawa}).
+{\color{blue} For an up-to-date treatment of missing data in statistics see \cite{Little}}.
 
-An example of an alternative methodology for dealing with missing data in the context of a Markov structure is the Multiple Imputation Particle Filter (MIPF) developed by \cite{Zhang}. This method, applied to signal processing, uses randomly drawn values (imputations) to provide a replacement for the missing data and then uses a particle filter to estimate non-linear state with the data.
+{\color{blue}Techniques like multiple imputations and data augmentation, in general do not use past observations and the state transition equations when estimating the probability of the hidden state knowing the observations. This can result in poor performance when the problem can be well modelled, for example, by a Markov structure (\cite{Zhang}).}
 
-Particle filters are sometimes used to estimate a hidden state when partial, noisy observations are made. However, the performance of particle filtering algorithms can severely degrade in the presence of missing data (\cite{Zhang}). For a comprehensive discussion of the applications of particle filters, also called Sequential Monte Carlo (SMC) methods, see \cite{Cappe} and \cite{Doucet}.
+{\color{blue} An example of a methodology for dealing with missing data in the context of a Markov structure} is the Multiple Imputation Particle Filter (MIPF) developed by \cite{Zhang}. This method, {\color{blue}applied to signal processing}, uses randomly drawn values (imputations) to provide a replacement for the missing data and then uses the particle filter to estimate non-linear state with the data, where a {\color{blue} Non-linear state estimations deals with estimation of input states, provided a measurement sequence from a sensor with the unknown input sequence.}
 
-Sequential importance sampling (SIS) is a form of Particle filter firstly introduced by \cite{Kong} that has been used in Bayesian missing data problems in the form of sequential imputation, in situations where the posterior must be constantly updated with the arrival of new data.
+Particle filters are sometimes used to estimate a hidden state when partial, noisy observations are made. However, the performance of particle filtering algorithms can severely degrade in the presence of missing data (\cite{Zhang}).
+
+{\color{blue} For a comprehensive discussion of the applications of particle filters, also called Sequential Monte Carlo (SMC) methods, see \cite{Cappe} and \cite{Doucet}.}
+
+{\color{blue} Sequential importance sampling, a form of Particle filter, was firstly introduced by \cite{Kong} and have been used in Bayesian missing data problems in the form of sequential imputation, in situations where the posterior must be constantly updated with the arrival of new data.}
 
 Here we propose a two-step iterative procedure for dynamically updating a collection of weighted particles used to represent a posterior distribution over the possible trajectories of a partially observed system. In the first step, we evolve particles in accordance with a model of the system, in a manner common to particle-based sequential Monte Carlo methods. In the second step, we correct the particles in light of newly acquired data. The method treats an uncorrected particle (generated in the first step) as a form of augmented variable. Thus the method constitutes a novel use of augmentation in sequential importance sampling. 
 
-As mentioned above, the observations in the problems we consider are partial, but exact. In general, in situations where the data are highly informative standard sequential Monte Carlo methods can perform poorly. %{\color{red} (HHH I don't understand what you mean by `informative' in that sentence. I think all statistical methods require data that is informative.)}
-%{\color{blue}VVV With informative observations I mean when there is very little noise present for the observation process relative to the amount of process noise. In this case standard SMC methods perform poorly as mentioned by Del Moral, but perhaps this is true only when the process is observed indirectly? Our case though, is a special case of indirect observations with $p(z_n | x_n) = \delta (z_n - x_n)$, where $z_n$ are the observations and $x_n$ the hidden states. so I though it was worth mentioning that SMC in general don't perform well with precise observations. This is my understanding: let us consider a hidden state model $x$ and observation values $z$ with very little noise (informative). 
-%\begin{equation}
-%    x_t | x_{1:t-1} \sim f(x_t | x_{t-1})
-%\end{equation}
-%\begin{equation}
-%    z_t = g(x_t)
-%\end{equation}
-%with $g$ a deterministic mapping. Let us consider a standard boostrap filter to provide estimates, for example, of the likelihood $p(z_{1:n} | \theta)$ where $\theta$ are the parameters. In the filter we will draw $N$ particles $\{ y^i_n\}_{i=1:N}$ from equation 1 then we calculate the weights multiplying the weights for the previous time with the values from equation 2. As long as there is at least one particle $y^j_n$ which gives a reasonably high probability for the measurement $z_t$ (and consequently gets assigned a large weight), the particle filter will provide a reasonable result, and the more such high-weight particles, the better (in terms of variance of the estimate $\hat{p}(z_{1:n} | \theta)$). However, if no samples $y_n$ are drawn under which $z_t$ could have been observed with reasonably high probability, the estimate will be poor. If there is very little measurement noise but non-negligible process noise in the model, the chance of drawing any useful particles by simulating the system dynamics would be small. Am I correct in saying so?}
-\cite{Del Moral} proposed a Sequential Monte Carlo method for sampling the posterior distribution of state-space models under highly informative observation regimes. In their method they introduced a schedule of intermediate weighting and resampling times between observation times, which guides particles towards the final state.
+Our method deals with situations where the data are informative, a situation where standard sequential Monte Carlo methods can perform poorly {\color{blue}\cite{Del Moral}}. {\color{red} (HHH I don't understand what you mean by `informative' in that sentence. I think all statistical methods require data that is informative.)}
+{\color{blue}VVV With informative observations I mean when there is very little noise present for the observation process relative to the amount of process noise. In this case standard SMC methods perform poorly as mentioned by Del Moral, but perhaps this is true only when the process is observed indirectly? Our case though, is a special case of indirect observations with $p(z_n | x_n) = \delta (z_n - x_n)$, where $z_n$ are the observations and $x_n$ the hidden states. so I though it was worth mentioning that SMC in general don't perform well with precise observations. This is my understanding: let us consider a hidden state model $x$ and observation values $z$ with very little noise (informative). 
+\begin{equation}
+    x_t | x_{1:t-1} \sim f(x_t | x_{t-1})
+\end{equation}
+\begin{equation}
+    z_t = g(x_t)
+\end{equation}
+with $g$ a deterministic mapping. Let us consider a standard boostrap filter to provide estimates, for example, of the likelihood $p(z_{1:n} | \theta)$ where $\theta$ are the parameters. In the filter we will draw $N$ particles $\{ y^i_n\}_{i=1:N}$ from equation 1 then we calculate the weights multiplying the weights for the previous time with the values from equation 2. As long as there is at least one particle $y^j_n$ which gives a reasonably high probability for the measurement $z_t$ (and consequently gets assigned a large weight), the particle filter will provide a reasonable result, and the more such high-weight particles, the better (in terms of variance of the estimate $\hat{p}(z_{1:n} | \theta)$). However, if no samples $y_n$ are drawn under which $z_t$ could have been observed with reasonably high probability, the estimate will be poor. If there is very little measurement noise but non-negligible process noise in the model, the chance of drawing any useful particles by simulating the system dynamics would be small. Am I correct in saying so?}
 
-\cite{Finke} developed a Particle Monte Carlo Markov Chain algorithm to estimate the demographic parameters of a population and then incorporated this algorithm into a sequential Monte Carlo sampler in order to perform model comparison motivated by the fact that a simple importance sampling performs poorly if there is a strong mismatch between the prior and the posterior, which is common when the data is highly informative.
+\cite{Del Moral} proposed a Sequential Monte Carlo method for sampling the posterior distribution of state-space models under highly informative observation regimes. In their method they introduce a schedule of intermediate weighting and resampling times between observation times, which guides particles towards the final state.
 
-Our new method gives similar results to the gold standard and is able to handle well the reconstruction of a river invasion. The cancellations we get during the calculation of the weights are a pleasing feature of the method, but we have yet to test the full potential and speed of the algorithm when the data to analyse is substantial.
+\cite{Finke} developed a Particle Monte Carlo Markov Chain algorithm to estimate the demographic parameters of a population and then incorporated this algorithm into a sequential Monte Carlo sampler in order to perform model comparison motivated by the fact that a simple importance sampling performs poorly if there is a strong mismatch between the prior and the posterior, which is common when the data is highly informative. {\color{blue}VVV I am not sure we need to mention Finke if we don't want to put focus on highly informative observations.}
+
+In this paper, we provide a proof of concept for our proposed methodology using a simple system modelled by an AR(1) process and a model for an invasive species in a river. In these examples, we present a version of our method in which only those imputed values that are strictly inconsistent with later observations are corrected in a deterministic manner. 
+In Section 1 we describe the new method. In Section 2 we apply the method to a simple stationary AR(1) model and compare our results with an analytic approach for the estimation of missing elements in stationary AR(1) models.
+In Section 3 we apply the method to a river invasion and illustrate how it can be used to infer the extent of the invasion.
+The last chapter contains our conclusions and proposes future directions for research.
 
 \section{Sequential Importance Sampling with corrections}
 \label{sec:2}
 
-In this chapter we present the method in a general context for an $M$-dimensional system, evolving in discrete time. The states of this system at times $t = 1, \dots, T$ are represented by random vectors $\vec{x}^t = (x^t_1, \dots, x^t_M) \in \Real^M$ defined on a probability space $(\Omega, \F, \P)$. The trajectory of the system up to time $t$ we represent by a random matrix $\vec{X}^t = (\vec{x}^1, \ldots, \vec{x}^t)$. We also represent our state of knowledge regarding the trajectory of the system up to time $t$ by a random binary matrix $\vec{b}^t = (b^t_{im}) \in 2^{t \times M}$, where $b^t_{im} = 1$ if the value of $x^i_m$ is known by time $t$, and $b^t_{im} = 0$ if the value of $x^i_m$ is still unknown at time $t$. Note that once a past system coordinate $x^i_m$ is known, it cannot become unknown, so $b^t_{im} = 1$ implies $b^{t^\prime}_{im} = 1$ at all later times $t^{\prime} > t$, and similarly $b^t_{im} = 0$ implies $b^{t^{\prime}}_{im} = 0$ at all earlier times $t^{\prime} < t$. It will also be convenient to define $\vec{B}^t = (\vec{b}^1,\ldots,\vec{b}^t)$.
+Consider an $M$-dimensional system, evolving in discrete time. The states of this system at times $t = 1, \dots, T$ are represented by random vectors $\vec{x}^t = (x^t_1, \dots, x^t_M) \in \Real^M$ defined on a probability space $(\Omega, \F, \P)$. The trajectory of the system up to time $t$ we represent by a random matrix $\vec{X}^t = (\vec{x}^1, \ldots, \vec{x}^t)$. We also represent our state of knowledge regarding the trajectory of the system up to time $t$ by a random binary matrix $\vec{b}^t = (b^t_{im}) \in 2^{t \times M}$, where $b^t_{im} = 1$ if the value of $x^i_m$ is known by time $t$, and $b^t_{im} = 0$ if the value of $x^i_m$ is still unknown at time $t$. Note that once a past system coordinate $x^i_m$ is known, it cannot become unknown, so $b^t_{im} = 1$ implies $b^{t^\prime}_{im} = 1$ at all later times $t^{\prime} > t$, and similarly $b^t_{im} = 0$ implies $b^{t^{\prime}}_{im} = 0$ at all earlier times $t^{\prime} < t$. It will also be convenient to define $\vec{B}^t = (\vec{b}^1,\ldots,\vec{b}^t)$.
 
 We define an {\em observation matrix} $\vec{z}^t = (z^t_{im})$, where $z^t_{im} = x^i_m$ if $b^t_{im} = 1$, and $z^t_{im} = -$ if $b^t_{im} = 0$. Thus the symbol `$-$' is used to represent an unknown system coordinate. It will also be convenient to define $\vec{Z}^t = (\vec{z}^1,\ldots,\vec{z}^t)$. 
 
@@ -294,9 +303,9 @@ for functions $l: \Omega_t' \rightarrow \Real$.
 
 We take a sequential importance sampling approach, at each iteration using a collection of weighted particles to approximate $p(\vec{X}^{t-1}, \vec{B}^{t-1} | \vec{Z}^{t-1})$, in the sense that these particles can be used to construct weighted Monte Carlo estimates for integrals of the above form. We evolve these under the model to create a new set of weighted particles representing the prior for iteration $t$, namely $q(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t-1})$. We then modify these particles to be consistent with the observations $\vec{Z}^{t}$, and adjust the weights to ensure the resulting weighted particles provide unbiased (HHH Check this is true) importance sampling estimates of an expectation $E_{p}[l(\vec{X}^{t}, \vec{B}^t) | \vec{Z}^t]$.
 
-Consider a particle $(\vec{X}^{t-1}_j,\vec{B}^{t-1}_j)$ constructed at time point $t$, for $j = 1, \ldots, n$, where $n$ is a fixed number of particles. We generate $\vec{x}^t_j$ for this particle by sampling from $f(\vec{x}^t | \vec{x}^{t-1}_j)$. Similarly, we generate $\vec{b}^{t}_j$ for this particle by sampling from $g(\vec{b}^{t} | \vec{x}^t_j, \vec{b}^{t-1}_j)$. However, the new matrix of observations $\vec{z}^{t}$ is typically inconsistent with a particle $(\vec{X}^{t}_j, \vec{B}^{t}_j)$ thus constructed, in two ways. First, the coordinates at which $\vec{b}^{t}_j$ contains a 0 may not correspond to the coordinates at which $\vec{z}^{t}$ contains a `$-$' and coordinates at which $\vec{b}^{t}_j$ contains a 1 may not correspond to an observation in $\vec{z}^{t}$. Second, the observed values in $\vec{z}^{t}$ may differ from the corresponding coordinates of $\vec{X}^{t}_j$. We must therefore correct $\vec{X}^{t}_j$ and $\vec{b}^{t}_j$ in light of the new observations $\vec{z}^{t}$. The simplest way to do this is to first replace $\vec{b}^{t}_j$ with the unique binary vector $(\vec{b}_j')^{t}$ that is consistent with $\vec{z}^{t}$, and then replace the coordinates of $\vec{X}^{t}_j$ with the corresponding coordinates of $\vec{z}^{t}$ wherever $(\vec{b}_j')^{t}$ has a `1', thus generating a corrected term $\vec{(X')}^{t}_j$. The corrections thus made at time point $t$ will be carried forward into the particles used at all future times. Here we use deterministic corrections, in which the simulated pair $\vec{y}^{t} = (\vec{X}^{t}, \vec{B}^{t}) \in \Omega_t$ can be corrected in only one way to produce a new element $\vec{(y')}^{t} = (\vec{(X')}^t, \vec{(B')}^t) \in \Omega_t'$ (note we have repressed the particle subscript $j$). That is, 
+Consider a particle $(\vec{X}^{t-1}_j,\vec{B}^{t-1}_j)$ constructed at time point $t$, for $j = 1, \ldots, n$, where $n$ is a fixed number of particles. We generate $\vec{x}^t_j$ for this particle by sampling from $f(\vec{x}^t | \vec{x}^{t-1}_j)$. Similarly, we generate $\vec{b}^{t}_j$ for this particle by sampling from $g(\vec{b}^{t} | \vec{x}^t_j, \vec{b}^{t-1}_j)$. However, the new matrix of observations $\vec{z}^{t}$ is typically inconsistent with a particle $(\vec{X}^{t}_j, \vec{B}^{t}_j)$ thus constructed, in two ways. First, the coordinates at which $\vec{b}^{t}_j$ contains a 0 may not correspond to the coordinates at which $\vec{z}^{t}$ contains a `$-$' and coordinates at which $\vec{b}^{t}_j$ contains a 1 may not correspond to an observation in $\vec{z}^{t}$. Second, the observed values in $\vec{z}^{t}$ may differ from the corresponding coordinates of $\vec{X}^{t}_j$. We must therefore correct $\vec{X}^{t}_j$ and $\vec{b}^{t}_j$ in light of the new observations $\vec{z}^{t}$. The simplest way to do this is to first replace $\vec{b}^{t}_j$ with the unique binary vector $\vec{(b')}^{t}$ that is consistent with $\vec{z}^{t}$, and then replace the coordinates of $\vec{X}^{t}_j$ with the corresponding coordinates of $\vec{z}^{t}$ wherever $\vec{(b')}^{t}$ has a `1', thus generating a corrected term $\vec{(X')}^{t}_j$. The corrections thus made at time point $t$ will be carried forward into the particles used at all future times. Here we use deterministic corrections, in which the simulated pair $\vec{y}^{t} = (\vec{X}^{t}, \vec{B}^{t}) \in \Omega_t$ can be corrected in only one way to produce a new element $\vec{(y')}^{t} = (\vec{(X')}^t, \vec{(B')}^t) \in \Omega_t'$ (note we have repressed the particle subscript $j$). That is, 
 \[
-\vec{(y')}^{t} = \rho(\vec{y}^{t},\vec{Z}^{t})
+\vec{(y')}^{t} = \rho(\vec{y}^{t},\vec{z}^{t})
 \]
 for some function $\rho$. The technique we propose can be generalised for non-deterministic corrections in a natural way, though we shall not do so here.
 
@@ -308,26 +317,17 @@ E_{p}[l(\vec{(y')}^{t})]  =  E_{p^*}[l(\pi (\vec{y}^{t}, \vec{(y')}^{t})]
 \]
 In this equation, the expectation on the left is over $\Omega_t'$, whereas the expectation on the right is over $\Omega_t^*$. We sketch a proof of this identity in the appendix.
 
-Since we are here interested in a deterministic correction, we define both $p^*$ and $q^*$ on a subspace of $\Omega_t^*$ consisting of points of the form $(\vec{y}^{t}, \rho(\vec{y}^{t}, \vec{Z}^{t}))$. (The densities $p^*$ and $q^*$ are defined with respect to a reference measure on this subspace, constructed with the aid of Rohlin's disintegration theorem (\cite{Rohlin}), though we shall not provide the measure theoretic details here.) Since $\vec{y}^{t}$ determines $\vec{(y')}^{t}$, but the reverse is not necessarily true, the new densities are of the form:
+Since we are here interested in a deterministic correction, we define both $p^*$ and $q^*$ on a subspace of $\Omega_t^*$ consisting of points of the form $(\vec{y}^{t}, \rho(\vec{y}^{t}, \vec{z}^{t}))$. (The densities $p^*$ and $q^*$ are defined with respect to a reference measure on this subspace, constructed with the aid of Rohlin's disintegration theorem (\cite{Rohlin}), though we shall not provide the measure theoretic details here.) The new densities are
 \begin{align*}
 q^*(\vec{y}^{t},\vec{(y')}^{t}) &= q(\vec{y}^{t} | \vec{Z}^{t-1}), \mbox{ and } \\
-p^*(\vec{y}^{t},\vec{(y')}^{t}) &= u(\vec{y}^{t} | \vec{(y')}^{t}) p(\vec{(y')}^{t} | \vec{Z}^{t})
+p^*(\vec{y}^{t},\vec{(y')}^{t}) &= u(\vec{y}^{t}) p(\vec{(y')}^{t} | \vec{Z}^{t-1})
 \end{align*}
-where $\vec{(y')}^{t} = \rho(\vec{y}^{t}, \vec{Z}^{t})$. (The conditioning on $\vec{Z}^{t-1}$ and $\vec{Z}^{t}$ has been suppressed on the left hand side of these definitions.) Here $u$ is the density of some distribution over the set 
+where $\vec{(y')}^{t} = \rho(\vec{y}^{t}, \vec{z}^{t})$. Here $u$ is the density of a distribution over the set 
 \[
-F(\vec{(y')}^{t}) = \{ \vec{y} \in \Omega^t  :  \rho(\vec{y}, \vec{Z}^{t}) = \vec{(y')}^{t} \}.
+F({\vec{(y')}^{t}, \vec{z}^{t}}) = \{ \vec{y} \in \Omega^t  :  \rho(\vec{y}^{t}, \vec{z}^{t}) = \vec{(y')}^{t} \}.
 \]
-Note the right hand side of the above definition depends on $\vec{Z}^{t}$, but this is not shown as an argument on the left hand side because $\vec{Z}^{t}$ is uniquely determined by $(\vec{y}')^{t}$.
-
-The set $F(\vec{(y')}^{t})$ contains all elements of $\Omega^t$ that can be corrected to $\vec{(y')}^{t}$ by the above procedure (including $\vec{y}^{t}$ and $\vec{(y')}^{t}$ itself). It can be characterised as the set of elements of the form $(\vec{X}^{t},\vec{B}^{t}) \in \Omega^t$ such that:
-\begin{enumerate}
-\item $\vec{b}^{j} = (\vec{b}')^{j}$ for all $j < t$,
-\item $b_{im}^{t} = (b_{im}')^t$ whenever $(b_{im}')^t = (b_{im}')^{t-1}$, otherwise $b_{im}^{t} \in \{ 0, 1 \}$, and
-\item $x_{m}^{i} = (x_{m}')^{i}$ whenever $(b_{im}')^t = (b_{im}')^{t-1}$, otherwise $x_{m}^{i} \in \Real$.
-\end{enumerate}
-Thus $F(\vec{(y')}^{t})$ is isomorphic to $\Real^k \times 2^k$, where $k$ is the number of coordinates of $\vec{B}^{t}$ at which $(b_{im}')^t \neq (b_{im}')^{t-1}$, that is, the number of newly observed coordinates.
-
-The density $u$ is somewhat flexible, but must ensure $\esssupp(p^*) \subseteq \esssupp(q^*)$, which is a crucial requirement for valid importance sampling (\cite{Geweke}). Here we consider two alternatives for $u$. The first, $u_1$, is the uniform density on a bounded subset of $F(\vec{(y')}^{t})$.  The subset must be bounded to ensure $u$ is integrable (with respect to the appropriate reference measure). If the bounded set is a hyper-rectangle, with each undetermined coordinate of $\vec{y}^{t}$ bounded independently of the others, then the normalising constant of $u_1$ depends on the number of newly observed coordinates $k$, but is otherwise independent of $\vec{(y')}^{t}$. If $\vec{y}^t$ is outside this hyper-rectangle, then $u_1(\vec{y}^t) = 0$, and as we shall see later in this section, this results in a zero-weighted particle in the context of importance sampling. In practice, the bounds can be set large enough that zero-weighted particles occur only infrequently, and cause no problems. The second alternative, $u_2$, is obtained by restricting $q(\vec{y}^{t} | \vec{Z}^{t-1})$ to the set $F(\vec{(y')}^{t})$. In this case, the normalising constant, obtained by integrating $q(\vec{y}^{t} | \vec{Z}^{t-1})$ over $F(\vec{(y')}^{t})$, depends on the specific value of $\vec{(y')}^{t}$. In our examples below it can be evaluated exactly, but in some cases it may require estimation. 
+This set will in general contain other elements in addition to $\vec{y}^{t}$. 
+The density $u$ is somewhat arbitrary, but should be non-zero on all of $F({\vec{(y')}^{t}, \vec{z}^{t}})$ to ensure $\esssupp(p^*) \subseteq \esssupp(q)$, which is a crucial requirement for valid importance sampling (\cite{Geweke}). Here we explore two alternatives for this function. The first, $u_1$, is the uniform density on $F({\vec{(y')}^{t}, \vec{z}^{t}})$, which is a proper density if $F({\vec{(y')}^{t}, \vec{z}^{t}})$ has finite measure (with respect to the appropriate reference measure, and again we omit the details). The second is $u_2$, obtained by restricting $q(\vec{y}^{t} | \vec{Z}^{t-1})$ to the set $F({\vec{(y')}^{t}, \vec{z}^{t}})$.
 
 Applying importance sampling on the probability space $\Omega^*$, and reintroducing the particle subscript $j$ gives
 \begin{align*}
@@ -339,69 +339,19 @@ Applying importance sampling on the probability space $\Omega^*$, and reintroduc
 where the weights are given by:
 \begin{eqnarray*}
     w^{t}_j &\propto& \frac{p^*(\vec{y}_j^{t}, (\vec{y}_j')^{t} | \vec{Z}^{t})} {q^*(\vec{y}_j^{t}, (\vec{y}_j')^{t} |\vec{Z}^{t-1})} \\
-    &=& u(\vec{y}_j^{t} | (\vec{y}_j')^{t}, \vec{Z}^{t})\frac{p((\vec{y}'_j)^{t} | \vec{Z}^{t})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})} \\
-    &=& \frac{u(\vec{y}_j^{t} | (\vec{y}_j')^{t}, \vec{Z}^{t})}{r(\vec{z}^{t} | \vec{Z}^{t-1})} \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})} \\
-    & \propto & u(\vec{y}_j^{t} | (\vec{y}_j')^{t}, \vec{Z}^{t}) \prod_{i=1}^{t} w^{t}_{ij}
+    &=& \frac{u(\vec{y}_j^{t}) p((\vec{y}'_j)^{t} | \vec{Z}^{t})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})} \\
+    &=& \frac{u(\vec{y}_j^{t})}{{\color{red}r(\vec{z}^{t} | \vec{Z}^{t-1})}} \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})}.
 \end{eqnarray*}
-with
-\begin{eqnarray*}
-w^{t}_{1j} &=& \frac{f((\vec{x}_j')^1)}{f(\vec{x}_j^1)} \frac{g((\vec{b}_j')^1 | (\vec{x}_j')^1)}{g(\vec{b}_j^1 | \vec{x}_j^1)}
-\end{eqnarray*}
-and
-\begin{eqnarray*}
-w^{t}_{ij} &=& \frac{f((\vec{x}_j')^i | (\vec{x}_j')^{i-1})}{f(\vec{x}_j^i | \vec{x}_j^{i-1})} \frac{g((\vec{b}_j')^i | (\vec{x}_j')^i, \vec{b}_j^{i-1})}{g(\vec{b}_j^i | \vec{x}_j^i, \vec{b}_j^{i-1})}
-\end{eqnarray*}
-for $i \geq 2$.
-Note the term $r(\vec{z}^{t} | \vec{Z}^{t-1})$ is the same for all particles, and thus can be disregarded, since it will cancel after normalising the weights across particles. Note also that $(\vec{b}_j')^i$ differs from $\vec{b}_j^i$ only for $i = t$, since the older observations $\vec{z}^{i}$ have already fully determined $\vec{b}_j^i$ for $i < t$. 
-
-Using $u = u_1$, the normalised weights become:
-\begin{eqnarray*}
-w^{t}_j &=& \frac{\prod_{i=1}^t w^{t}_{ij}}{\sum_{j=1}^n \prod_{i=1}^t w^{t}_{ij}},
-\end{eqnarray*}
-(with zero-weight particles, which can arise as described above, discarded prior to normalisation, and $n$ reduced accordingly). Note that $u_1$ has the same value for all particles and hence cancels at normalisation.
-% \begin{multline*}
-%     w_j^{t} = \frac{q((\vec{y}'_j)^{t} | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_j | \vec{Z}^{t-1})}\Bigg( \sum_{j=1}^n  \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_j | \vec{Z}^{t-1})}\Bigg)^{-1} 
-%     %= \\
-%     %\frac{q(\vec{({\color{red}X}')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{{\color{red}X}}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg( \sum_{i=1}^n \frac{q(\vec{({\color{red}X}')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{{\color{red}X}}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg)^{-1}
-% \end{multline*}
-For $u = u_2$, the normalised weights after cancelling terms are
-\begin{eqnarray*}
-w^{t}_j &=& \frac{\frac{1}{N_j} \prod_{i=1}^t v^{t}_{ij}}{\sum_{l=1}^n \frac{1}{N_l}\prod_{i=1}^t v^{t}_{il}}
-\end{eqnarray*}
-where $N_j$ is the normalisation constant obtained by integrating $q(\vec{y}^{t} | \vec{Z}^{t-1})$ over $F((\vec{y}_j')^{t})$, and the alternative partial weights are given by
+Normalising the weights across particles results in cancellation of the term $r(\vec{z}^{t} | \vec{Z}^{t-1})$, since this is the same for all particles. Using $u = u_1$, the normalised weights become:
+\begin{multline*}
+    w_j^{t} = \frac{q((\vec{y}'_j)^{t} | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_j | \vec{Z}^{t-1})}\Bigg( \sum_{j=1}^n  \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_j | \vec{Z}^{t-1})}\Bigg)^{-1} 
+    %= \\
+    %\frac{q(\vec{({\color{red}X}')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{{\color{red}X}}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg( \sum_{i=1}^n \frac{q(\vec{({\color{red}X}')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{{\color{red}X}}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg)^{-1}
+\end{multline*}
+whereas with $u = u_2$ we obtain:
 \[
-v^{t}_{1j} = w^{t}_{1j} f(\vec{x}_j^1)g(\vec{b}_j^1 | \vec{x}_j^1) = f((\vec{x}_j')^1)g((\vec{b}_j')^1 | (\vec{x}_j')^1)
+    w_j^{t} = q((\vec{y}'_j)^{t} | \vec{Z}^{t-1}) \Bigg( \sum_{j=1}^n  q((\vec{y}_j')^{t} | \vec{Z}^{t-1}) \Bigg)^{-1}.
 \]
-and
-\begin{eqnarray*}
-v^{t}_{ij} &=& w^{t}_{ij} f(\vec{x}_j^i | \vec{x}_j^{i-1}) g(\vec{b}_j^i | \vec{x}_j^i, \vec{b}_j^{i-1}) \\
-&=& f((\vec{x}_j')^i | (\vec{x}_j')^{i-1}) g((\vec{b}_j')^i | (\vec{x}_j')^i, (\vec{b}_j')^{i-1})
-\end{eqnarray*}
-for $i \geq 2$. 
-
-If $\vec{B}^t$ evolves independently of $\vec{X}^t$, the partial weights simplify to
-\begin{eqnarray*}
-w^{t}_{1j} &=& \frac{f((\vec{x}_j')^1)}{f(\vec{x}_j^1)}
-\end{eqnarray*}
-and
-\begin{eqnarray*}
-w^{t}_{ij} &=& \frac{f((\vec{x}_j')^i | (\vec{x}_j')^{i-1})}{f(\vec{x}_j^i | \vec{x}_j^{i-1})}
-\end{eqnarray*}
-for $i \in \{ 2, \ldots, t-1 \}$. 
-However, the final $g$ term (for $i = t$) does not cancel in general, hence
-\begin{eqnarray*}
-w^{t}_{tj} &=& \frac{f((\vec{x}_j')^t | (\vec{x}_j')^{t-1})}{f(\vec{x}_j^t | \vec{x}_j^{t-1})} \frac{g((\vec{b}_j')^t | \vec{b}_j^{t-1})}{g(\vec{b}_j^t | \vec{b}_j^{t-1})}
-\end{eqnarray*}
-The alternative partial weight $v_{ij}^t$ simplifies similarly (and is again equal to the numerator of $w_{ij}^t$).
-
-
-
-
-
-
-% \[
-%     w_j^{t} = q((\vec{y}'_j)^{t} | \vec{Z}^{t-1}) \Bigg( \sum_{j=1}^n  q((\vec{y}_j')^{t} | \vec{Z}^{t-1}) \Bigg)^{-1}.
-% \]
 
 
 %In order to be able to apply importance sampling we will need to prove that $\esssupp(p^*) \subseteq \esssupp(q)$
@@ -424,20 +374,39 @@ This process is stationary provided the initial distribution is
 \end{equation*}
 which is possible only if $|\varphi| < 1$. 
 
-In this example, the dimension of the system is $M = 1$, and the trajectory of the system is $\vec {X}^{t} = (x^1, \dots, x^{t})$. Suppose that at time $t$, only some subset of the values $\vec {X}^{t} = (x^1, \dots, x^{t})$ have so far been observed. However, those that have been observed are known without error. %We collect the values that have been observed at or before time $t$ to form $\vec{z}^{t} = (z_1^{t}, \dots, z_{t}^{t})$, where for each $i \leq t$, $z_i^{t} = x^i$ if $x^i$ has been observed at or before time $t$ and $z_i^{t} = -$ otherwise. Thus each coordinate of $\vec{z}^{t}$ belongs to an extension of the reals $\mathbb{R} \cup \{ - \}$. 
-%As time progresses, new observations become available. Thus some dashes in $\vec{z}^{t}$ will be replaced by observations in $\vec{z}^{t+1}$. However, the reverse does not occur: if we have $z_i^{t} = x^i$ for times $i$ and $t$ where $i \leq t$ then we must also have $z_i^{t^{\prime}} = x^i$ at all subsequent times $t^{\prime} > t$. 
-Note that because $M=1$, $\vec{z}^{t}$ may be represented as a row vector with $t$ coordinates, and $\vec{Z}^{t}$ may be represented as a lower triangular $t \times t$ matrix, in which row $i$ contains the vector $\vec{z}^{i}$, padded with zeroes at the right.
-%We also define $\vec{b}^{t} = (b_1^{t}, \dots, b_{t}^{t})$, where $b_i^{t} = 1$ if $z_i^{t} = x^i$, $b_i^{t} = 0$ if $z_i^{t} = -$, and $\vec{B}^{t} = (\vec{b}^{1}, \ldots, \vec{b}^{t})$. 
-Similarly, $\vec{b}^{t}$ can be represented as a row vector with $t$ coordinates and $\vec{B}^{t}$ can be represented as a lower triangular $t \times t$ binary matrix in which row $i$ is the vector $\vec{b}^{i}$. %The matrix $\vec{B}^{t}$ must satisfy the constraints that if $b_i^{t} = 1$, then $b_{i}^{t'} = 1$ for all $t' > t$ and if $b_i^{t} = 0$, then $b_{i}^{t'} = 0$ for all $t' < t$. Note $\vec{b}^{t}$ is fully determined by $\vec{z}^{t}$.
+In this example, the dimension of the system is $M = 1$, and the trajectory of the system is $\vec {X}^{t} = (x^1, \dots, x^{t})$. Suppose that at time $t$, only some subset of the values $\vec {X}^{t} = (x^1, \dots, x^{t})$ have so far been observed. However, those that have been observed are known without error. We collect the values that have been observed at or before time $t$ to form $\vec{z}^{t} = (z_1^{t}, \dots, z_{t}^{t})$, where for each $i \leq t$, $z_i^{t} = x^i$ if $x^i$ has been observed at or before time $t$ and $z_i^{t} = -$ otherwise. Thus each coordinate of $\vec{z}^{t}$ belongs to an extension of the reals $\mathbb{R} \cup \{ - \}$. 
+
+As time progresses, new observations become available. Thus some dashes in $\vec{z}^{t}$ will be replaced by observations in $\vec{z}^{t+1}$. However, the reverse does not occur: if we have $z_i^{t} = x^i$ for times $i$ and $t$ where $i \leq t$ then we must also have $z_i^{t^{\prime}} = x^i$ at all subsequent times $t^{\prime} > t$. Note that in this example, because $M=1$, $\vec{z}^{t}$ may be represented as a row vector with $t$ coordinates, and $\vec{Z}^{t}$ may be represented as a lower triangular $t \times t$ matrix, in which row $i$ contains the vector $\vec{z}^{i}$, padded with zeroes at the right.
+
+We also define $\vec{b}^{t} = (b_1^{t}, \dots, b_{t}^{t})$, where $b_i^{t} = 1$ if $z_i^{t} = x^i$, and $b_i^{t} = 0$ if $z_i^{t} = -$, and $\vec{B}^{t} = (\vec{b}^{1}, \ldots, \vec{b}^{t})$. Again $\vec{b}^{t}$ can be represented as a row vector with $t$ coordinates and $\vec{B}^{t}$ can be represented as a lower triangular $t \times t$ binary matrix in which row $i$ is the vector $\vec{b}^{i}$. The matrix $\vec{B}^{t}$ must satisfy the constraints that if $b_i^{t} = 1$, then $b_{i}^{t'} = 1$ for all $t' > t$ and if $b_i^{t} = 0$, then $b_{i}^{t'} = 0$ for all $t' < t$. Note $\vec{b}^{t}$ is fully determined by $\vec{z}^{t}$.
 
 We model $b_i^{t}$, when $b_i^{t-1} = 0$, as Bernoulli with probability $\theta$:
 \begin{equation*}
     (b_i^{t} | b_i^{t-1} = 0) \sim Bernoulli(\theta).
 \end{equation*}
-Thus $\vec{B}^{t}$ evolves independently of $\vec{X}^{t}$, so that the conditional distribution of $\vec{b}^{t}$ given $(x^{t}, \vec{b}^{t-1})$ is of the form $g(\vec{b}^{t} | x^{t}, \vec{b}^{t-1} ) = g( \vec{b}^{t} | \vec{b}^{t-1} )$. As we saw above, this results in cancellation of most terms containing $\vec{b}^{t}$ or $\vec{B}^{t}$, which simplifies the expressions for the prior and posterior distributions.
+Thus $\vec{B}^{t}$ evolves independently of $\vec{X}^{t}$, so that the conditional distribution of $\vec{b}^{t}$ given $(x^{t}, \vec{b}^{t-1})$ is of the form $g(\vec{b}^{t} | x^{t}, \vec{b}^{t-1} ) = g( \vec{b}^{t} | \vec{b}^{t-1} )$. As we saw above, this results in cancellation of terms containing $\vec{b}^{t}$ or $\vec{B}^{t}$, which simplifies the expressions for the prior and posterior distributions defined in the following section.
 
-%\subsection{Bayesian inference for an AR(1) model}
-%\label{sec:4}
+\subsection{Bayesian inference for an AR(1) model}
+\label{sec:4}
+
+To perform Bayesian inference in this partially observed state space we want to determine the posterior distribution for $\vec{X}^{t}$ in light of observations $\vec{Z}^{t}$. Suppose that at time $t$ we have some prior density $q(\vec{X}^{t} | \vec{Z}^{t-1})$ that represents our knowledge about the system trajectory before we observe $\vec{z}^{t}$. 
+
+This prior is defined on the subspace $\Omega_t = \prod_{i=1}^t \mathbb{X}_i^{t-1} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t-1} = \mathbb{R}$ for $z_i^{t-1} = -$, and $\mathbb{X}_i^{t-1} = \{ z_i^{t-1} \}$ otherwise. That is, $\Omega_t$ is the subspace of $\mathbb{R}^t$ corresponding to observed co-ordinates being fixed. Note we adopt the convention $z_t^{t-1} = -$, since the system state $x^t$ is never determined by $\vec{Z}^{t-1}$. 
+
+The posterior distribution for $\vec{X}^{t}$ is obtained by re-normalising $q$ over values consistent with $\vec{Z}^{t}$. It has a density on the subspace $\Omega_t' = \prod_{i=1}^t \mathbb{X}_i^{t} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t} = \mathbb{R}$ for $z_i^{t} = -$ and $\mathbb{X}_i^{t} = \{ z_i^{t}\}$ otherwise. The density is given by:
+\begin{equation*}
+    p(\vec{X}^{t} | \vec{Z}^{t}) = \frac{ q(\vec{X}^{t} |\vec{Z}^{t-1})} {r(\vec{z}^{t} | \vec{Z}^{t-1})}
+\end{equation*}
+where 
+\begin{equation*}
+    r(\vec{z}^{t} | \vec{Z}^{t-1}) = \int_{\Omega'_t} q(\vec{X}^{t} |\vec{Z}^{t-1}) \prod_{\{i \leq t: z_i^{t} = -\}} \D x^i.
+\end{equation*}
+The prior $q(\vec{X}^{t} | \vec{Z}^{t-1})$ represents our knowledge about the system trajectory at time $t$, before we observe $\vec{z}^{t}$. Using the independence of $\vec{X}^t$ and $\vec{B}^t$, we have
+\begin{equation}
+    q(\vec{X}^{t} | \vec{Z}^{t-1}) = p(\vec{X}^{t-1} | \vec{Z}^{t-1}) p(x^t | x^{t-1}).
+    \label{eq:1}
+\end{equation}
+
 \subsection{Sequential importance sampling for an AR(1) model}
 \label{sec:5}
 
@@ -445,58 +414,37 @@ To keep this first example simple, we limit our interest to approximating expect
 \begin{align*}
     E_{p} \Big[l(\vec{X}^{t}) \Big] &=  \int_{\Omega_t'} l(\vec{X}^{t})\; p(\vec{X}^{t} | \vec{Z}^{t})\; \prod_{ \{ i \leq t  : z^t_{i} = - \} } \D x^i
 \end{align*}
-for functions $l: \Omega_t'  \rightarrow \Real$. Since these expectations do not depend on $\vec{B}^t$, we can dispense with $\vec{y}^t$ and $(\vec{y}')^t$ as defined in Section~\ref{sec:2}, and instead deal directly with uncorrected and corrected particles $\vec{X}_j^t$ and $(\vec{X}')_j^t$ respectively, where $j = 1, \ldots, n$. To estimate such expectations, we want to use the sequential importance strategy described in Section~\ref{sec:2}. 
+for functions $l: \Omega_t'  \rightarrow \Real$. We want to estimate such expectations using the sequential importance strategy described in Section~\ref{sec:2}. Since these expectations do not depend on $\vec{B}^t$, we can dispense with $\vec{y}^t$ and $(\vec{y}')^t$ as defined in Section~\ref{sec:2}, and instead deal directly with uncorrected and corrected particles $\vec{X}_j^t$ and $(\vec{X}')_j^t$ respectively, where $j = 1, \ldots, n$.
 
-At time $t$, the prior density $q(\vec{X}^{t} | \vec{Z}^{t-1})$ 
-%that represents our knowledge about the system trajectory before we observe $\vec{z}^{t}$. This prior 
-is defined on the subspace $\Omega_t = \prod_{i=1}^t \mathbb{X}_i^{t-1} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t-1} = \mathbb{R}$ for $z_i^{t-1} = -$, and $\mathbb{X}_i^{t-1} = \{ z_i^{t-1} \}$ otherwise. That is, $\Omega_t$ is the subspace of $\mathbb{R}^t$ corresponding to observed co-ordinates being fixed. Note we adopt the convention $z_t^{t-1} = -$, since the system state $x^t$ is not observed at time $t-1$.  The posterior density $p(\vec{X}^{t} | \vec{Z}^{t})$ 
-%is obtained by re-normalising $q$ over values consistent with $\vec{Z}^{t}$. It 
-is defined on the subspace $\Omega_t' = \prod_{i=1}^t \mathbb{X}_i^{t} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t} = \mathbb{R}$ for $z_i^{t} = -$ and $\mathbb{X}_i^{t} = \{ z_i^{t}\}$ otherwise. 
+We define a probability $p^*$ on $\Omega^* = \Omega \times \Omega'$ such that the marginal distribution of $p^*$ on $\Omega'$ is $p$, that is:
 
-% The density is given by:
-% \begin{equation*}
-%     p(\vec{X}^{t} | \vec{Z}^{t}) = \frac{ q(\vec{X}^{t} |\vec{Z}^{t-1})} {r(\vec{z}^{t} | \vec{Z}^{t-1})}
-% \end{equation*}
-% where 
-% \begin{equation*}
-%     r(\vec{z}^{t} | \vec{Z}^{t-1}) = \int_{\Omega'_t} q(\vec{X}^{t} |\vec{Z}^{t-1}) \prod_{\{i \leq t: z_i^{t} = -\}} \D x^i.
-% \end{equation*}
-% The prior $q(\vec{X}^{t} | \vec{Z}^{t-1})$ represents our knowledge about the system trajectory at time $t$, before we observe $\vec{z}^{t}$. Using the independence of $\vec{X}^t$ and $\vec{B}^t$, we have
-% \begin{equation}
-%     q(\vec{X}^{t} | \vec{Z}^{t-1}) = p(\vec{X}^{t-1} | \vec{Z}^{t-1}) p(x^t | x^{t-1}).
-%     \label{eq:1}
-% \end{equation}
+\begin{equation*}
+    p(\vec{(X')}^t | \vec{Z}^t) = \int_{\Omega_t} p^*(\vec{X}^t, \vec{(X')}^t | \vec{Z}^t)\; \prod_{ \{ i \leq t  : z^{t-1}_{i} = - \} } \D x^i.
+\end{equation*}
 
+We can therefore use the identity
 
-% We define a probability $p^*$ on $\Omega^* = \Omega \times \Omega'$ such that the marginal distribution of $p^*$ on $\Omega'$ is $p$, that is:
+\begin{align*}
+    E_{p}[l(\vec{(X')}^{t})]  &=  E_{p^*}[l(\pi (\vec{X}^{t}, \vec{(X')}^{t}))].
+\end{align*}
+and estimate the right hand side expectation via importance sampling
 
-% \begin{equation*}
-%     p(\vec{(X')}^t | \vec{Z}^t) = \int_{\Omega_t} p^*(\vec{X}^t, \vec{(X')}^t | \vec{Z}^t)\; \prod_{ \{ i \leq t  : z^{t-1}_{i} = - \} } \D x^i.
-% \end{equation*}
+\begin{align*}
+    E_{p^*}[l(\pi (\vec{X}^{t}, \vec{(X')}^{t})] \approx \sum_{j=1}^n  w^{t}_j l(\pi (\vec{X}^{t}_j), \vec{(X')}^{t}_j)
+\end{align*}
+with normalised weights given by
 
-% We can therefore use the identity
-
-% \begin{align*}
-%     E_{p}[l(\vec{(X')}^{t})]  &=  E_{p^*}[l(\pi (\vec{X}^{t}, \vec{(X')}^{t}))].
-% \end{align*}
-% and estimate the right hand side expectation via importance sampling
-
-% \begin{align*}
-%     E_{p^*}[l(\pi (\vec{X}^{t}, \vec{(X')}^{t})] \approx \sum_{j=1}^n  w^{t}_j l(\pi (\vec{X}^{t}_j, \vec{(X')}^{t}_j))
-% \end{align*}
-% with normalised weights given by
-
-% \begin{multline*}
-%     w^{t}_j = \frac{q(\vec{(X')}^{t}_j | \vec{Z}^{t-1}) }{q(\vec{X}^{t}_j | \vec{Z}^{t-1})}\Bigg( \sum_{j=1}^n  \frac{q(\vec{(X')}^{t}_j | \vec{Z}^{t-1}) }{q(\vec{X}^{t}_j | \vec{Z}^{t-1})}\Bigg)^{-1}.
-% \end{multline*}
-% Notice that since we are potentially correcting every previous event at every iteration, the weights for previous times also need to be recalculated at every iteration. However, there will be many cancellations in the calculation of the weights, making the process manageable and not computationally expensive.
+\begin{multline*}
+    w^{t}_j = \frac{q(\vec{(X')}^{t}_j | \vec{Z}^{t-1}) }{q(\vec{X}^{t}_j | \vec{Z}^{t-1})}\Bigg( \sum_{j=1}^n  \frac{q(\vec{(X')}^{t}_j | \vec{Z}^{t-1}) }{q(\vec{X}^{t}_j | \vec{Z}^{t-1})}\Bigg)^{-1}.
+\end{multline*}
+Notice that since we are potentially correcting every previous event at every iteration, the weights for previous times also need to be recalculated at every iteration. {\color{red} (HHH It's not clear how that works in practice. We resample at every step using the weights we have, so do we go back and resample earlier iterations somehow? I don't think so, but it's unclear what it means to recalculate weights for previous iterations.)} However, there will be many cancellations in the calculation of the weights, making the process manageable and not computationally expensive.
 
 For every particle $i$, the unnormalised weights at time $t$ for $b' \in \{0,1\}$ and $b \in \{0,1\}$ are calculated with the following formula
 
 \begin{align} \label{eq:2}
     &\frac{q(\vec{(X')}^{t} | \vec{Z}^{t-1}) }{q(\vec{X}^{t} | \vec{Z}^{t-1})} =
     \frac{\bigg \{ \prod_{s=2}^{t}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x'_s - \varphi x'_{s-1})^{2} \bigg ] \bigg \} }{\bigg \{ \prod_{s=2}^{t}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x_s - \varphi x_{s-1})^{2} \bigg ] \bigg \} } \nonumber \\
-    &\frac{p^{b'_t} (1 - p)^{1-b'_t}  }{p^{b_t} (1 - p)^{1-b_t} }
+    &\frac{p(x'_{1}) \prod_{s=2}^{t} p^{b'_s} (1 - p)^{1-b'_s}  }{ p(x_{1}) \prod_{s=2}^{t} p^{b_s} (1 - p)^{1-b_s} }
 \end{align}
 and we will have terms cancellations in the Gaussian term when both $z_{s-1} \neq 0$ and $z_s \neq 0$, while the Bernoulli term will cancel every time that $z_s \neq 0$. Also, we will consider that the first event is known a priori, so that $p(x'_1)=p(x_1)$, and those two terms will cancel out as well.
 
@@ -509,7 +457,7 @@ We have compared the distributions for the missing observations to distributions
 
 {\color{red} (HHH JK Look at this section next. Can it be simplified?)}
 
-Here we derive the analytical solutions for a sequence of contiguous missing values in the AR(1) context. This can then be generalised for many blocks of missing values. The blocks can consist of only one value.
+Here we will explain how we have derived the analytical solutions for a sequence of contiguous missing values in the AR(1) context. This can then be generalised for many blocks of missing values. The blocks can consist of only one value.
 
 We will want to find the distribution of all the missing values in light of all the observations for an AR(1) model with exact observations $p(x_V | z_A, z_B)$ where we are missing observations $z_{V \setminus \{A,B\} }$, were $V$, $A$ and $B$ are set of indexes such that $V = 1, \dots, t$, $A = 1, \dots, \tau$ and $B = m, \dots, t$ with $1 < \tau < m \leq t$.
 Notice that the Kalman Smoother is not well suited to the situation where the observations are exact since the one-step ahead error {\color{blue}(for a definition see \cite{Young})} cannot be defined. However, we can use the model definition and the knowledge of the observations before and after the missing terms to estimate the posterior for those missing terms analytically.
@@ -605,19 +553,19 @@ therefore
       &p(x_i | x_{\tau-1}, x_{m}) = \\
       &\mathcal{N} \Bigg(\frac{\varphi^{m-i} \sum_{j=0}^{i-\tau} \varphi^{2j} x_{m} + \varphi^{i-\tau+1} \sum_{j=0}^{m-i-1} \varphi^{2j} x_{\tau-1}}{\sum_{j=0}^{m-\tau} \varphi^{2j}}, \\ &\frac{\sigma^2 \sum_{j=0}^{m-i-1} \varphi^{2j} \sum_{j=0}^{i-\tau} \varphi^{2j}}{\sum_{j=0}^{m-\tau} \varphi^{2j}} \Bigg).
 \end{align*}
-We have run our simulations with 1,000 particles and 30 times and compared our methodology with this analytical solution showing that our algorithm and the gold standard agree well (see Figure 1).
+We have run our simulations with 1,000 particles and 30 times and compared our methodology with this analytical solution showing that our algorithm and the gold standard agrees really well.
 
 \section{Application to an invasive species model}
 \label{sec:7}
 
-This second implementation illustrates the applicability of our method to invasive species models. For simplicity, we consider a one-dimensional environment such as a river without tributaries or confluences. We divide the length of the river into $N$ sections or cells and suppose the first introduction of the invasive species occurs in a cell with index $m$. From this cell, the invasion can propagate only in the immediately adjacent sections of the river, namely the cells indexed by $m-1$ and $m+1$. At each time step, a cell becomes infested from an adjacent infested cell with probability $\theta$. We represent the state of the system at time $i \in \{ 1, \dots, t \}$ by a binary vector $\vec{x}^{i} = (x_1^{i}, \dots, x_{N}^{i})$. These vectors all have length $N$, and their elements indicate the state of each cell at time $i$: 1 if the cell is invaded and 0 if the cell has not been invaded. The invasion will be complete, (that is, all cells will be invaded) at an unknown time $T$. 
+This second application of our method illustrates its applicability to invasive species models. For simplicity, we consider a one-dimensional environment (such as a river) without tributaries or confluences. We divide the length of the river into $N$ sections or cells and suppose the first introduction of the invasive species occurs in a cell with index $m$. From this cell, the invasion can propagate only in the immediately adjacent sections of the river, namely the cells indexed by $m-1$ and $m+1$. At each time step, a cell becomes infested from an adjacent infested cell with probability $\theta$. We represent the state of the system at time $i \in \{ 1, \dots, t \}$ by a binary vector $\vec{x}^{i} = (x_1^{i}, \dots, x_{N}^{i})$. These vectors all have length $N$, and their elements indicate the state of each cell at time $i$: 1 if the cell is invaded and 0 if the cell has not been invaded. The invasion will be complete, (that is, all cells will be invaded) at an unknown time $T$. 
 The invasion expands in two directions (left and right) simultaneously with the same probability $\theta$ of expansion of the invasion by one cell applicable in both directions. It is convenient to collect these vectors to form a $t\times N$ matrix $\vec{X}^{t}$, in which each row $i$ is the binary vector $\vec{x}^{i}$
 
 We will store information regarding which cells have been observed to contain the invasive species at or before time $i = 1, \dots, t$ in binary vectors $\vec{z}^{i} = (z_1^{i}, \dots, z_{N}^{i})$, where $z_s^{i} = 1$ if $x_s^{i} = 1$ and the invasive species has been detected at location $s$ at or before time $i$, and $z_s^{i} = 0$ otherwise. As for the AR(1) model example, once a cell has been observed it will remain observed at all subsequent times, therefore if $z_s^{i} = 1$ at time $i$, then we must also have $z_s^{i^{*}} = 1$ at all subsequent times $i^{*} > i$. These vectors will define a $t \times N$ matrix $\vec{Z}^{t}$, in which each row $i$ is a vector $\vec{z}^{i}$.
 
-We will model the new observations on the left and on the right of the previously observed nests in the following way. We will consider observations made by a probe that will check only those unobserved cells adjacent to cells where the invasive species has been detected. For example, if a cell is observed as invaded at time $t-1$, at time $t$ the adjacent cell in which no invader has previously been detected will be probed. If that cell is both invaded and observed, adjacent cells will also be probed, and so on until a cell in which no invaders are detected is found. The probe might fail to observe an invader that is present, and hence searching may stop without finding all invaded cells. The probability of observing invaders in an infested cell is denoted $\varphi$. Notice that in this example we don't need to define the matrix $\vec{B}^t$ as $\vec{B}^t$ and $\vec{Z}^t$ coincide, meaning that if I observe and what I observe are expressed by the same quantity, namely a 1.
+We will model the new observations on the left and on the right of the previously observed nests {\color{blue} in the following way}. We will consider observations made by a a probe that will check only those unobserved cells adjacent to cells where the invasive species has been detected. For example, if a cell is observed as invaded at time $t-1$, at time $t$ the adjacent cell in which no invader has previously been detected will be probed. If that cell is both invaded and observed, adjacent cells will also be probed, and so on until a cell in which no invaders are detected is found. The probe might fail to observe an invader that is present, and hence searching may stop without finding all invaded cells. The probability of observing invaders in an infested cell is denoted $\varphi$. Notice that in this example we don't need to define the matrix $\vec{B}^t$ as $\vec{B}^t$ and $\vec{Z}^t$ coincide, meaning that if I observe and what I observe are expressed by the same quantity, namely a 1.
 
-In this example, as for the AR(1) model, corrections are deterministic.
+In this example, as for the AR(1) model, {\color{blue} corrections} are deterministic. {\color{red} (HHH I'm not sure what you mean by saying that observations are deterministic. Corrections are deterministic, but have we explained what that means?)} {\color{blue} HHH I think we have explained this in the general context on chapter 2 page 4, second column, at the end of the second paragraph and in the third paragraph. Then on page 5, first column towards the end we show what the consequences are in the calculations of the weights.}
 
 \subsection{Bayesian inference in a partially observed state space}
 \label{sec:8}
@@ -676,7 +624,7 @@ Substituting and expanding the recursion in equation \eqref{eq:3} we have
 \begin{align}
     & q(\vec{X}^{t},\vec{z}^{t} | \vec{Z}^{t-1}) =  \prod_{i=2}^{t} \varphi^{(a^{i} - a^{i-1})}\bigg(1 - \varphi \bigg)^{1-\one {a^i=\gamma^i}} \nonumber \\
     & \varphi^{(c^{i} - c^{i-1})} \bigg(1 - \varphi\bigg)^{1-\one {c^i=\beta^i}} \; \prod_{i=2}^{\min\{t,r\}} \theta^{k_i} (1-\theta)^{1-k_i}  \label{eq:4} \\ 
-    & \prod_{i=2}^{\min\{t,l\}} \theta^{h_i} (1-\theta)^{1-h_i} \nonumber
+    & \prod_{i=2}^{\min\{t,r\}} \theta^{h_i} (1-\theta)^{1-h_i} \nonumber
 \end{align}
 where $l$ is the time at which the invasion has reached the left end of the modelled region, $r$ is the time at which the invasion has reached the right end of the modelled region, {\color{blue} $k_i \in \{0,1\}$ and $h_i \in \{0,1\}$ where $k_i$ is 1 if the invasion expanded one cell to the right at time $i$ and $h_i$ is 1 if the invasion expanded one cell to the left at time $i$}.
 
@@ -686,7 +634,7 @@ Similarly to the AR(1) model, since our corrections are deterministic, the unnor
 \end{equation*}
 where the primed are the corrected terms. Again, there will be many cancellations in the calculations of the weights.
 
-Figure 2 shows a series of heat maps for 3 possible invasions and observations simulated from the distributions in the river example. The map is a visualization of the probability of finding an invader in each location at each time for different values of the observation parameter $\varphi$ but for the same value of the expansion  parameter $\theta$. The length of the vertical axis represents the time at which the simulated invasion reached an end and all cells are occupied: for example in figure A1 at time 165 in the simulated invasion all the cells are invaded. The image shows how we get a more accurate representations of the invasion with a higher number of observations. We can also see that the algorithm becomes less accurate when we have only few observations.
+{\color{blue} Below we present a series of heat maps for 3 possible invasions and observations simulated from the above distributions in the river example. The map is a visualization of the probability of finding an invader in each location at each time for different values of the parameter $\varphi$ (observations) but for the same value of the parameter $\theta$ (expansion). The length of the vertical axis represents the time at which the simulated invasion reached an end and all cells are occupied: for example in figure A1 at time 165 the simulated invasion has reached the point where all the cells are invaded. In the image we can see how we get a more accurate representations of the invasion with a higher number of observations. We can also see that the algorithm becomes less accurate in the situation in which we have a low number of observations.}
 
 \begin{figure*}
     \subfloat[fig 1]{\includegraphics[width=0.5\linewidth]{ar1_001.PNG}}
@@ -707,19 +655,19 @@ Figure 2 shows a series of heat maps for 3 possible invasions and observations s
 \section{Conclusions and further developments}
 \label{sec:9}
 
-The present investigation shows how our new methodology can be used to estimate the past and present state of a system for which incomplete information is continuously gathered. In particular in the case of invasive species it will be well suited to estimate the past trajectories and current extent of an invasion. This could be then used to help understanding the efficacy of an eradication program or to inform on where to search for currently hidden invades or to assess the risk from currently unobserved individuals.
+{\color{blue} The present investigation shows how our new methodology can be used to estimate the past and present state of a system for which incomplete information is continuously gathered. In particular in the case of invasive species it will be well suited to estimate the past trajectories and current extent of an invasion. This could be then used to help understanding the efficacy of an eradication program or to inform on where to search for currently hidden invades or to assess the risk from currently unobserved individuals.
+
+As mentioned in the introduction, different methods exist to numerically solve estimations problems with exact but incomplete observations in an online manner. However, our method is the first one, at the best of our knowledge, that uses corrections seeking to improve previous estimations as each new observation is acquired. VVV Jon, I think this sentence is really important, is there anything I should/could add to show how innovative or different the method is?}
+
+The methodology could also be used in the more complex scenario where not only we have entire cases unobserved, but also the number of missing cases is unknown, {\color{blue} for example, in more general predictive modeling of a species geographical distribution.}
+
+In this context we are planning to apply our new method to a specific invasive species problem: the fire ants invasion in Queensland, Australia. This application will seek to improve and complement the existing agent based approach developed by Keith and Spring (\cite{Keith}). {\color{blue} Their method consisted of constructing a likelihood model in terms of some unknown parameters that included, among other things, the phylogeny, jump type, founding type and treatment success rate. The posterior distribution was then sampled using a generalised Gibbs technique that enabled transdimensional sampling, which is used when the number of parameters is unknown, as in their case. However, their method needed to be re-run each time new data was available and could not be updated online.}
 
 The results we have for the AR(1) model compared to the gold standard show that our simulations closely approximate analytical solutions, while the rive example shows the applicability of the method to a simple invasive species problem.
 
-As mentioned in the introduction, different methods exist to numerically solve estimations problems with exact but incomplete observations in an online manner. However, our method is the first one, at the best of our knowledge, that uses corrections seeking to improve previous estimations as each new observation is acquired.
+Our algorithm is also reasonably fast as the weights involve cancellations that significantly reduce the calculations required. However, we might need to optimise and further maximise efficiency when running with bigger data sets. For example, we could apply a more efficient resampling step.
 
-The methodology could also be used in the more complex scenario where not only we have entire cases unobserved, but also the number of missing cases is unknown, for example, in more general predictive modeling of a species geographical distribution. In this context we are planning to apply our new method to a specific invasive species problem: the fire ants invasion in Queensland, Australia. This application will seek to improve and complement the existing agent based approach developed by Keith and Spring (\cite{Keith}). Their method consisted of constructing a likelihood model in terms of some unknown parameters that included, among other things, the phylogeny, jump type, founding type and treatment success rate. The posterior distribution was then sampled using a generalised Gibbs technique that enabled trans-dimensional sampling, which is used when the number of parameters is unknown, as in their case. However, their method needed to be re-run each time new data was available and could not be updated online.
-
-In this new application the methodology will need to be adapted to time continuous models. We also envisage the possibility of improving our approach to allow for non-deterministic revision of imputed values that, while not inconsistent with later observations, can nevertheless be updated in light of new information. This will require a different definition of the probability $p^*$ and some more theoretical proof of its existence and validity. 
-
-Our algorithm is reasonably fast as the weights involve cancellations that significantly reduce the calculations required. However, we might need to optimise and further maximise efficiency when running with bigger data sets. For example, we could apply a more efficient resampling step.
-
-
+We are planning to adapt the methodology to be applied to time continuous models, and we also envisage the possibility of improving our approach to allow for non-deterministic revision of imputed values that, while not inconsistent with later observations, can nevertheless be updated in light of new information. This will require a different definition of the probability $p^*$ and some more theoretical proof of its existence and validity. 
 
 %\begin{acknowledgements}
 %If you'd like to thank anyone, place your comments here
@@ -881,9 +829,7 @@ Zhang, X., Khwaja A. S., Luo J., Housfater A.S., Anpalagan A.: Multiple Imputati
  \end{algorithmic}
 \end{algorithm}
 
-
-\section{proof of the identity in section \ref{sec:2} }
-
+\begin{appendix}
 Define a probability measure $\P^*$ having density $p^*$ on $\Omega^*_t$ such that the marginal distribution of $\P^*$ on $\Omega_t'$ is $\P$, that is $\P = \P^* \circ \pi^{-1}$, where $\P$ is the measure with density $p$ on $\Omega_t'$. (Here the measurable sets in $\Omega_t$, $\Omega_t'$ and $\Omega_t^*$, are constructed from Borel sets on $\Real^M$ and subsets of $2^M$ in the manner implied by the sequence of cross-products and restrictions used to define $\Omega_t$, $\Omega_t'$ and $\Omega_t^*$. Similarly, reference measures are constructed from Lebesgue measure on $\Real^M$ and counting measure on $2^M$.)
 
 By the disintegration theorem (see \cite{Rohlin}) there exists a family of measures $\{ \nu_{\vec{(y')}^t} \}_{\vec{(y')}^t \in \Omega'{\color{red}_t}}$ on $\Omega^*{\color{red}_t}$ such that for every measurable Borel function $m : \Omega^*_t \rightarrow [0, \infty]$
@@ -908,8 +854,7 @@ Moreover,
     &= \int_{\Omega_t^*} l(\pi(\vec{(y')}^{t}, \vec{y}^{t}))\; p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) \D \P^*(\vec{(y')}^t, \vec{y}^t) \\ 
     &= E_{p^*}[l(\pi (\vec{(y')}^{t}, \vec{y}^{t}))].
 \end{align*}
-
+\end{appendix}
 
 \end{document}
 
-notice 

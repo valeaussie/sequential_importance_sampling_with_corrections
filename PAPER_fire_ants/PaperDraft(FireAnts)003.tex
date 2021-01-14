@@ -45,11 +45,11 @@
 \newcommand{\var}{\mathrm{Var}}
 \newcommand{\cov}{\mathrm{Cov}}
 \newcommand{\ind}{\mathrm{I}}
-\newcommand{\D}{\mathscr{D}}
 \newcommand{\Borel}{\mathscr{B}}
 \newcommand{\M}{\mathcal{M}}
 \newcommand{\Z}{\mathcal{Z}}
 \renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+\newcommand{\D}{\mathrm{d}}
 
 \newcommand{\ben}{\begin{enumerate}}
 \newcommand{\een}{\end{enumerate}}
@@ -232,6 +232,7 @@ Substituting $h$ and evaluating the last integral we get
         - & \sum_{ \{ i : t_{i} = \infty \} } \bigg[\varphi(T - f_{i}) \bigg].
     \end{aligned}
 \end{equation*}
+We will not consider natural deaths in our model, so nests are immortal until detected and removed.
 
 {\color{red}\section{Simulation of the model} \label{section:simulationModel}
 
@@ -257,46 +258,62 @@ For the simulation of the process in a time interval $\tau_j = (T_{j-1}, T_j]$ b
 {\color{red}
 \section{Sequential Importance sampling with corrections applied to the self-exciting point process} \label{sec:SISMethod}
 
-In this section we present our new Sequential Importance Sampling methodology and apply it to the model above. As we have discussed in the introduction, during the eradication program locations of new nests are continuously acquired either through passive or active surveillance activities, while new nests are also continuously created. We will consider the locations and time of observation as correct information when we acquire it, however, only a limited number of colonies will be discovered at each observation while an unknown number of them will remain undetected. If an area is surveyed and deemed free of invaders this can be because there are no invaders to be detected or because we fail to make an observation. This can happen for example when nests are young and not easy to spot. At each step we will simulate plausible locations and founding time for all the undetected nests created in the past and for all the newly created nests. When receiving new data these simulations will need correction in order to get the most plausible configuration of nests in light of this data. We will therefore correct the simulation then adjust the weights in order to correctly represent our posterior.
+In this section we present our new Sequential Importance Sampling methodology and apply it to the model above. As we have discussed in the introduction, during the eradication program locations of new nests are continuously acquired either through passive or active surveillance activities, while new nests are also continuously created. We will consider the locations and time of observation as correct information when we acquire it, however, only a limited number of colonies will be discovered at each observation while an unknown number of them will remain undetected. If an area is surveyed and deemed free of invaders this can be because there are no invaders to be detected or because we fail to make an observation. This can happen for example when nests are young and not easy to spot. At each step we will simulate plausible locations and founding times for all the undetected nests created in the past and for all the newly created nests. When receiving new data these simulations will need correction in order to get the most plausible configuration of nests in light of this data. We will therefore correct the simulation then adjust the weights in order to correctly represent our posterior.
 
-In order to facilitate our analysis we will split the area we want to analyse into a grid. According to the paper from Wu et al. \cite{Wu} the average density of the RIFA nests is 5 nests over 100 $m^2$, so we will choose a grid where each square will have a side of at least 20 $m^2$. The area that we will consider will be a bigger that the are we suspect invaded (how much bigger?).
-
-As for the Agent based paper \cite{Keith} we will simulate an eradication program with a search strategy similar to the one used by the Biosecurity Queensland Control Centre (BQCC) that provided the data. We will have passive detections from citizens each month. These detections will have a probability of 0.02 in urban areas and 0.01 in rural areas. Whenever a passive detection occurred a grid cells of side length 100 $m$ containing the detected nest was searched as were the 8 grid cells forming around it.
+We will consider a search party that monthly surveys the area where the first invader at time $T_1$ was spotted and where each month new invaders are detected. The searched area will be bigger than the area that we expect to be invaded (how much bigger?). 
 
 \subsection{Bayesian inference in a partially observed state space} \label{subsec:POS}
 
-Our model will have a discrete state space in continuous time. We define our state space as a topological measure space $(\Omega, \mathcal{F}, \lambda)$ on which a prior probability measure $\mathbb{Q}$ with density $q(\cdot)$ relative to the Borel measure $\lambda$ has been defined. The density $q$ represents our knowledge of the state of the system before we make the next set of observations.
+In section \ref{section:simulationModel} we have defined the time intervals $\tau_j = (T_{j-1}, T_j]$ where $T_j$ is the time at which we receive a new set of observations. Then the interval of time $[T_0, T_i]$ from the beginning of the invasion $T_0=0$ to the time of the last detection $T_i$ will be partitioned in sub-intervals $\tau_j$ with $j = 1, \dots, i$. We will consider observations arriving monthly so these times intervals are going to be of 30 days. The total number of observations reports (i.e. the number of months from $T_0$ to $T_i$) will be $L$.
 
-In section \ref{section:simulationModel} we have defined the time intervals $\tau_j = (T_{j-1}, T_j]$ where $T_j$ is the time at which we receive a new set of observations. Then the interval of time $[T_0, T_i]$ from the beginning of the invasion $T_0=0$ to the time of the last detection $T_i$ will be partitioned in sub-intervals $\tau_j$ with $j = 1, \dots, i$. 
+We are considering a system evolving continuously in time. We will define vectors $\vec{a}^{T_j} = (a^{T_j}_1, \dots, a^{T_j}_{N^{T_j}})$ where $N^{T_j}}$ is the total number of nests founded from the beginning of the invasion up to time $T_j$. These vectors are defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$ and will represent the state of the system at each time $T_j$ we receive a new set of observations.
+The trajectory of the system from $T_0$ to $T_i$ is represented by a random matrix $\vec{A}^{T_i} = (\vec{a}^1, \dots, \vec{a}^{L})$. Notice that each element $a^k_j = (t^k_j, f^k_j, x^k_j, y^k_j)$ is itself a vector representing a nest and containing 4 elements: the time of founding $f_k$, the time of observation $t_k$, and the coordinates $x_k$ and $y_k$. The total number of nests founded $N^{T_i}$ is the sum of the unknown number of nests $n^{\tau_j}$ founded in each time interval $\tau_j$, so $N^{T_i} = \sum_{j=1}^{i} n^{\tau_j}$. 
 
-The trajectory of the system from $T_0$ to $T_i$ is represented by a random matrix $\vec{A}^{T_i} = (\vec{a}^1, \dots, \vec{a}^{N^{T_i}}) \in \mathbb{R}^{N^{T_i} \times 4}}$ where $N^{T_i}}$ is the total number of nests founded from the beginning of the invasion. Each element $a^k_j = (f^k_j, x^k_j, y^k_j)$ is a vector containing 4 elements for each nest: its time of founding $f_k$, its time of observation $t_k$, and its coordinates $x_k$ and $y_k$. Notice that the total number of nests founded $N^T_i$ is the sum of the number of nests $n^{\tau_j}$ founded in each time interval $\tau_j$, so $N^T_i = \sum_{j=1}^{i} n^{\tau_j}$.
+$(\Omega, \mathcal{F}, \lambda)$
+We are also going to define an \textit{observation matrix} $\vec{Z}^{T_i} \in \mathbb{R}^{i \times M^{T_i} \times 3}$ where $M^{T_i}$ is the total number of nests detected up to time $T_i$ and is such that $M^{T_i} = \sum_{j=1}^i m^{\tau_j}$ with $m^{\tau_j$ the number of nests detected in the time interval $\tau_j$. This matrix will contain the coordinates of the observed nests and their times of detection up to time $T_i$. $\vec{Z}^{T_i}$ will be formed by $i$ matrices $\vec{z}^{l} \in \mathbb{R}^{M^{T_i} \times 3}$ for $l = 1, \dots, i$ with $\vec{z}^{l} = (z^l_1, \dots, z^l_{M^{\tau_i}})$. Each $z^l_k$ for $k=1, \dots, M^{T_i}$ is a vector in $\mathbb{R}^3$ such that $z^l_k = (t^l_k, x^l_k, y^l_k)$. We assume that the observations are made without error and therefore the nests locations of the observed nests will correspond exactly to some of the nests of the process $A$.
 
-We are also going to define an \textit{observation matrix} $\vec{Z}^{T_i} \in \mathbb{R}^{i \times M^{T_i} \times 3}$ where $M^{T_i}$ is the total number of nests detected up to time $T_i$ and is such that $M^{T_i} = \sum_{j=1}^i m^{\tau_j}$ with $m^{\tau_j$ the number of nests detected in the time interval $\tau_j$. This matrix will contain the coordinates of the observed nests and their times of detection up to time $T_i$. $\vec{Z}^{T_i}$ will be formed by $i$ matrices $\vec{z}^{l} \in \mathbb{R}^{M^{T_i} \times 3}$ for $l = 0, \dots, i$ with $\vec{z}^{l} = (z^l_1, \dots, z^l_{M^{\tau_i}})$. Each $z^l_k$ for $k=0, \dots, M^{T_i}$ is a vector in $\mathbb{R}^3$ such that $z^l_k = (t^l_k, x^l_k, y^l_k)$. So, if at any time $T_j$ only a subset of the values of $\vec{A}^{T_j}$ have been observed and those observations are made without error, we collect the values of those observations at of before time $T_j$ in $\vec{Z}^{T_j}$.
 
-For each nest that has not yet been observed at time $T_i$ we have information derived from all the observed nests and the model of the system. We take a Bayesian approach to quantify this information. At the time we receive the first set of observation $T_i$, our knowledge of the state of the system before we make the next set of observations $\vec{z}^{T_i}$ is represented by $q(\vec{A}^{T_i}, \vec{z}^{T_i} | \vec{Z}^{T_{i-1}})$. To make an inference about this partially observed state space we want to determine the posterior distribution for $(\vec{A}^{T_i})$ in light of the observations $\vec{Z}^{T_i}$. This is obtained renormalising the prior at time $T_i$ with values consistent with the observations $\vec{Z}^{T_i}$.
+In our model for the RIFA invasion all the detected nests are killed as soon as they are found, the probability distribution for the next set of observations will be dependent on the entire process $A^{T_i}$ and on all the previous observations and the distribution for the next set of created nests will be dependent on all the previously observed nests and all the previously founded nests
+
+\begin{align*}
+   & \vec{a}^{T_i} | \vec{A}^{T_{i-1}}, \vec{B}^{T_{i-1}} \sim p(\vec{a}^{T_i} | \vec{A}^{T_{i-1}}, \vec{B}^{T_{i-1}}) \\
+   & \vec{b}^{T_i} | \vec{A}^{T_i}, \vec{B}^{T_{i-1}} \sim h(\vec{b}^{T_i} | \vec{A}^{T_i}, \vec{B}^{T_{i-1}})
+\end{align*}
+where $p(\vec{a}^{T_i} | \vec{A}^{T_{i-1}}, \vec{Z}^{T_{i-1}})$ is the point process and $h(\vec{z}^{T_i} | \vec{A}^{T_i}, \vec{Z}^{T_{i-1}})$ is the observation process, both defined in chapter \ref{section:model}.
+For each nest that has not yet been observed at time $T_i$ we have information derived from all the observed nests and the model of the system. We take a Bayesian approach to quantify this information. At the time $T_i$, when we receive next set of observations, we will want to calculate the posterior $p(\vec{A}^{T_i} | \vec{Z}^{T_i})$ which can be written as.
 
 \begin{equation} \label{eq:post}
-    p(\vec{A}^{T_i} | \vec{Z}^{T_i}) = \frac{q(\vec{A}^{T_i}, \vec{z}^{T_i} | \vec{Z}^{T_{i-1}}) }{r(\vec{z}^{T_i} | \vec{Z}^{T_{i-1}})}
+    p(\vec{A}^{T_i} | \vec{Z}^{T_i}) = \frac{p(\vec{A}^{T_i}, \vec{Z}^{T_{i}}) }{r(\vec{Z}^{T_{i}})}
 \end{equation}
 with
 
 \begin{equation*}
-    r(\vec{z}^{T_i} | \vec{Z}^{T_{i-1}}) = \int_{\vec{a} \in B} q(\vec{A}^{T_i} = \vec{a}, \vec{z}^{T_i} | \vec{Z}^{T_{i-1}}) \;\; \text{d} \vec{A}^{T_i}.
+    r(\vec{Z}^{T_i}) = \int p(\vec{A}^{T_i}, \vec{Z}^{T_i})
 \end{equation*}
-where $B = \{ \vec{a} = a^1, \dots, a^{N^{T_i}} \;\; \text{s.t.} \;\; a_s = z_s^{\tau_i} \;\; \text{if} \;\; t^{\tau_i}_s} \leq T_i \;\; \text{and} \;\; a_s \in \mathbb{R}^4 \;\; \text{if} \;\; t^{\tau_i}_s} > T_i \}$
+constant.
 
-The prior can be written as
+The joint probability $p(\vec{A}^{T_i}, \vec{Z}^{T_{i}})$ can be written as
 
 \begin{equation} \label{eq:prior}
-    q(\vec{A}^{T_i}, \vec{z}^{T_i} | \vec{Z}^{T_{i-1}}) = p(\vec{a}^{T_i}, \vec{z}^{T_i} | \vec{A}^{T_{i-1}}, \vec{Z}^{T_{i-1}}) p(\vec{A}^{T_{i-1}} | \vec{Z}^{T_{i-1}})
+    p(\vec{A}^{T_i}, \vec{Z}^{T_{i}}) = p(\vec{a}^{T_i}, \vec{z}^{T_i}, \vec{A}^{T_{i-1}}, \vec{Z}^{T_{i-1}}) = p(\vec{z}^{T_i} | \vec{A}^{T_i}, \vec{Z}^{T_{i-1}}) p(\vec{a}^{T_i} | \vec{A}^{T_{i-1}}, \vec{Z}^{T_{i-1}}) p(\vec{A}^{T_{i-1}}, \vec{Z}^{T_{i-1}})
 \end{equation}
-Were $p(\vec{A}^{T_{i-1}}| \vec{Z}^{T_{i-1}})$ is the posterior distribution at the previous step and $p(\vec{a}^{T_i}, \vec{z}^{T_i} | \vec{A}^{T_{i-1}}, \vec{Z}^{T_{i-1}})$ is the likelihood of the model for the time interval $\tau_i$ that we have defined in section \ref{section:model}.
-
-Substituting the value found in equation (\ref{eq:prior}) for the prior in equation (\ref{eq:post}) and iterating this process we can write the posterior as
+were 
 
 \begin{equation*}
-    p(\vec{A}^{T_{i-1}} | \vec{Z}^{T_{i-1}}) \propto \prod_{j=1}^i q(\vec{A}^{T_j}, \vec{z}^{T_j} | \vec{Z}^{T_{j-1}}).
+    p(\vec{A}^{T_{i-1}}, \vec{Z}^{T_{i-1}})
 \end{equation*}
+is the posterior distribution at the previous step and 
+
+\begin{equation*}
+    p(\vec{z}^{T_i}, \vec{a}^{T_i} | \vec{A}^{T_i}, \vec{Z}^{T_{i-1}}) = p(\vec{z}^{T_i} | \vec{A}^{T_i}, \vec{Z}^{T_{i-1}}) p(\vec{a}^{T_i} | \vec{A}^{T_{i-1}}, \vec{Z}^{T_{i-1}})
+\end{equation*} 
+is the likelihood of the model for the time interval $\tau_i$ that we have defined in section \ref{section:model}.
+
+Substituting the value found in equation (\ref{eq:prior}) for the joint distribution in equation (\ref{eq:post}) and iterating this process we can write the posterior as
+
+\begin{equation} \label{eq:post2}
+    p(\vec{A}^{T_{i-1}} | \vec{Z}^{T_{i-1}}) \propto p(\vec{z}^{T_1} | \vec{A}^{T_1}) p(\vec{a}^{T_1}) \prod_{j=2}^i p(\vec{z}^{T_j} | \vec{A}^{T_j}, \vec{Z}^{T_{j-1}}) p(\vec{a}^{T_j} | \vec{A}^{T_{j-1}}, \vec{Z}^{T_{j-1}}).
+\end{equation}
 
 }
 
@@ -315,17 +332,12 @@ One possible way to make those correction would be to amend each simulated nest'
 \label{fig:1}
 \end{figure*}
 
-A better strategy is to assume that each set of particles that have been simulated up to time $T_i$ and have yet to be corrected can be corrected in a finite number of ways when we receive a new set of observation $\vec{z}^{\tau_i}$ at time $T_i$. We also make the assumption that once a particle have been corrected it will remain corrected in future times. These corrections are made with probability $H_{z^{\tau_i}}((\vec{s}^{T_i})' | \vec{s}^{T_i})_k$, where $(\vec{s}^{T_i})'$ is the vector of locations for the corrected nests at time $T_i$. Each time that a nest is corrected, its new location will correspond to the location of the observed nest that have caused the correction. If we have more simulated nests than what we have observed some nests will not be corrected and we will add them to the set of nests that still need to be corrected when the following set of observations will arrive. If we have more observed nests than simulated one, all nests will be corrected and we will add the observed nests left over (the one that where not responsible for a correction) to the set of nests simulated and observed.
+A better strategy is to assume that each set of particles that has been simulated up to time $T_i$ and have yet to be corrected can be corrected in a finite number of ways when we receive a new set of observation $\vec{z}^{\tau_i}$ at time $T_i$. We also make the assumption that a nests can be only corrected once and if corrected at time $T_j$ it we will not be corrected again in future times. These corrections are made with probability $H_{z^{\tau_i}}((\vec{a}^{T_i})' | \vec{a}^{T_i})_k$, where $(\vec{a}^{T_i})'$ is the vector of the corrected nests at time $T_i$. Each time a nest is corrected its new location will correspond to the location of one of the observed nests. If we have simulated more nests than what we have observed some nests will not be corrected and we will add them to the set of nests that still need to be corrected when the following set of observations will arrive. If we have more observed nests than simulated one, all nests will be corrected and we will add the observed nests that where not responsible for a correction to the set of nests simulated and observed. We introduce the quantity $\mu^{T_i}$ as the total number of simulated but not previously corrected nests. It follows by the definition of $n^{\tau_j}$, $m^{\tau_j}$ and $M^{T_j}$ in chapter \ref{subsec:POS} that $\mu^{T_i} = M^{T_i} - \sum_{j=1}^{i-1} min(n^{\tau_j}, m^{\tau_j})$.
 
-The probability $H_{z^{\tau_i}}((\vec{s}^{T_i})' | \vec{s}^{T_i})_k$ of the new configuration of nests $k$ will depend on the distances between the simulated nests and the observed nests in the following way. Let us consider a simulated nest $s_j$ and an observation $z_h$. Then $s_j$ can be corrected by $z_h$ with probability $p_{s_j z_h} = p(s_j \leftrightarrow z_h) = e^{-d_{s_j z_h}}$ where $d_{s_j z_h}$ is the Euclidean distance between $s_j$ and $z_h$. Notice that when the distance is $d_{s_j z_h} = 0$ the probability $p_{s_j z_h}$ is 1 and the observation coincide with the simulated nest. The unnormalised probability of a certain new configuration $k$ of nests will therefore be $p((\vec{s}^{T_i})')_k = \prod_{h = 1}^{m^{\tau_i}} (p_{s_j z_h})$ where we remember that the quantity $m^{\tau_i}$ is the number of nests observed in the time interval between set of observations $\tau_i$. Therefore the probability of that configuration will be $H_{z^{\tau_i}} = p((\vec{s}^T)')_k / \sum_k p((\vec{s}^T)')_k $ where the sum is over all the possible configurations. So, each set simulated particle that have not been corrected can be corrected in only a finite number of ways to produce an element of the non-empty finite set $O_{\vec{z}^{\tau_i}} (\vec{s}^{T_i})$ that contains all the allowed corrections. The correction is made selecting an element $(\vec{s}^{T_i})'$ from the set $O_{\vec{z}^{T_i}} (\vec{s}^T)$ with probability $H_{z^{\tau_i}}$.
+The probability $H_{z^{\tau_i}}((\vec{a}^{T_i})' | \vec{a}^{T_i})_k$ of the new configuration of nests $k$ will depend on the distances between the simulated nests and the observed nests in the following way. Let us consider a simulated nest $a_j$ and an observation $z_h$. Then $a_j$ can be corrected by $z_h$ with probability $p_{a_j z_h} = p(a_j \leftrightarrow z_h) = e^{-d_{a_j z_h}}$ where $d_{a_j z_h}$ is the Euclidean distance between $a_j$ and $z_h$. Notice that when the distance is $d_{s_j z_h} = 0$ the probability $p_{s_j z_h}$ is 1 and the observation coincide with the simulated nest. The unnormalised probability of a certain new configuration $k$ of nests will therefore be $p((\vec{a}^{T_i})')_k = \prod_{h = 1}^{m^{\tau_i}} (p_{a_j z_h})$ where we remember that the quantity $m^{\tau_i}$ is the number of nests observed in the time interval between set of observations $\tau_i$. Therefore the probability of that configuration will be $H_{z^{\tau_i}} = p((\vec{a}^T)')_k / \sum_k p((\vec{a}^T)')_k $ where the sum is over all the possible configurations. Each set of simulated particles that have not been corrected, can be corrected in only a finite number of ways to produce an element of the non-empty finite set $O_{\vec{z}^{\tau_i}} (\vec{a}^{T_i})$ that contains all the allowed corrections. The correction is made selecting an element $(\vec{a}^{T_i})'$ from the set $O_{\vec{z}^{T_i}} (\vec{a}^T)$ with probability $H_{z^{\tau_i}}$.
 
-The selected configuration for the corrections will also determine $T_i$ to be the time of observation for those nests that have been corrected. For example if a nests was simulated as unobserved at time $T_i$ we will correct also the time of observation to be $T_i$. 
+The selected configuration for the corrections will also determine $T_i$ to be the time of observation for those nests that have been corrected. For example if a nests was simulated as unobserved at time $T_i$ we will correct also the time of observation to be $T_i$.
 
-NOTE TO SELF: Notice that the simulated time of observation does not have an impact in the calculation of the probability for the corrections. We could improve this step adding that perhaps?
-
-NOTE TO SELF: The normalization constant in the calculation of $H_{z^{\tau_i}}$ should cancel out when normalising the weight. 
-
-NOTE TO SELF: The quantity $H_{z'^{\tau_i}}$ (notice the primed for z) which is the correction we would have made have we first generated the corrected sample then corrected in light of the observation is 1 as the corrected nests and the observed nests will coincide. If we add corrections for the nests that are not going to be located exactly in the location of the observed nests this quantity will not be 1.
 }
 
 {\color{red}
@@ -335,8 +347,60 @@ In this section we will use Sequential Importance Sampling with an auxiliary var
 
 We will want to approximate the posterior $p(\vec{A}^{T_i} | \vec{Z}^{T_i})$ by iterative sampling and obtain Monte Carlo estimates of position, time of founding and observation time for the nests generated during the invasion. 
 
+For simplicity, we will call $(\vec{a}^{T_j}, \vec{z}^{T_j}) = \vec{y}^{T_j}$ and $(\vec{(x')}^{T_j}, \vec{(z')}^{T_j}) = \vec{(y')}^{T_j}$.
 
+We define a probability $p^*$ on $\Omega^* = \Omega \times \Omega'$ (need to define these spaces) such that the marginal distribution of $p^*$ on $\Omega'$ is $p$, that is:
 
+\begin{equation*}
+    p(\vec{(y')}^{T_j} | \vec{Z}^{T_j}) = \int_{\pi^{-1}(\vec{y'})} p^*(\vec{(y')}^{T_j}, \vec{y}^{T_j} | \vec{Z}^{T_j})\; d \vec{y}^{T_j}.
+\end{equation*}
+Applying the disintegration theorem we will define a family of measures for which
+
+\begin{align*}
+    E_{p}[f(\vec{(y')}^{t})]  &= \int_{\Omega'} f(\vec{(y')}^{t})\; p(\vec{(y')}^{t} | \vec{Z}^{t}) \D \vec{(y')}^{t} \\
+    &= \int_{\Omega'} f(\vec{(y')}^{t})\Bigg[\int_{\pi^{-1}(y')} p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) \D \vec{y}^{t}\Bigg] \D \vec{(y')}^{t} \\ 
+    &= \int_{\Omega^*} f(\pi(\vec{(y')}^{t}, \vec{y}^{t}))\; p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) \D \vec{y}^{t} \\ 
+    &= E_{p^*}[f(\pi (\vec{(y')}^{t}, \vec{y}^{t}))].
+\end{align*}
+Then applying importance sampling
+
+\begin{align*}
+    E_{p^*}[f(\pi (\vec{(y')}^{t}, \vec{y}^{t})] = \int_{\Omega^*} f(\pi(\vec{(y')}^{t}, \vec{y}^{t})) \frac{p^*(\vec{(y')}^{t}, \vec{y}^{t}|\vec{Z}^{t})} {q(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t-1})} \\
+    p(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t-1}) \; \D \vec{y}^{t} \approx \sum_{i=1}^n  w^{t}_i f(\pi (\vec{(y')}^{t}_i, \vec{y}^{t}_i))
+\end{align*}
+with weights for each particle are $w^{t}_k$ with $k = 1, \dots, K$ where $K$ is the number of particles sampled
+
+\begin{equation*}
+    w^{T_j}_k = \frac{p^*(\vec{(y')}^{t}_k, \vec{y}^{t}_k | \vec{Z}^{t})} {p(\vec{(y')}^{t}_k, \vec{y}^{t}_k | \vec{Z}^{t-1})}
+\end{equation*}
+The joint density at a point $(\vec{(y')}^{T_j}_k, \vec{y}^{T_j}_k)$ will be 
+
+\begin{equation*}
+    p(\vec{(y')}^{T_j}_k, \vec{y}^{T_j}_k | \vec{Z}^{t-1}) = p(\vec{y}^{T_j}_k) H_{z^{\tau_j}} (\vec{(y')}^{T_j}_k | \vec{y}^{T_j}_k}).
+\end{equation*}
+The density $p^*(\vec{(y')}^{T_j}_k, \vec{y}^{T_j}_k | \vec{Z}^{t})$ will be
+
+\begin{equation*}
+    p^*(\vec{(y')}^{T_j}_k, \vec{y}^{T_j}_k | \vec{Z}^{t}) = p(\vec{(y')}^{T_j}_k | \vec{Z}^{t}) u(\vec{(Z')}^{t}) H_{(z')^{\tau_j}} (\vec{y}^{T_j}_k | \vec{(y')}^{T_j}_k})
+\end{equation*}
+where $(\vec{z})' = \sigma(\vec{y})$ and $u$ is the uniform density with respect to $\lambda'$ 
+
+\begin{equation*}
+    u(\vec{z}) = \Bigg( \int_{\Omega'} \D \lambda' \Bigg)^{(-1)}.
+\end{equation*}
+and $H_{(z')^{\tau_j}} (\vec{y}^{T_j}_k | \vec{(y')}^{T_j}_k}$ represents a correction we would have made had we initially generated a sample $H_{(z')^{\tau_j}} (\vec{y}^{T_j}_k | \vec{(y')}^{T_j}_k}$
+
+(here we will need to prove that p' is a proper density, that p' has marginal density p and the validity of the essential supports).
+The weights will therefore be 
+
+\begin{equation*}
+    w^{T_j}_k \propto \frac{p(\vec{(y')}^{T_j}_k | \vec{Z}^{t}) u(\vec{(Z')}^{t}) H_{(z')^{\tau_j}} (\vec{y}^{T_j}_k | \vec{(y')}^{T_j}_k)}{p(\vec{y}^{T_j}_k) H_{z^{\tau_j}} (\vec{(y')}^{T_j}_k | \vec{y}^{T_j}_k)}
+\end{equation*}
+we notice now that the quantities $H_{(z')^{\tau_j}} (\vec{y}^{T_j}_k | \vec{(y')}^{T_j}_k)$ and $H_{z^{\tau_j}} (\vec{(y')}^{T_j}_k | \vec{y}^{T_j}_k)$ are identical at each step and will cancel out. Also $u$ and $r$ will cancel out after normalisation leaving
+
+\begin{equation*}
+    w^{T_j}_k = \frac{p(\vec{(y')}^{T_j}_k | \vec{Z})}{p(\vec{y}^{T_j}_k)} 
+\end{equation*}
 
 
 }
@@ -421,7 +485,7 @@ We will want to approximate the posterior $p(\vec{A}^{T_i} | \vec{Z}^{T_i})$ by 
 
 \bibitem{Wang} Wang L, Xu Y, Zeng L, Lu Y (2019). Impact of the red imported fire ant Solenopsis invicta Buren on biodiversity in South China: A review. \textit{Journal of Integrative Agriculture} 18(4): 788-796
 
-\bibitem{Wetterer} Wetterer J K (2013). Exotic spread of Solenopsis invicta Buren (Hymenoptera: Formicidae) beyond North America. \textit{Sociobiology} 60: 50-55
+%\bibitem{Wetterer} Wetterer J K (2013). Exotic spread of Solenopsis invicta Buren (Hymenoptera: Formicidae) beyond North America. \textit{Sociobiology} 60: 50-55
 
 \bibitem{WylieMay16} Wylie R, Janssen-May S (2016). Invader  Red imported fire ant in Australia:  What if we lose the war?. \textit{Ecological Management & Restoration} 18(1): 32-44
 

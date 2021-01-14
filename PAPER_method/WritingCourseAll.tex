@@ -161,7 +161,7 @@ Our original motivation for considering this problem was to facilitate analysis 
 
 Here we propose a new approach to problems of this type. Although our approach is ultimately aimed at inference for invasive species, we will illustrate the method for less complex evolving systems in which correct but partial observations are being made in real time.
 
-In the first chapter of this paper we introduce our Bayesian approach that uses a new sequential importance sampling (SIS) strategy. As is typical of SIS methods, we generate a population of particles, each representing a plausible sequence of system states, and we evolve each particle at each time step according to a model of system dynamics. Again in a manner typical of SIS methods, new observations arrive in real time, and we use these observations to adjust the weights assigned to particles. However, a crucial new element in our method is that we allow missing values imputed at earlier time steps to be corrected so that they are consistent with the new observations. We test our method with two simple models in chapter 2 and 3. Firstly, we apply the method to an AR(1) model where we simulate a set of observations then reconstruct the system. These results are subsequently compared with the analytical solutions obtained directly applying the AR(1) model definition. In order to test the applicability of our method to a simple invasive species problem, we therefore introduce a model for a partially observed river invasion and impute the missing data.
+In the first chapter of this paper we introduce our Bayesian approach that uses a new sequential importance sampling (SIS) strategy. As is typical of SIS methods, we generate a population of particles, each representing a plausible sequence of system states, and we evolve each particle at each time step according to a model of system dynamics. Again in a manner typical of SIS methods, new observations arrive in real time, and we use these observations to adjust the weights assigned to particles. However, a crucial new element in our method is that we allow missing values imputed at earlier time steps to be corrected so that they are consistent with the new observations. We then test our method with two simple models in chapter 2 and 3. Firstly, we apply the method to an AR(1) model where we simulate a set of observations then reconstruct the system. We then compare our results with the analytical solutions obtained directly applying the AR(1) model definition. In order to test the applicability of our method to a simple invasive species problem, we then introduce a model for a partially observed river invasion and impute the missing data.
 
 Our method addresses a problem that is common in practice: new observations made in real time can render previously imputed missing values implausible, and may even conflict with what has been simulated. For example, in the invasive species context described above, undetected individuals imputed to geographic areas that do not contain any invaders become increasingly implausible as time passes without any detection being made in those regions. In standard SIS approaches, such particles receive low weights and are eventually eliminated by resampling, but a common problem is that all particles can become implausible, if not inconsistent, with observations.
 
@@ -294,9 +294,9 @@ for functions $l: \Omega_t' \rightarrow \Real$.
 
 We take a sequential importance sampling approach, at each iteration using a collection of weighted particles to approximate $p(\vec{X}^{t-1}, \vec{B}^{t-1} | \vec{Z}^{t-1})$, in the sense that these particles can be used to construct weighted Monte Carlo estimates for integrals of the above form. We evolve these under the model to create a new set of weighted particles representing the prior for iteration $t$, namely $q(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t-1})$. We then modify these particles to be consistent with the observations $\vec{Z}^{t}$, and adjust the weights to ensure the resulting weighted particles provide unbiased (HHH Check this is true) importance sampling estimates of an expectation $E_{p}[l(\vec{X}^{t}, \vec{B}^t) | \vec{Z}^t]$.
 
-Consider a particle $(\vec{X}^{t-1}_j,\vec{B}^{t-1}_j)$ constructed at time point $t$, for $j = 1, \ldots, n$, where $n$ is a fixed number of particles. We generate $\vec{x}^t_j$ for this particle by sampling from $f(\vec{x}^t | \vec{x}^{t-1}_j)$. Similarly, we generate $\vec{b}^{t}_j$ for this particle by sampling from $g(\vec{b}^{t} | \vec{x}^t_j, \vec{b}^{t-1}_j)$. However, the new matrix of observations $\vec{z}^{t}$ is typically inconsistent with a particle $(\vec{X}^{t}_j, \vec{B}^{t}_j)$ thus constructed, in two ways. First, the coordinates at which $\vec{b}^{t}_j$ contains a 0 may not correspond to the coordinates at which $\vec{z}^{t}$ contains a `$-$' and coordinates at which $\vec{b}^{t}_j$ contains a 1 may not correspond to an observation in $\vec{z}^{t}$. Second, the observed values in $\vec{z}^{t}$ may differ from the corresponding coordinates of $\vec{X}^{t}_j$. We must therefore correct $\vec{X}^{t}_j$ and $\vec{b}^{t}_j$ in light of the new observations $\vec{z}^{t}$. The simplest way to do this is to first replace $\vec{b}^{t}_j$ with the unique binary vector $(\vec{b}_j')^{t}$ that is consistent with $\vec{z}^{t}$, and then replace the coordinates of $\vec{X}^{t}_j$ with the corresponding coordinates of $\vec{z}^{t}$ wherever $(\vec{b}_j')^{t}$ has a `1', thus generating a corrected term $\vec{(X')}^{t}_j$. The corrections thus made at time point $t$ will be carried forward into the particles used at all future times. Here we use deterministic corrections, in which the simulated pair $\vec{y}^{t} = (\vec{X}^{t}, \vec{B}^{t}) \in \Omega_t$ can be corrected in only one way to produce a new element $\vec{(y')}^{t} = (\vec{(X')}^t, \vec{(B')}^t) \in \Omega_t'$ (note we have repressed the particle subscript $j$). That is, 
+Consider a particle $(\vec{X}^{t-1}_j,\vec{B}^{t-1}_j)$ constructed at time point $t$, for $j = 1, \ldots, n$, where $n$ is a fixed number of particles. We generate $\vec{x}^t_j$ for this particle by sampling from $f(\vec{x}^t | \vec{x}^{t-1}_j)$. Similarly, we generate $\vec{b}^{t}_j$ for this particle by sampling from $g(\vec{b}^{t} | \vec{x}^t_j, \vec{b}^{t-1}_j)$. However, the new matrix of observations $\vec{z}^{t}$ is typically inconsistent with a particle $(\vec{X}^{t}_j, \vec{B}^{t}_j)$ thus constructed, in two ways. First, the coordinates at which $\vec{b}^{t}_j$ contains a 0 may not correspond to the coordinates at which $\vec{z}^{t}$ contains a `$-$' and coordinates at which $\vec{b}^{t}_j$ contains a 1 may not correspond to an observation in $\vec{z}^{t}$. Second, the observed values in $\vec{z}^{t}$ may differ from the corresponding coordinates of $\vec{X}^{t}_j$. We must therefore correct $\vec{X}^{t}_j$ and $\vec{b}^{t}_j$ in light of the new observations $\vec{z}^{t}$. The simplest way to do this is to first replace $\vec{b}^{t}_j$ with the unique binary vector $\vec{(b')}^{t}$ that is consistent with $\vec{z}^{t}$, and then replace the coordinates of $\vec{X}^{t}_j$ with the corresponding coordinates of $\vec{z}^{t}$ wherever $\vec{(b')}^{t}$ has a `1', thus generating a corrected term $\vec{(X')}^{t}_j$. The corrections thus made at time point $t$ will be carried forward into the particles used at all future times. Here we use deterministic corrections, in which the simulated pair $\vec{y}^{t} = (\vec{X}^{t}, \vec{B}^{t}) \in \Omega_t$ can be corrected in only one way to produce a new element $\vec{(y')}^{t} = (\vec{(X')}^t, \vec{(B')}^t) \in \Omega_t'$ (note we have repressed the particle subscript $j$). That is, 
 \[
-\vec{(y')}^{t} = \rho(\vec{y}^{t},\vec{Z}^{t})
+\vec{(y')}^{t} = \rho(\vec{y}^{t},\vec{z}^{t})
 \]
 for some function $\rho$. The technique we propose can be generalised for non-deterministic corrections in a natural way, though we shall not do so here.
 
@@ -308,26 +308,17 @@ E_{p}[l(\vec{(y')}^{t})]  =  E_{p^*}[l(\pi (\vec{y}^{t}, \vec{(y')}^{t})]
 \]
 In this equation, the expectation on the left is over $\Omega_t'$, whereas the expectation on the right is over $\Omega_t^*$. We sketch a proof of this identity in the appendix.
 
-Since we are here interested in a deterministic correction, we define both $p^*$ and $q^*$ on a subspace of $\Omega_t^*$ consisting of points of the form $(\vec{y}^{t}, \rho(\vec{y}^{t}, \vec{Z}^{t}))$. (The densities $p^*$ and $q^*$ are defined with respect to a reference measure on this subspace, constructed with the aid of Rohlin's disintegration theorem (\cite{Rohlin}), though we shall not provide the measure theoretic details here.) Since $\vec{y}^{t}$ determines $\vec{(y')}^{t}$, but the reverse is not necessarily true, the new densities are of the form:
+Since we are here interested in a deterministic correction, we define both $p^*$ and $q^*$ on a subspace of $\Omega_t^*$ consisting of points of the form $(\vec{y}^{t}, \rho(\vec{y}^{t}, \vec{z}^{t}))$. (The densities $p^*$ and $q^*$ are defined with respect to a reference measure on this subspace, constructed with the aid of Rohlin's disintegration theorem (\cite{Rohlin}), though we shall not provide the measure theoretic details here.) The new densities are
 \begin{align*}
 q^*(\vec{y}^{t},\vec{(y')}^{t}) &= q(\vec{y}^{t} | \vec{Z}^{t-1}), \mbox{ and } \\
-p^*(\vec{y}^{t},\vec{(y')}^{t}) &= u(\vec{y}^{t} | \vec{(y')}^{t}) p(\vec{(y')}^{t} | \vec{Z}^{t})
+p^*(\vec{y}^{t},\vec{(y')}^{t}) &= u(\vec{y}^{t}) p(\vec{(y')}^{t} | \vec{Z}^{t-1})
 \end{align*}
-where $\vec{(y')}^{t} = \rho(\vec{y}^{t}, \vec{Z}^{t})$. (The conditioning on $\vec{Z}^{t-1}$ and $\vec{Z}^{t}$ has been suppressed on the left hand side of these definitions.) Here $u$ is the density of some distribution over the set 
+where $\vec{(y')}^{t} = \rho(\vec{y}^{t}, \vec{z}^{t})$. Here $u$ is the density of a distribution over the set 
 \[
-F(\vec{(y')}^{t}) = \{ \vec{y} \in \Omega^t  :  \rho(\vec{y}, \vec{Z}^{t}) = \vec{(y')}^{t} \}.
+F({\vec{(y')}^{t}, \vec{z}^{t}}) = \{ \vec{y} \in \Omega^t  :  \rho(\vec{y}^{t}, \vec{z}^{t}) = \vec{(y')}^{t} \}.
 \]
-Note the right hand side of the above definition depends on $\vec{Z}^{t}$, but this is not shown as an argument on the left hand side because $\vec{Z}^{t}$ is uniquely determined by $(\vec{y}')^{t}$.
-
-The set $F(\vec{(y')}^{t})$ contains all elements of $\Omega^t$ that can be corrected to $\vec{(y')}^{t}$ by the above procedure (including $\vec{y}^{t}$ and $\vec{(y')}^{t}$ itself). It can be characterised as the set of elements of the form $(\vec{X}^{t},\vec{B}^{t}) \in \Omega^t$ such that:
-\begin{enumerate}
-\item $\vec{b}^{j} = (\vec{b}')^{j}$ for all $j < t$,
-\item $b_{im}^{t} = (b_{im}')^t$ whenever $(b_{im}')^t = (b_{im}')^{t-1}$, otherwise $b_{im}^{t} \in \{ 0, 1 \}$, and
-\item $x_{m}^{i} = (x_{m}')^{i}$ whenever $(b_{im}')^t = (b_{im}')^{t-1}$, otherwise $x_{m}^{i} \in \Real$.
-\end{enumerate}
-Thus $F(\vec{(y')}^{t})$ is isomorphic to $\Real^k \times 2^k$, where $k$ is the number of coordinates of $\vec{B}^{t}$ at which $(b_{im}')^t \neq (b_{im}')^{t-1}$, that is, the number of newly observed coordinates.
-
-The density $u$ is somewhat flexible, but must ensure $\esssupp(p^*) \subseteq \esssupp(q^*)$, which is a crucial requirement for valid importance sampling (\cite{Geweke}). Here we consider two alternatives for $u$. The first, $u_1$, is the uniform density on a bounded subset of $F(\vec{(y')}^{t})$.  The subset must be bounded to ensure $u$ is integrable (with respect to the appropriate reference measure). If the bounded set is a hyper-rectangle, with each undetermined coordinate of $\vec{y}^{t}$ bounded independently of the others, then the normalising constant of $u_1$ depends on the number of newly observed coordinates $k$, but is otherwise independent of $\vec{(y')}^{t}$. If $\vec{y}^t$ is outside this hyper-rectangle, then $u_1(\vec{y}^t) = 0$, and as we shall see later in this section, this results in a zero-weighted particle in the context of importance sampling. In practice, the bounds can be set large enough that zero-weighted particles occur only infrequently, and cause no problems. The second alternative, $u_2$, is obtained by restricting $q(\vec{y}^{t} | \vec{Z}^{t-1})$ to the set $F(\vec{(y')}^{t})$. In this case, the normalising constant, obtained by integrating $q(\vec{y}^{t} | \vec{Z}^{t-1})$ over $F(\vec{(y')}^{t})$, depends on the specific value of $\vec{(y')}^{t}$. In our examples below it can be evaluated exactly, but in some cases it may require estimation. 
+This set will in general contain other elements in addition to $\vec{y}^{t}$. 
+The density $u$ is somewhat arbitrary, but should be non-zero on all of $F({\vec{(y')}^{t}, \vec{z}^{t}})$ to ensure $\esssupp(p^*) \subseteq \esssupp(q)$, which is a crucial requirement for valid importance sampling (\cite{Geweke}). Here we explore two alternatives for this function. The first, $u_1$, is the uniform density on $F({\vec{(y')}^{t}, \vec{z}^{t}})$, which is a proper density if $F({\vec{(y')}^{t}, \vec{z}^{t}})$ has finite measure (with respect to the appropriate reference measure, and again we omit the details). The second is $u_2$, obtained by restricting $q(\vec{y}^{t} | \vec{Z}^{t-1})$ to the set $F({\vec{(y')}^{t}, \vec{z}^{t}})$.
 
 Applying importance sampling on the probability space $\Omega^*$, and reintroducing the particle subscript $j$ gives
 \begin{align*}
@@ -339,69 +330,19 @@ Applying importance sampling on the probability space $\Omega^*$, and reintroduc
 where the weights are given by:
 \begin{eqnarray*}
     w^{t}_j &\propto& \frac{p^*(\vec{y}_j^{t}, (\vec{y}_j')^{t} | \vec{Z}^{t})} {q^*(\vec{y}_j^{t}, (\vec{y}_j')^{t} |\vec{Z}^{t-1})} \\
-    &=& u(\vec{y}_j^{t} | (\vec{y}_j')^{t}, \vec{Z}^{t})\frac{p((\vec{y}'_j)^{t} | \vec{Z}^{t})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})} \\
-    &=& \frac{u(\vec{y}_j^{t} | (\vec{y}_j')^{t}, \vec{Z}^{t})}{r(\vec{z}^{t} | \vec{Z}^{t-1})} \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})} \\
-    & \propto & u(\vec{y}_j^{t} | (\vec{y}_j')^{t}, \vec{Z}^{t}) \prod_{i=1}^{t} w^{t}_{ij}
+    &=& \frac{u(\vec{y}_j^{t}) p((\vec{y}'_j)^{t} | \vec{Z}^{t})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})} \\
+    &=& \frac{u(\vec{y}_j^{t})}{{\color{red}r(\vec{z}^{t} | \vec{Z}^{t-1})}} \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})}.
 \end{eqnarray*}
-with
-\begin{eqnarray*}
-w^{t}_{1j} &=& \frac{f((\vec{x}_j')^1)}{f(\vec{x}_j^1)} \frac{g((\vec{b}_j')^1 | (\vec{x}_j')^1)}{g(\vec{b}_j^1 | \vec{x}_j^1)}
-\end{eqnarray*}
-and
-\begin{eqnarray*}
-w^{t}_{ij} &=& \frac{f((\vec{x}_j')^i | (\vec{x}_j')^{i-1})}{f(\vec{x}_j^i | \vec{x}_j^{i-1})} \frac{g((\vec{b}_j')^i | (\vec{x}_j')^i, \vec{b}_j^{i-1})}{g(\vec{b}_j^i | \vec{x}_j^i, \vec{b}_j^{i-1})}
-\end{eqnarray*}
-for $i \geq 2$.
-Note the term $r(\vec{z}^{t} | \vec{Z}^{t-1})$ is the same for all particles, and thus can be disregarded, since it will cancel after normalising the weights across particles. Note also that $(\vec{b}_j')^i$ differs from $\vec{b}_j^i$ only for $i = t$, since the older observations $\vec{z}^{i}$ have already fully determined $\vec{b}_j^i$ for $i < t$. 
-
-Using $u = u_1$, the normalised weights become:
-\begin{eqnarray*}
-w^{t}_j &=& \frac{\prod_{i=1}^t w^{t}_{ij}}{\sum_{j=1}^n \prod_{i=1}^t w^{t}_{ij}},
-\end{eqnarray*}
-(with zero-weight particles, which can arise as described above, discarded prior to normalisation, and $n$ reduced accordingly). Note that $u_1$ has the same value for all particles and hence cancels at normalisation.
-% \begin{multline*}
-%     w_j^{t} = \frac{q((\vec{y}'_j)^{t} | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_j | \vec{Z}^{t-1})}\Bigg( \sum_{j=1}^n  \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_j | \vec{Z}^{t-1})}\Bigg)^{-1} 
-%     %= \\
-%     %\frac{q(\vec{({\color{red}X}')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{{\color{red}X}}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg( \sum_{i=1}^n \frac{q(\vec{({\color{red}X}')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{{\color{red}X}}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg)^{-1}
-% \end{multline*}
-For $u = u_2$, the normalised weights after cancelling terms are
-\begin{eqnarray*}
-w^{t}_j &=& \frac{\frac{1}{N_j} \prod_{i=1}^t v^{t}_{ij}}{\sum_{l=1}^n \frac{1}{N_l}\prod_{i=1}^t v^{t}_{il}}
-\end{eqnarray*}
-where $N_j$ is the normalisation constant obtained by integrating $q(\vec{y}^{t} | \vec{Z}^{t-1})$ over $F((\vec{y}_j')^{t})$, and the alternative partial weights are given by
+Normalising the weights across particles results in cancellation of the term $r(\vec{z}^{t} | \vec{Z}^{t-1})$, since this is the same for all particles. Using $u = u_1$, the normalised weights become:
+\begin{multline*}
+    w_j^{t} = \frac{q((\vec{y}'_j)^{t} | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_j | \vec{Z}^{t-1})}\Bigg( \sum_{j=1}^n  \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_j | \vec{Z}^{t-1})}\Bigg)^{-1} 
+    %= \\
+    %\frac{q(\vec{({\color{red}X}')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{{\color{red}X}}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg( \sum_{i=1}^n \frac{q(\vec{({\color{red}X}')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{{\color{red}X}}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg)^{-1}
+\end{multline*}
+whereas with $u = u_2$ we obtain:
 \[
-v^{t}_{1j} = w^{t}_{1j} f(\vec{x}_j^1)g(\vec{b}_j^1 | \vec{x}_j^1) = f((\vec{x}_j')^1)g((\vec{b}_j')^1 | (\vec{x}_j')^1)
+    w_j^{t} = q((\vec{y}'_j)^{t} | \vec{Z}^{t-1}) \Bigg( \sum_{j=1}^n  q((\vec{y}_j')^{t} | \vec{Z}^{t-1}) \Bigg)^{-1}.
 \]
-and
-\begin{eqnarray*}
-v^{t}_{ij} &=& w^{t}_{ij} f(\vec{x}_j^i | \vec{x}_j^{i-1}) g(\vec{b}_j^i | \vec{x}_j^i, \vec{b}_j^{i-1}) \\
-&=& f((\vec{x}_j')^i | (\vec{x}_j')^{i-1}) g((\vec{b}_j')^i | (\vec{x}_j')^i, (\vec{b}_j')^{i-1})
-\end{eqnarray*}
-for $i \geq 2$. 
-
-If $\vec{B}^t$ evolves independently of $\vec{X}^t$, the partial weights simplify to
-\begin{eqnarray*}
-w^{t}_{1j} &=& \frac{f((\vec{x}_j')^1)}{f(\vec{x}_j^1)}
-\end{eqnarray*}
-and
-\begin{eqnarray*}
-w^{t}_{ij} &=& \frac{f((\vec{x}_j')^i | (\vec{x}_j')^{i-1})}{f(\vec{x}_j^i | \vec{x}_j^{i-1})}
-\end{eqnarray*}
-for $i \in \{ 2, \ldots, t-1 \}$. 
-However, the final $g$ term (for $i = t$) does not cancel in general, hence
-\begin{eqnarray*}
-w^{t}_{tj} &=& \frac{f((\vec{x}_j')^t | (\vec{x}_j')^{t-1})}{f(\vec{x}_j^t | \vec{x}_j^{t-1})} \frac{g((\vec{b}_j')^t | \vec{b}_j^{t-1})}{g(\vec{b}_j^t | \vec{b}_j^{t-1})}
-\end{eqnarray*}
-The alternative partial weight $v_{ij}^t$ simplifies similarly (and is again equal to the numerator of $w_{ij}^t$).
-
-
-
-
-
-
-% \[
-%     w_j^{t} = q((\vec{y}'_j)^{t} | \vec{Z}^{t-1}) \Bigg( \sum_{j=1}^n  q((\vec{y}_j')^{t} | \vec{Z}^{t-1}) \Bigg)^{-1}.
-% \]
 
 
 %In order to be able to apply importance sampling we will need to prove that $\esssupp(p^*) \subseteq \esssupp(q)$
@@ -424,20 +365,39 @@ This process is stationary provided the initial distribution is
 \end{equation*}
 which is possible only if $|\varphi| < 1$. 
 
-In this example, the dimension of the system is $M = 1$, and the trajectory of the system is $\vec {X}^{t} = (x^1, \dots, x^{t})$. Suppose that at time $t$, only some subset of the values $\vec {X}^{t} = (x^1, \dots, x^{t})$ have so far been observed. However, those that have been observed are known without error. %We collect the values that have been observed at or before time $t$ to form $\vec{z}^{t} = (z_1^{t}, \dots, z_{t}^{t})$, where for each $i \leq t$, $z_i^{t} = x^i$ if $x^i$ has been observed at or before time $t$ and $z_i^{t} = -$ otherwise. Thus each coordinate of $\vec{z}^{t}$ belongs to an extension of the reals $\mathbb{R} \cup \{ - \}$. 
-%As time progresses, new observations become available. Thus some dashes in $\vec{z}^{t}$ will be replaced by observations in $\vec{z}^{t+1}$. However, the reverse does not occur: if we have $z_i^{t} = x^i$ for times $i$ and $t$ where $i \leq t$ then we must also have $z_i^{t^{\prime}} = x^i$ at all subsequent times $t^{\prime} > t$. 
-Note that because $M=1$, $\vec{z}^{t}$ may be represented as a row vector with $t$ coordinates, and $\vec{Z}^{t}$ may be represented as a lower triangular $t \times t$ matrix, in which row $i$ contains the vector $\vec{z}^{i}$, padded with zeroes at the right.
-%We also define $\vec{b}^{t} = (b_1^{t}, \dots, b_{t}^{t})$, where $b_i^{t} = 1$ if $z_i^{t} = x^i$, $b_i^{t} = 0$ if $z_i^{t} = -$, and $\vec{B}^{t} = (\vec{b}^{1}, \ldots, \vec{b}^{t})$. 
-Similarly, $\vec{b}^{t}$ can be represented as a row vector with $t$ coordinates and $\vec{B}^{t}$ can be represented as a lower triangular $t \times t$ binary matrix in which row $i$ is the vector $\vec{b}^{i}$. %The matrix $\vec{B}^{t}$ must satisfy the constraints that if $b_i^{t} = 1$, then $b_{i}^{t'} = 1$ for all $t' > t$ and if $b_i^{t} = 0$, then $b_{i}^{t'} = 0$ for all $t' < t$. Note $\vec{b}^{t}$ is fully determined by $\vec{z}^{t}$.
+In this example, the dimension of the system is $M = 1$, and the trajectory of the system is $\vec {X}^{t} = (x^1, \dots, x^{t})$. Suppose that at time $t$, only some subset of the values $\vec {X}^{t} = (x^1, \dots, x^{t})$ have so far been observed. However, those that have been observed are known without error. We collect the values that have been observed at or before time $t$ to form $\vec{z}^{t} = (z_1^{t}, \dots, z_{t}^{t})$, where for each $i \leq t$, $z_i^{t} = x^i$ if $x^i$ has been observed at or before time $t$ and $z_i^{t} = -$ otherwise. Thus each coordinate of $\vec{z}^{t}$ belongs to an extension of the reals $\mathbb{R} \cup \{ - \}$. 
+
+As time progresses, new observations become available. Thus some dashes in $\vec{z}^{t}$ will be replaced by observations in $\vec{z}^{t+1}$. However, the reverse does not occur: if we have $z_i^{t} = x^i$ for times $i$ and $t$ where $i \leq t$ then we must also have $z_i^{t^{\prime}} = x^i$ at all subsequent times $t^{\prime} > t$. Note that in this example, because $M=1$, $\vec{z}^{t}$ may be represented as a row vector with $t$ coordinates, and $\vec{Z}^{t}$ may be represented as a lower triangular $t \times t$ matrix, in which row $i$ contains the vector $\vec{z}^{i}$, padded with zeroes at the right.
+
+We also define $\vec{b}^{t} = (b_1^{t}, \dots, b_{t}^{t})$, where $b_i^{t} = 1$ if $z_i^{t} = x^i$, and $b_i^{t} = 0$ if $z_i^{t} = -$, and $\vec{B}^{t} = (\vec{b}^{1}, \ldots, \vec{b}^{t})$. Again $\vec{b}^{t}$ can be represented as a row vector with $t$ coordinates and $\vec{B}^{t}$ can be represented as a lower triangular $t \times t$ binary matrix in which row $i$ is the vector $\vec{b}^{i}$. The matrix $\vec{B}^{t}$ must satisfy the constraints that if $b_i^{t} = 1$, then $b_{i}^{t'} = 1$ for all $t' > t$ and if $b_i^{t} = 0$, then $b_{i}^{t'} = 0$ for all $t' < t$. Note $\vec{b}^{t}$ is fully determined by $\vec{z}^{t}$.
 
 We model $b_i^{t}$, when $b_i^{t-1} = 0$, as Bernoulli with probability $\theta$:
 \begin{equation*}
     (b_i^{t} | b_i^{t-1} = 0) \sim Bernoulli(\theta).
 \end{equation*}
-Thus $\vec{B}^{t}$ evolves independently of $\vec{X}^{t}$, so that the conditional distribution of $\vec{b}^{t}$ given $(x^{t}, \vec{b}^{t-1})$ is of the form $g(\vec{b}^{t} | x^{t}, \vec{b}^{t-1} ) = g( \vec{b}^{t} | \vec{b}^{t-1} )$. As we saw above, this results in cancellation of most terms containing $\vec{b}^{t}$ or $\vec{B}^{t}$, which simplifies the expressions for the prior and posterior distributions.
+Thus $\vec{B}^{t}$ evolves independently of $\vec{X}^{t}$, so that the conditional distribution of $\vec{b}^{t}$ given $(x^{t}, \vec{b}^{t-1})$ is of the form $g(\vec{b}^{t} | x^{t}, \vec{b}^{t-1} ) = g( \vec{b}^{t} | \vec{b}^{t-1} )$. As we saw above, this results in cancellation of terms containing $\vec{b}^{t}$ or $\vec{B}^{t}$, which simplifies the expressions for the prior and posterior distributions defined in the following section.
 
-%\subsection{Bayesian inference for an AR(1) model}
-%\label{sec:4}
+\subsection{Bayesian inference for an AR(1) model}
+\label{sec:4}
+
+To perform Bayesian inference in this partially observed state space we want to determine the posterior distribution for $\vec{X}^{t}$ in light of observations $\vec{Z}^{t}$. Suppose that at time $t$ we have some prior density $q(\vec{X}^{t} | \vec{Z}^{t-1})$ that represents our knowledge about the system trajectory before we observe $\vec{z}^{t}$. 
+
+This prior is defined on the subspace $\Omega_t = \prod_{i=1}^t \mathbb{X}_i^{t-1} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t-1} = \mathbb{R}$ for $z_i^{t-1} = -$, and $\mathbb{X}_i^{t-1} = \{ z_i^{t-1} \}$ otherwise. That is, $\Omega_t$ is the subspace of $\mathbb{R}^t$ corresponding to observed co-ordinates being fixed. Note we adopt the convention $z_t^{t-1} = -$, since the system state $x^t$ is never determined by $\vec{Z}^{t-1}$. 
+
+The posterior distribution for $\vec{X}^{t}$ is obtained by re-normalising $q$ over values consistent with $\vec{Z}^{t}$. It has a density on the subspace $\Omega_t' = \prod_{i=1}^t \mathbb{X}_i^{t} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t} = \mathbb{R}$ for $z_i^{t} = -$ and $\mathbb{X}_i^{t} = \{ z_i^{t}\}$ otherwise. The density is given by:
+\begin{equation*}
+    p(\vec{X}^{t} | \vec{Z}^{t}) = \frac{ q(\vec{X}^{t} |\vec{Z}^{t-1})} {r(\vec{z}^{t} | \vec{Z}^{t-1})}
+\end{equation*}
+where 
+\begin{equation*}
+    r(\vec{z}^{t} | \vec{Z}^{t-1}) = \int_{\Omega'_t} q(\vec{X}^{t} |\vec{Z}^{t-1}) \prod_{\{i \leq t: z_i^{t} = -\}} \D x^i.
+\end{equation*}
+The prior $q(\vec{X}^{t} | \vec{Z}^{t-1})$ represents our knowledge about the system trajectory at time $t$, before we observe $\vec{z}^{t}$. Using the independence of $\vec{X}^t$ and $\vec{B}^t$, we have
+\begin{equation}
+    q(\vec{X}^{t} | \vec{Z}^{t-1}) = p(\vec{X}^{t-1} | \vec{Z}^{t-1}) p(x^t | x^{t-1}).
+    \label{eq:1}
+\end{equation}
+
 \subsection{Sequential importance sampling for an AR(1) model}
 \label{sec:5}
 
@@ -445,58 +405,37 @@ To keep this first example simple, we limit our interest to approximating expect
 \begin{align*}
     E_{p} \Big[l(\vec{X}^{t}) \Big] &=  \int_{\Omega_t'} l(\vec{X}^{t})\; p(\vec{X}^{t} | \vec{Z}^{t})\; \prod_{ \{ i \leq t  : z^t_{i} = - \} } \D x^i
 \end{align*}
-for functions $l: \Omega_t'  \rightarrow \Real$. Since these expectations do not depend on $\vec{B}^t$, we can dispense with $\vec{y}^t$ and $(\vec{y}')^t$ as defined in Section~\ref{sec:2}, and instead deal directly with uncorrected and corrected particles $\vec{X}_j^t$ and $(\vec{X}')_j^t$ respectively, where $j = 1, \ldots, n$. To estimate such expectations, we want to use the sequential importance strategy described in Section~\ref{sec:2}. 
+for functions $l: \Omega_t'  \rightarrow \Real$. We want to estimate such expectations using the sequential importance strategy described in Section~\ref{sec:2}. Since these expectations do not depend on $\vec{B}^t$, we can dispense with $\vec{y}^t$ and $(\vec{y}')^t$ as defined in Section~\ref{sec:2}, and instead deal directly with uncorrected and corrected particles $\vec{X}_j^t$ and $(\vec{X}')_j^t$ respectively, where $j = 1, \ldots, n$.
 
-At time $t$, the prior density $q(\vec{X}^{t} | \vec{Z}^{t-1})$ 
-%that represents our knowledge about the system trajectory before we observe $\vec{z}^{t}$. This prior 
-is defined on the subspace $\Omega_t = \prod_{i=1}^t \mathbb{X}_i^{t-1} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t-1} = \mathbb{R}$ for $z_i^{t-1} = -$, and $\mathbb{X}_i^{t-1} = \{ z_i^{t-1} \}$ otherwise. That is, $\Omega_t$ is the subspace of $\mathbb{R}^t$ corresponding to observed co-ordinates being fixed. Note we adopt the convention $z_t^{t-1} = -$, since the system state $x^t$ is not observed at time $t-1$.  The posterior density $p(\vec{X}^{t} | \vec{Z}^{t})$ 
-%is obtained by re-normalising $q$ over values consistent with $\vec{Z}^{t}$. It 
-is defined on the subspace $\Omega_t' = \prod_{i=1}^t \mathbb{X}_i^{t} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t} = \mathbb{R}$ for $z_i^{t} = -$ and $\mathbb{X}_i^{t} = \{ z_i^{t}\}$ otherwise. 
+We define a probability $p^*$ on $\Omega^* = \Omega \times \Omega'$ such that the marginal distribution of $p^*$ on $\Omega'$ is $p$, that is:
 
-% The density is given by:
-% \begin{equation*}
-%     p(\vec{X}^{t} | \vec{Z}^{t}) = \frac{ q(\vec{X}^{t} |\vec{Z}^{t-1})} {r(\vec{z}^{t} | \vec{Z}^{t-1})}
-% \end{equation*}
-% where 
-% \begin{equation*}
-%     r(\vec{z}^{t} | \vec{Z}^{t-1}) = \int_{\Omega'_t} q(\vec{X}^{t} |\vec{Z}^{t-1}) \prod_{\{i \leq t: z_i^{t} = -\}} \D x^i.
-% \end{equation*}
-% The prior $q(\vec{X}^{t} | \vec{Z}^{t-1})$ represents our knowledge about the system trajectory at time $t$, before we observe $\vec{z}^{t}$. Using the independence of $\vec{X}^t$ and $\vec{B}^t$, we have
-% \begin{equation}
-%     q(\vec{X}^{t} | \vec{Z}^{t-1}) = p(\vec{X}^{t-1} | \vec{Z}^{t-1}) p(x^t | x^{t-1}).
-%     \label{eq:1}
-% \end{equation}
+\begin{equation*}
+    p(\vec{(X')}^t | \vec{Z}^t) = \int_{\Omega_t} p^*(\vec{X}^t, \vec{(X')}^t | \vec{Z}^t)\; \prod_{ \{ i \leq t  : z^{t-1}_{i} = - \} } \D x^i.
+\end{equation*}
 
+We can therefore use the identity
 
-% We define a probability $p^*$ on $\Omega^* = \Omega \times \Omega'$ such that the marginal distribution of $p^*$ on $\Omega'$ is $p$, that is:
+\begin{align*}
+    E_{p}[l(\vec{(X')}^{t})]  &=  E_{p^*}[l(\pi (\vec{X}^{t}, \vec{(X')}^{t}))].
+\end{align*}
+and estimate the right hand side expectation via importance sampling
 
-% \begin{equation*}
-%     p(\vec{(X')}^t | \vec{Z}^t) = \int_{\Omega_t} p^*(\vec{X}^t, \vec{(X')}^t | \vec{Z}^t)\; \prod_{ \{ i \leq t  : z^{t-1}_{i} = - \} } \D x^i.
-% \end{equation*}
+\begin{align*}
+    E_{p^*}[l(\pi (\vec{X}^{t}, \vec{(X')}^{t})] \approx \sum_{j=1}^n  w^{t}_j l(\pi (\vec{X}^{t}_j), \vec{(X')}^{t}_j)
+\end{align*}
+with normalised weights given by
 
-% We can therefore use the identity
-
-% \begin{align*}
-%     E_{p}[l(\vec{(X')}^{t})]  &=  E_{p^*}[l(\pi (\vec{X}^{t}, \vec{(X')}^{t}))].
-% \end{align*}
-% and estimate the right hand side expectation via importance sampling
-
-% \begin{align*}
-%     E_{p^*}[l(\pi (\vec{X}^{t}, \vec{(X')}^{t})] \approx \sum_{j=1}^n  w^{t}_j l(\pi (\vec{X}^{t}_j, \vec{(X')}^{t}_j))
-% \end{align*}
-% with normalised weights given by
-
-% \begin{multline*}
-%     w^{t}_j = \frac{q(\vec{(X')}^{t}_j | \vec{Z}^{t-1}) }{q(\vec{X}^{t}_j | \vec{Z}^{t-1})}\Bigg( \sum_{j=1}^n  \frac{q(\vec{(X')}^{t}_j | \vec{Z}^{t-1}) }{q(\vec{X}^{t}_j | \vec{Z}^{t-1})}\Bigg)^{-1}.
-% \end{multline*}
-% Notice that since we are potentially correcting every previous event at every iteration, the weights for previous times also need to be recalculated at every iteration. However, there will be many cancellations in the calculation of the weights, making the process manageable and not computationally expensive.
+\begin{multline*}
+    w^{t}_j = \frac{q(\vec{(X')}^{t}_j | \vec{Z}^{t-1}) }{q(\vec{X}^{t}_j | \vec{Z}^{t-1})}\Bigg( \sum_{j=1}^n  \frac{q(\vec{(X')}^{t}_j | \vec{Z}^{t-1}) }{q(\vec{X}^{t}_j | \vec{Z}^{t-1})}\Bigg)^{-1}.
+\end{multline*}
+Notice that since we are potentially correcting every previous event at every iteration, the weights for previous times also need to be recalculated at every iteration. {\color{red} (HHH It's not clear how that works in practice. We resample at every step using the weights we have, so do we go back and resample earlier iterations somehow? I don't think so, but it's unclear what it means to recalculate weights for previous iterations.)} However, there will be many cancellations in the calculation of the weights, making the process manageable and not computationally expensive.
 
 For every particle $i$, the unnormalised weights at time $t$ for $b' \in \{0,1\}$ and $b \in \{0,1\}$ are calculated with the following formula
 
 \begin{align} \label{eq:2}
     &\frac{q(\vec{(X')}^{t} | \vec{Z}^{t-1}) }{q(\vec{X}^{t} | \vec{Z}^{t-1})} =
     \frac{\bigg \{ \prod_{s=2}^{t}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x'_s - \varphi x'_{s-1})^{2} \bigg ] \bigg \} }{\bigg \{ \prod_{s=2}^{t}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x_s - \varphi x_{s-1})^{2} \bigg ] \bigg \} } \nonumber \\
-    &\frac{p^{b'_t} (1 - p)^{1-b'_t}  }{p^{b_t} (1 - p)^{1-b_t} }
+    &\frac{p(x'_{1}) \prod_{s=2}^{t} p^{b'_s} (1 - p)^{1-b'_s}  }{ p(x_{1}) \prod_{s=2}^{t} p^{b_s} (1 - p)^{1-b_s} }
 \end{align}
 and we will have terms cancellations in the Gaussian term when both $z_{s-1} \neq 0$ and $z_s \neq 0$, while the Bernoulli term will cancel every time that $z_s \neq 0$. Also, we will consider that the first event is known a priori, so that $p(x'_1)=p(x_1)$, and those two terms will cancel out as well.
 
@@ -615,7 +554,7 @@ The invasion expands in two directions (left and right) simultaneously with the 
 
 We will store information regarding which cells have been observed to contain the invasive species at or before time $i = 1, \dots, t$ in binary vectors $\vec{z}^{i} = (z_1^{i}, \dots, z_{N}^{i})$, where $z_s^{i} = 1$ if $x_s^{i} = 1$ and the invasive species has been detected at location $s$ at or before time $i$, and $z_s^{i} = 0$ otherwise. As for the AR(1) model example, once a cell has been observed it will remain observed at all subsequent times, therefore if $z_s^{i} = 1$ at time $i$, then we must also have $z_s^{i^{*}} = 1$ at all subsequent times $i^{*} > i$. These vectors will define a $t \times N$ matrix $\vec{Z}^{t}$, in which each row $i$ is a vector $\vec{z}^{i}$.
 
-We will model the new observations on the left and on the right of the previously observed nests in the following way. We will consider observations made by a probe that will check only those unobserved cells adjacent to cells where the invasive species has been detected. For example, if a cell is observed as invaded at time $t-1$, at time $t$ the adjacent cell in which no invader has previously been detected will be probed. If that cell is both invaded and observed, adjacent cells will also be probed, and so on until a cell in which no invaders are detected is found. The probe might fail to observe an invader that is present, and hence searching may stop without finding all invaded cells. The probability of observing invaders in an infested cell is denoted $\varphi$. Notice that in this example we don't need to define the matrix $\vec{B}^t$ as $\vec{B}^t$ and $\vec{Z}^t$ coincide, meaning that if I observe and what I observe are expressed by the same quantity, namely a 1.
+We will model the new observations on the left and on the right of the previously observed nests in the following way. We will consider observations made by a a probe that will check only those unobserved cells adjacent to cells where the invasive species has been detected. For example, if a cell is observed as invaded at time $t-1$, at time $t$ the adjacent cell in which no invader has previously been detected will be probed. If that cell is both invaded and observed, adjacent cells will also be probed, and so on until a cell in which no invaders are detected is found. The probe might fail to observe an invader that is present, and hence searching may stop without finding all invaded cells. The probability of observing invaders in an infested cell is denoted $\varphi$. Notice that in this example we don't need to define the matrix $\vec{B}^t$ as $\vec{B}^t$ and $\vec{Z}^t$ coincide, meaning that if I observe and what I observe are expressed by the same quantity, namely a 1.
 
 In this example, as for the AR(1) model, corrections are deterministic.
 
@@ -676,7 +615,7 @@ Substituting and expanding the recursion in equation \eqref{eq:3} we have
 \begin{align}
     & q(\vec{X}^{t},\vec{z}^{t} | \vec{Z}^{t-1}) =  \prod_{i=2}^{t} \varphi^{(a^{i} - a^{i-1})}\bigg(1 - \varphi \bigg)^{1-\one {a^i=\gamma^i}} \nonumber \\
     & \varphi^{(c^{i} - c^{i-1})} \bigg(1 - \varphi\bigg)^{1-\one {c^i=\beta^i}} \; \prod_{i=2}^{\min\{t,r\}} \theta^{k_i} (1-\theta)^{1-k_i}  \label{eq:4} \\ 
-    & \prod_{i=2}^{\min\{t,l\}} \theta^{h_i} (1-\theta)^{1-h_i} \nonumber
+    & \prod_{i=2}^{\min\{t,r\}} \theta^{h_i} (1-\theta)^{1-h_i} \nonumber
 \end{align}
 where $l$ is the time at which the invasion has reached the left end of the modelled region, $r$ is the time at which the invasion has reached the right end of the modelled region, {\color{blue} $k_i \in \{0,1\}$ and $h_i \in \{0,1\}$ where $k_i$ is 1 if the invasion expanded one cell to the right at time $i$ and $h_i$ is 1 if the invasion expanded one cell to the left at time $i$}.
 
@@ -881,9 +820,7 @@ Zhang, X., Khwaja A. S., Luo J., Housfater A.S., Anpalagan A.: Multiple Imputati
  \end{algorithmic}
 \end{algorithm}
 
-
-\section{proof of the identity in section \ref{sec:2} }
-
+\begin{appendix}
 Define a probability measure $\P^*$ having density $p^*$ on $\Omega^*_t$ such that the marginal distribution of $\P^*$ on $\Omega_t'$ is $\P$, that is $\P = \P^* \circ \pi^{-1}$, where $\P$ is the measure with density $p$ on $\Omega_t'$. (Here the measurable sets in $\Omega_t$, $\Omega_t'$ and $\Omega_t^*$, are constructed from Borel sets on $\Real^M$ and subsets of $2^M$ in the manner implied by the sequence of cross-products and restrictions used to define $\Omega_t$, $\Omega_t'$ and $\Omega_t^*$. Similarly, reference measures are constructed from Lebesgue measure on $\Real^M$ and counting measure on $2^M$.)
 
 By the disintegration theorem (see \cite{Rohlin}) there exists a family of measures $\{ \nu_{\vec{(y')}^t} \}_{\vec{(y')}^t \in \Omega'{\color{red}_t}}$ on $\Omega^*{\color{red}_t}$ such that for every measurable Borel function $m : \Omega^*_t \rightarrow [0, \infty]$
@@ -908,8 +845,7 @@ Moreover,
     &= \int_{\Omega_t^*} l(\pi(\vec{(y')}^{t}, \vec{y}^{t}))\; p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) \D \P^*(\vec{(y')}^t, \vec{y}^t) \\ 
     &= E_{p^*}[l(\pi (\vec{(y')}^{t}, \vec{y}^{t}))].
 \end{align*}
-
+\end{appendix}
 
 \end{document}
 
-notice 
