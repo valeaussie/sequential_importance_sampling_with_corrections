@@ -1,4 +1,8 @@
-%Books
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Books %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%                                           BOOKS
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %-----------------------------Ecology Books
 
@@ -67,7 +71,7 @@ year        = {1991}
 
 
 
-%-----------------------------Multiple Imputation Books
+%-----------------------------Missin Data Books
 
 %Multiple Imputation for Nonresponse in Surveys
 @book{RubinMI,
@@ -82,9 +86,64 @@ year        = {1991}
 
 
 
+%Statistical Analysis with Missing Data, Second Edition
+@book{Little,
+  title     = {Statistical Analysis with Missing Data, Second Edition},
+  author    = {Little, R. J. A. and Rubin, D. B.},
+  isbn      = {9781119013563},
+  series    = {Wiley Series in Probability and Statistics},
+  url       = {https://onlinelibrary.wiley.com/doi/book/10.1002/9781119013563},
+  year      = {2002},
+  publisher = {Wiley New York}
+}
 
 
-%Articles
+%-----------------------------Particel Filters Books
+
+
+%Recursive Estimation and Time-Series Analysis
+@book{Young,
+  title     = {{Recursive Estimation and Time-Series Analysis}},
+  author    = {Young, Peter C.},
+  isbn      = {978-3-642-21981-8},
+  url       = {https://www.springer.com/gp/book/9783642219801},
+  year      = {2011},
+  publisher = {Springer-Verlag Berlin Heidelberg}
+}
+
+
+
+
+
+%Sequential  Monte  Carlo  Methods  in  Practice
+@book{DoucetBook,
+  title     = {{Sequential  Monte  Carlo  Methods  in  Practice}},
+  author    = {Doucet, Arnaud and de Freitas, Nando and Gordon Neil},
+  isbn      = {978-1-4757-3437-9},
+  series    = {Statistics for Engineering and Information Science},
+  url       = {https://link.springer.com/book/10.1007/978-1-4757-3437-9},
+  year      = {2001},
+  publisher = {Springer, New York, NY}
+}
+
+
+
+%Stochastic Processes and Filtering Theory
+@book{Jazwinski,
+  title     = {Stochastic Processes and Filtering Theory},
+  author    = {Jazwinski},
+  isbn      = {1-282-29031-2},
+  url       = {https://www.sciencedirect.com/bookseries/mathematics-in-science-and-engineering/vol/64/suppl/C},
+  series    = {Mathematics in science and engineering},
+  year      = {1970},
+  publisher = {New York : Academic Press, 1970}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Articles %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%                                              ARTICLES
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
@@ -103,22 +162,21 @@ year        = {1991}
  year       = {1987}
 }
 
-%--------------------------------Particle Filters
 
-%Multiple Imputations Particle Filters: Convergence and Performance Analyses for Nonlinear State Estimation With Missing Data
-@ARTICLE{Zhang,
-  author    = {X. {Zhang} and A. S. {Khwaja} and J. {Luo} and A. S. {Housfater} and A. {Anpalagan}},
-  journal   = {IEEE Journal of Selected Topics in Signal Processing}, 
-  title     = {Multiple Imputations Particle Filters: Convergence and Performance Analyses for Nonlinear State Estimation With Missing Data}, 
-  year      = {2015},
-  volume    = {9},
-  number    = {8},
-  pages     = {1536-1547},
-  doi       = {10.1109/JSTSP.2015.2465360},
-  url       = {https://ieeexplore.ieee.org/abstract/document/7181645}
+%--------------------------------Missing Data
+
+
+%Bayesian Reconstruction of Missing Observations
+@article{KATAOKA,
+  title={Bayesian Reconstruction of Missing Observations},
+  author={Shun KATAOKA and Muneki YASUDA and Kazuyuki TANAKA},
+  journal={Interdisciplinary Information Sciences},
+  volume={21},
+  number={1},
+  pages={11-23},
+  year={2015},
+  doi={10.4036/iis.2015.11}
 }
-  
-%--------------------------------SIS Methods
 
 %Sequential Monte Carlo with Highly Informative Observations
 @article{DelMoral,
@@ -133,6 +191,75 @@ doi         = {10.1137/15M1011214},
 URL         = {https://doi.org/10.1137/15M1011214},
 eprint      = {https://doi.org/10.1137/15M1011214}
 }
+
+%Multiple Imputations Particle Filters: Convergence and Performance Analyses for Nonlinear State Estimation With Missing Data
+@ARTICLE{Zhang,
+  author    = {X. {Zhang} and A. S. {Khwaja} and J. {Luo} and A. S. {Housfater} and A. {Anpalagan}},
+  journal   = {IEEE Journal of Selected Topics in Signal Processing}, 
+  title     = {Multiple Imputations Particle Filters: Convergence and Performance Analyses for Nonlinear State Estimation With Missing Data}, 
+  year      = {2015},
+  volume    = {9},
+  number    = {8},
+  pages     = {1536-1547},
+  doi       = {10.1109/JSTSP.2015.2465360},
+  url       = {https://ieeexplore.ieee.org/abstract/document/7181645}
+}
+
+
+%Missing data imputation for spectral audio signals
+@INPROCEEDINGS{Smaragdis,
+  author    = {P. {Smaragdis} and B. {Raj} and M. {Shashanka}},
+  booktitle = {2009 IEEE International Workshop on Machine Learning for Signal Processing}, 
+  title     = {Missing data imputation for spectral audio signals}, 
+  year      = {2009},
+  volume    = {},
+  number    = {},
+  pages     = {1-6},
+  doi       = {10.1109/MLSP.2009.5306194}}
+  
+  
+@article{https://doi.org/10.1111/j.2517-6161.1977.tb01600.x,
+author      = {Dempster, A. P. and Laird, N. M. and Rubin, D. B.},
+title       = {Maximum Likelihood from Incomplete Data Via the EM Algorithm},
+journal     = {Journal of the Royal Statistical Society: Series B (Methodological)},
+volume      = {39},
+number      = {1},
+pages       = {1-22},
+keywords    = {maximum likelihood, incomplete data, em algorithm, posterior mode},
+doi         = {https://doi.org/10.1111/j.2517-6161.1977.tb01600.x},
+url         = {https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.2517-6161.1977.tb01600.x},
+eprint      = {https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/j.2517-6161.1977.tb01600.x},
+year        = {1977}
+}
+
+
+
+%Maximum Likelihood from Incomplete Data Via the EM Algorithm
+@article{Dempster,
+author      = {Dempster, A. P. and Laird, N. M. and Rubin, D. B.},
+title       = {Maximum Likelihood from Incomplete Data Via the EM Algorithm},
+journal     = {Journal of the Royal Statistical Society: Series B (Methodological)},
+volume      = {39},
+number      = {1},
+pages       = {1-22},
+keywords    = {maximum likelihood, incomplete data, em algorithm, posterior mode},
+doi         = {https://doi.org/10.1111/j.2517-6161.1977.tb01600.x},
+url         = {https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.2517-6161.1977.tb01600.x},
+eprint      = {https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/j.2517-6161.1977.tb01600.x},
+year        = {1977}
+}
+
+
+
+
+
+%--------------------------------Particle Filters
+
+
+
+  
+%--------------------------------SIS Methods
+
 
 %The Calculation of Posterior Distributions by Data Augmentation: Comment: A Noniterative Sampling/Importance Resampling Alternative to the Data Augmentation Algorithm for Creating a Few Imputations When Fractions of Missing Information Are Modest
 @article{Rubin,
@@ -149,6 +276,91 @@ URL         = {https://doi.org/10.1080/01621459.1987.10478461},
 }
 
 
+%A tutorial on particle filters
+@article{Speekenbrink,
+title = {A tutorial on particle filters},
+journal = {Journal of Mathematical Psychology},
+volume = {73},
+pages = {140-152},
+year = {2016},
+issn = {0022-2496},
+doi = {https://doi.org/10.1016/j.jmp.2016.05.006},
+url = {https://www.sciencedirect.com/science/article/pii/S002224961630030X},
+author = {Maarten Speekenbrink},
+keywords = {Particle filter, Sequential Monte Carlo, State-space model, Sequential Bayesian inference},
+}
+
+
+
+%Learning of state-space models with highly informative observations: a tempered Sequential {Monte} {Carlo} solution
+@article{Svensson,
+author = {Svensson, Andreas and Sch\"on, Thomas B. and Lindsten, Fredrik},
+title = {Learning of state-space models with highly informative
+observations: a tempered Sequential {Monte} {Carlo} solution},
+journal = {Mechanical Systems and Signal Processing},
+volume = {104},
+year = {2018},
+pages = {915--928},
+}
+
+
+%Sequential Imputations and Bayesian Missing Data Problems
+@article{Kong,
+ ISSN = {01621459},
+ URL = {http://www.jstor.org/stable/2291224},
+ author = {Augustine Kong and Jun S. Liu and Wing Hung Wong},
+ journal = {Journal of the American Statistical Association},
+ number = {425},
+ pages = {278--288},
+ publisher = {[American Statistical Association, Taylor & Francis, Ltd.]},
+ title = {Sequential Imputations and Bayesian Missing Data Problems},
+ volume = {89},
+ year = {1994}
+}
+
+
+%------------------------------- Analytical Solutions to Gaussian state-space Models
+
+%Novel approach to nonlinear/non-Gaussian Bayesian state estimation
+@ARTICLE{Gordon,
+  author    = {Gordon, N. J. and Salmond, D. J. {Luo} and Smith, A. F. M.},
+  journal   = {IEE Proceedings F (Radar and Signal Processing)}, 
+  title     = {Novel approach to nonlinear/non-Gaussian Bayesian state estimation}, 
+  year      = {1993},
+  volume    = {140},
+  number    = {2},
+  pages     = {107-113},
+  doi       = {10.1049/ip-f-2.1993.0015},
+  url       = {https://digital-library.theiet.org/content/journals/10.1049/ip-f-2.1993.0015}
+}
+
+%A New Approach to Linear Filtering and Prediction Problems
+@ARTICLE{Kalman,  
+    author      = {Kalman, R.E.},
+    title       = {A New Approach to Linear Filtering and Prediction Problems},   
+    year        = {1960},
+    volume      = {82},  
+    number      = {1},  
+    pages       = {35-45},  
+    doi         = {10.1115/1.3662552}
+    url         = {https://doi.org/10.1115/1.3662552}
+}
+
+
+
+%Recursive bayesian estimation using gaussian sums
+@article{Soreson,
+title = "Recursive bayesian estimation using gaussian sums",
+journal = "Automatica",
+volume = "7",
+number = "4",
+pages = "465 - 479",
+year = "1971",
+issn = "0005-1098",
+doi = "https://doi.org/10.1016/0005-1098(71)90097-5",
+url = "http://www.sciencedirect.com/science/article/pii/0005109871900975",
+author = "H.W. Sorenson and D.L. Alspach",
+}
 
 
 %--------------------------------Point Processes
@@ -185,7 +397,7 @@ URL         = {https://doi.org/10.1080/01621459.1987.10478461},
 }
 
 
-%Simulation of nonhomogeneous poisson processes by thinning
+%Simulation of nonhomogeneous Poisson processes by thinning
 @article{Lewis,
 author      = {Lewis, P. A. W and Shedler, G. S.},
 title       = {Simulation of nonhomogeneous Poisson processes by thinning},
@@ -276,7 +488,7 @@ year        = {1979}
 
 
 %Analyzing earthquake clustering features by using stochastic reconstruction
-@article{https://doi.org/10.1029/2003JB002879,
+@article{Zhuang,
 author      = {Zhuang, Jiancang and Ogata, Yosihiko and Vere-Jones, David},
 title       = {Analyzing earthquake clustering features by using stochastic reconstruction},
 journal     = {Journal of Geophysical Research: Solid Earth},
@@ -287,10 +499,6 @@ url         = {https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/2003JB002
 eprint      = {https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2003JB002879},
 year        = {2004}
 }
-
-
-
-
 
 
 
@@ -457,7 +665,12 @@ author  = "Tom Beer",
 
 
 
-%Dissertations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Dissertations %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%                                      DISSERTATIONS
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %Hawkes Processes: Simulation, Estimation, and Validation
 @phdthesis{Laub ,
@@ -485,6 +698,14 @@ url         = {https://pat-laub.github.io/pdfs/honours_thesis.pdf},
 }
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Tutorials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%                                   TUTORIALS
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
+@inproceedings{DoucetTutorial,
+  title={A Tutorial on Particle Filtering and Smoothing: Fifteen years later},
+  author={A. Doucet and A. Johansen},
+  year={2008}
+}

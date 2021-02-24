@@ -51,8 +51,8 @@ grestore
 %
 % insert here the call for the packages your document requires
 %\usepackage{latexsym}
-\usepackage[demo]{graphicx}
-%\usepackage{graphicx}
+%\usepackage[demo]{graphicx}
+\usepackage{graphicx}
 \usepackage[caption = false]{subfig}
 \graphicspath{ {./images/} }
 \usepackage[round]{natbib}
@@ -119,8 +119,7 @@ grestore
 }
 
 \author{Valentina Di Marco \and
-        Jonathan Keith \and
-        Daniel Spring}
+        Jonathan Keith}
 
 \institute{Valentina Di Marco \at
               School of Mathematical Science, Monash University, Clayton Campus, VIC 3800, Australia \\
@@ -146,7 +145,7 @@ Our motivating example is drawn from invasive species biology, where it is commo
 
 We propose a sequential importance sampling strategy to infer the state of the invasion under a Bayesian model of such a system. The strategy involves simulating multiple alternative states consistent with current knowledge of the system, as revealed by the observations. However, a difficult problem that arises is that observations made at a later time are invariably incompatible with previously simulated states. To solve this problem, we propose a two-step iterative process in which states of the system are alternately simulated in accordance with past observations, then corrected in light of new observations. We identify criteria under which such corrections can be made while maintaining appropriate importance weights.
 
-\keywords{ Sequential Importance Sampling \and Filtering \and Bayesian estimation \and Partially observed spaces \and Missing data}
+\keywords{Sequential Importance Sampling \and Filtering \and Bayesian estimation \and Partially observed spaces \and Missing data}
 % \PACS{PACS code1 \and PACS code2 \and more}
 % \subclass{MSC code1 \and MSC code2 \and more}
 \end{abstract}
@@ -179,15 +178,8 @@ Sequential importance sampling (SIS) is a form of Particle filter firstly introd
 
 Here we propose a two-step iterative procedure for dynamically updating a collection of weighted particles used to represent a posterior distribution over the possible trajectories of a partially observed system. In the first step, we evolve particles in accordance with a model of the system, in a manner common to particle-based sequential Monte Carlo methods. In the second step, we correct the particles in light of newly acquired data. The method treats an uncorrected particle (generated in the first step) as a form of augmented variable. Thus the method constitutes a novel use of augmentation in sequential importance sampling. 
 
-As mentioned above, the observations in the problems we consider are partial, but exact. In general, in situations where the data are highly informative standard sequential Monte Carlo methods can perform poorly. %{\color{red} (HHH I don't understand what you mean by `informative' in that sentence. I think all statistical methods require data that is informative.)}
-%{\color{blue}VVV With informative observations I mean when there is very little noise present for the observation process relative to the amount of process noise. In this case standard SMC methods perform poorly as mentioned by Del Moral, but perhaps this is true only when the process is observed indirectly? Our case though, is a special case of indirect observations with $p(z_n | x_n) = \delta (z_n - x_n)$, where $z_n$ are the observations and $x_n$ the hidden states. so I though it was worth mentioning that SMC in general don't perform well with precise observations. This is my understanding: let us consider a hidden state model $x$ and observation values $z$ with very little noise (informative). 
-%\begin{equation}
-%    x_t | x_{1:t-1} \sim f(x_t | x_{t-1})
-%\end{equation}
-%\begin{equation}
-%    z_t = g(x_t)
-%\end{equation}
-%with $g$ a deterministic mapping. Let us consider a standard boostrap filter to provide estimates, for example, of the likelihood $p(z_{1:n} | \theta)$ where $\theta$ are the parameters. In the filter we will draw $N$ particles $\{ y^i_n\}_{i=1:N}$ from equation 1 then we calculate the weights multiplying the weights for the previous time with the values from equation 2. As long as there is at least one particle $y^j_n$ which gives a reasonably high probability for the measurement $z_t$ (and consequently gets assigned a large weight), the particle filter will provide a reasonable result, and the more such high-weight particles, the better (in terms of variance of the estimate $\hat{p}(z_{1:n} | \theta)$). However, if no samples $y_n$ are drawn under which $z_t$ could have been observed with reasonably high probability, the estimate will be poor. If there is very little measurement noise but non-negligible process noise in the model, the chance of drawing any useful particles by simulating the system dynamics would be small. Am I correct in saying so?}
+As mentioned above, the observations in the problems we consider are partial, but exact. In general, in situations where the data are highly informative standard sequential Monte Carlo methods can perform poorly. 
+
 \cite{Del Moral} proposed a Sequential Monte Carlo method for sampling the posterior distribution of state-space models under highly informative observation regimes. In their method they introduced a schedule of intermediate weighting and resampling times between observation times, which guides particles towards the final state.
 
 \cite{Finke} developed a Particle Monte Carlo Markov Chain algorithm to estimate the demographic parameters of a population and then incorporated this algorithm into a sequential Monte Carlo sampler in order to perform model comparison motivated by the fact that a simple importance sampling performs poorly if there is a strong mismatch between the prior and the posterior, which is common when the data is highly informative.
@@ -246,7 +238,7 @@ and when $t \geq 2$:
 on the space $\Omega_t$, and the joint posterior distribution is given by:
 \begin{eqnarray*}
     p(\vec{X}^t, \vec{B}^t | \vec{Z}^t) 
-& = & \frac{f(\vec{x}^1)g(\vec{b}^1 | \vec{x}^1)}{r(\vec{z}^1)} \prod_{i=2}^t \frac{f(\vec{x}^i | \vec{x}^{i-1}) g(\vec{b}^i | \vec{x}^i , \vec{b}^{i-1})}{r(\vec{z}^t | \vec{Z}^{t-1})} 
+& = & \frac{f(\vec{x}^1)g(\vec{b}^1 | \vec{x}^1)}{r(\vec{z}^1)} \prod_{i=2}^t \frac{f(\vec{x}^i | \vec{x}^{i-1}) g(\vec{b}^i | \vec{x}^i , \vec{b}^{i-1})}{r(\vec{z}^i | \vec{Z}^{i-1})} 
 \end{eqnarray*}
 on $\Omega_t'$. It is also helpful to define
 \begin{eqnarray*}
@@ -257,44 +249,18 @@ where
 \begin{eqnarray*}
 h(\vec{X}^t,\vec{B}^t) & := & f(\vec{x}^1)g(\vec{b}^1 | \vec{x}^1) \prod_{i=2}^{t} f(\vec{x}^i | \vec{x}^{i-1}) g(\vec{b}^i | \vec{x}^i , \vec{b}^{i-1}).
 \end{eqnarray*}
-
-If $\vec{B}^t$ evolves independently of $\vec{X}^t$, the $g$ terms can be brought outside the integrals in the expressions above. Thus all $g$ terms cancel in the above expression for $p(\vec{X}^t, \vec{B}^t | \vec{Z}^t)$. Moreover, all $g$ terms except the final term $g(\vec{b}^t | \vec{b}^{t-1})$ cancel in the above expression for $q(\vec{X}^t, \vec{B}^t | \vec{Z}^{t-1})$ and this last term may be removed by summing over $\vec{B}^t$. In this case, it will be convenient to redefine $h$ and $r$ as follows:
-\begin{eqnarray*}
-h(\vec{X}^t) & := & f(\vec{x}^1)\prod_{i=2}^{t} f(\vec{x}^i | \vec{x}^{i-1})
-\end{eqnarray*}
-and
-\begin{eqnarray*}
-r(\vec{Z}^t) & := & \int_{\Omega_t'}  h(\vec{X}^t) \prod_{ \{ i \leq t, m \in \{1, \ldots, M \} : z^t_{im} = - \} } \D x^i_m
-\end{eqnarray*}
-with
-\begin{eqnarray*}
-r(\vec{z}^t | \vec{Z}^{t-1}) & := & \frac{r(\vec{Z}^t)}{r(\vec{Z}^{t-1})}.
-\end{eqnarray*}
-Note the set $\Omega_t'$ also needs to be redefined as the projection of $\sigma^{-1}(\vec{Z}^t)$ onto the subspace obtained by discarding the second element of the pair $(\vec{X}^t,\vec{B}^t)$, noting that $\vec{B}^t$ is the same for all elements of $\sigma^{-1}(\vec{Z}^t)$. With this modified notation, we can now write:
-\[
-q(\vec{X}^1) = f(\vec{x}^1),
-\]
-on $\Omega_1 = \Real^M$ and for $t \geq 2$,
-\begin{eqnarray*}
-    q(\vec{X}^t | \vec{Z}^{t-1}) & = & \frac{f(\vec{x}^1)}{r(\vec{z}^1)}  \prod_{i=2}^{t-1} \frac{f(\vec{x}^i | \vec{x}^{i-1}) }{r(\vec{z}^t | \vec{Z}^{t-1})} f(\vec{x}^t | \vec{x}^{t-1})
-\end{eqnarray*}
-on $\Omega_t = \Omega_{t-1}' \times \Real^M $ and 
-\begin{eqnarray*}
-    p(\vec{X}^t | \vec{Z}^t) 
-& = & \frac{f(\vec{x}^1)}{r(\vec{z}^1)} \prod_{i=2}^t \frac{f(\vec{x}^i | \vec{x}^{i-1}) }{r(\vec{z}^t | \vec{Z}^{t-1})} 
-\end{eqnarray*}
-on $\Omega_t'$.
-
-Returning to the general case, we want to approximate the distribution $p(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t})$ by iterative sampling, and thus obtain Monte Carlo estimates of expectations of the form:
+We want to approximate the distribution $p(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t})$ by iterative sampling, and thus obtain Monte Carlo estimates of expectations of the form:
 \begin{align*}
     &E_{p} \Big[l(\vec{X}^{t}, \vec{B}^{t} ) \Big| \vec{Z}^{t} \Big] = \\
     &\int_{\Omega_t'} l(\vec{X}^{t}, \vec{B}^{t})\; p(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t})\; \prod_{ \{ i \leq t, m \in \{1, \ldots, M \} : z^t_{im} = - \} } \D x^i_m
 \end{align*}
 for functions $l: \Omega_t' \rightarrow \Real$. 
 
-We take a sequential importance sampling approach, at each iteration using a collection of weighted particles to approximate $p(\vec{X}^{t-1}, \vec{B}^{t-1} | \vec{Z}^{t-1})$, in the sense that these particles can be used to construct weighted Monte Carlo estimates for integrals of the above form. We evolve these under the model to create a new set of weighted particles representing the prior for iteration $t$, namely $q(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t-1})$. We then modify these particles to be consistent with the observations $\vec{Z}^{t}$, and adjust the weights to ensure the resulting weighted particles provide unbiased (HHH Check this is true) importance sampling estimates of an expectation $E_{p}[l(\vec{X}^{t}, \vec{B}^t) | \vec{Z}^t]$.
+We take a sequential importance sampling approach, at each iteration using a collection of weighted particles to approximate $p(\vec{X}^{t-1}, \vec{B}^{t-1} | \vec{Z}^{t-1})$, in the sense that these particles can be used to construct weighted Monte Carlo estimates for integrals of the above form. For simplicity, we suppose particles are resampled at the end of each iteration, thus resetting the particle weights to be equal. However, the methods we describe below can be modified in a straightforward way if resampling is not performed, in which case the weights from successive iterations multiply, as is usual in sequential importance sampling.
 
-Consider a particle $(\vec{X}^{t-1}_j,\vec{B}^{t-1}_j)$ constructed at time point $t$, for $j = 1, \ldots, n$, where $n$ is a fixed number of particles. We generate $\vec{x}^t_j$ for this particle by sampling from $f(\vec{x}^t | \vec{x}^{t-1}_j)$. Similarly, we generate $\vec{b}^{t}_j$ for this particle by sampling from $g(\vec{b}^{t} | \vec{x}^t_j, \vec{b}^{t-1}_j)$. However, the new matrix of observations $\vec{z}^{t}$ is typically inconsistent with a particle $(\vec{X}^{t}_j, \vec{B}^{t}_j)$ thus constructed, in two ways. First, the coordinates at which $\vec{b}^{t}_j$ contains a 0 may not correspond to the coordinates at which $\vec{z}^{t}$ contains a `$-$' and coordinates at which $\vec{b}^{t}_j$ contains a 1 may not correspond to an observation in $\vec{z}^{t}$. Second, the observed values in $\vec{z}^{t}$ may differ from the corresponding coordinates of $\vec{X}^{t}_j$. We must therefore correct $\vec{X}^{t}_j$ and $\vec{b}^{t}_j$ in light of the new observations $\vec{z}^{t}$. The simplest way to do this is to first replace $\vec{b}^{t}_j$ with the unique binary vector $(\vec{b}_j')^{t}$ that is consistent with $\vec{z}^{t}$, and then replace the coordinates of $\vec{X}^{t}_j$ with the corresponding coordinates of $\vec{z}^{t}$ wherever $(\vec{b}_j')^{t}$ has a `1', thus generating a corrected term $\vec{(X')}^{t}_j$. The corrections thus made at time point $t$ will be carried forward into the particles used at all future times. Here we use deterministic corrections, in which the simulated pair $\vec{y}^{t} = (\vec{X}^{t}, \vec{B}^{t}) \in \Omega_t$ can be corrected in only one way to produce a new element $\vec{(y')}^{t} = (\vec{(X')}^t, \vec{(B')}^t) \in \Omega_t'$ (note we have repressed the particle subscript $j$). That is, 
+At each time point, we evolve the particles under the model to create a new set of particles representing the prior for iteration $t$, namely $q(\vec{X}^{t}, \vec{B}^{t} | \vec{Z}^{t-1})$. We then modify these particles to be consistent with the observations $\vec{Z}^{t}$, and adjust the weights to ensure the resulting weighted particles provide consistent importance sampling estimates of an expectation $E_{p}[l(\vec{X}^{t}, \vec{B}^t) | \vec{Z}^t]$.
+
+Consider a particle $(\vec{X}^{t-1}_j,\vec{B}^{t-1}_j)$ constructed at time point $t$, for $j = 1, \ldots, n$, where $n$ is a fixed number of particles. We generate $\vec{x}^t_j$ for this particle by sampling from $f(\vec{x}^t | \vec{x}^{t-1}_j)$. Similarly, we generate $\vec{b}^{t}_j$ for this particle by sampling from $g(\vec{b}^{t} | \vec{x}^t_j, \vec{b}^{t-1}_j)$. However, the new matrix of observations $\vec{z}^{t}$ is typically inconsistent with a particle $(\vec{X}^{t}_j, \vec{B}^{t}_j)$ thus constructed, in two ways. First, the coordinates at which $\vec{b}^{t}_j$ contains a 0 may not correspond to the coordinates at which $\vec{z}^{t}$ contains a `$-$' and coordinates at which $\vec{b}^{t}_j$ contains a 1 may not correspond to an observation in $\vec{z}^{t}$. Second, the observed values in $\vec{z}^{t}$ may differ from the corresponding coordinates of $\vec{X}^{t}_j$. We must therefore correct $\vec{X}^{t}_j$ and $\vec{b}^{t}_j$ in light of the new observations $\vec{z}^{t}$. The simplest way to do this is to first replace $\vec{b}^{t}_j$ with the unique binary matrix $(\vec{b}_j')^{t}$ that is consistent with $\vec{z}^{t}$, and then replace the coordinates of $\vec{X}^{t}_j$ with the corresponding coordinates of $\vec{z}^{t}$ wherever $(\vec{b}_j')^{t}$ has a `1', thus generating a corrected term $\vec{(X')}^{t}_j$. The corrections thus made at time point $t$ will be carried forward into the particles used at all future times. Here we use deterministic corrections, in which the simulated pair $\vec{y}^{t} = (\vec{X}^{t}, \vec{B}^{t}) \in \Omega_t$ can be corrected in only one way to produce a new element $\vec{(y')}^{t} = (\vec{(X')}^t, \vec{(B')}^t) \in \Omega_t'$ (note we have repressed the particle subscript $j$). That is, 
 \[
 \vec{(y')}^{t} = \rho(\vec{y}^{t},\vec{Z}^{t})
 \]
@@ -325,23 +291,21 @@ The set $F(\vec{(y')}^{t})$ contains all elements of $\Omega^t$ that can be corr
 \item $b_{im}^{t} = (b_{im}')^t$ whenever $(b_{im}')^t = (b_{im}')^{t-1}$, otherwise $b_{im}^{t} \in \{ 0, 1 \}$, and
 \item $x_{m}^{i} = (x_{m}')^{i}$ whenever $(b_{im}')^t = (b_{im}')^{t-1}$, otherwise $x_{m}^{i} \in \Real$.
 \end{enumerate}
-Thus $F(\vec{(y')}^{t})$ is isomorphic to $\Real^k \times 2^k$, where $k$ is the number of coordinates of $\vec{B}^{t}$ at which $(b_{im}')^t \neq (b_{im}')^{t-1}$, that is, the number of newly observed coordinates.
+Thus $F(\vec{(y')}^{t})$ is isomorphic to $\Real^k \times 2^M$, where $k$ is the number of coordinates of $\vec{B}^{t}$ at which $(b_{im}')^t \neq (b_{im}')^{t-1}$, that is, the number of newly observed coordinates.
 
 The density $u$ is somewhat flexible, but must ensure $\esssupp(p^*) \subseteq \esssupp(q^*)$, which is a crucial requirement for valid importance sampling (\cite{Geweke}). Here we consider two alternatives for $u$. The first, $u_1$, is the uniform density on a bounded subset of $F(\vec{(y')}^{t})$.  The subset must be bounded to ensure $u$ is integrable (with respect to the appropriate reference measure). If the bounded set is a hyper-rectangle, with each undetermined coordinate of $\vec{y}^{t}$ bounded independently of the others, then the normalising constant of $u_1$ depends on the number of newly observed coordinates $k$, but is otherwise independent of $\vec{(y')}^{t}$. If $\vec{y}^t$ is outside this hyper-rectangle, then $u_1(\vec{y}^t) = 0$, and as we shall see later in this section, this results in a zero-weighted particle in the context of importance sampling. In practice, the bounds can be set large enough that zero-weighted particles occur only infrequently, and cause no problems. The second alternative, $u_2$, is obtained by restricting $q(\vec{y}^{t} | \vec{Z}^{t-1})$ to the set $F(\vec{(y')}^{t})$. In this case, the normalising constant, obtained by integrating $q(\vec{y}^{t} | \vec{Z}^{t-1})$ over $F(\vec{(y')}^{t})$, depends on the specific value of $\vec{(y')}^{t}$. In our examples below it can be evaluated exactly, but in some cases it may require estimation. 
 
 Applying importance sampling on the probability space $\Omega^*$, and reintroducing the particle subscript $j$ gives
 \begin{align*}
     E_{p^*}[l(\pi (\vec{(y')}^{t}, \vec{y}^{t})] 
-    %= \int_{\Omega^*} l(\vec{(y')}^{t}) \frac{p^*(\vec{(y')}^{t}, \vec{y}^{t}|\vec{Z}^{t})} {q^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t-1})} \\
-    %q^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t-1}) \; \D \vec{y}^{t}\
     \approx \sum_{j=1}^n  w^{t}_j l((\vec{y}'_j)^{t})
 \end{align*}
 where the weights are given by:
 \begin{eqnarray*}
     w^{t}_j &\propto& \frac{p^*(\vec{y}_j^{t}, (\vec{y}_j')^{t} | \vec{Z}^{t})} {q^*(\vec{y}_j^{t}, (\vec{y}_j')^{t} |\vec{Z}^{t-1})} \\
-    &=& u(\vec{y}_j^{t} | (\vec{y}_j')^{t}, \vec{Z}^{t})\frac{p((\vec{y}'_j)^{t} | \vec{Z}^{t})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})} \\
-    &=& \frac{u(\vec{y}_j^{t} | (\vec{y}_j')^{t}, \vec{Z}^{t})}{r(\vec{z}^{t} | \vec{Z}^{t-1})} \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})} \\
-    & \propto & u(\vec{y}_j^{t} | (\vec{y}_j')^{t}, \vec{Z}^{t}) \prod_{i=1}^{t} w^{t}_{ij}
+    &=& u(\vec{y}_j^{t} | (\vec{y}_j')^{t})\frac{p((\vec{y}'_j)^{t} | \vec{Z}^{t})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})} \\
+    &=& \frac{u(\vec{y}_j^{t} | (\vec{y}_j')^{t})}{r(\vec{z}^{t} | \vec{Z}^{t-1})} \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1})}{q(\vec{y}_j^{t} | \vec{Z}^{t-1})} \\
+    & \propto & u(\vec{y}_j^{t} | (\vec{y}_j')^{t}) \prod_{i=1}^{t} w^{t}_{ij}
 \end{eqnarray*}
 with
 \begin{eqnarray*}
@@ -352,18 +316,13 @@ and
 w^{t}_{ij} &=& \frac{f((\vec{x}_j')^i | (\vec{x}_j')^{i-1})}{f(\vec{x}_j^i | \vec{x}_j^{i-1})} \frac{g((\vec{b}_j')^i | (\vec{x}_j')^i, \vec{b}_j^{i-1})}{g(\vec{b}_j^i | \vec{x}_j^i, \vec{b}_j^{i-1})}
 \end{eqnarray*}
 for $i \geq 2$.
-Note the term $r(\vec{z}^{t} | \vec{Z}^{t-1})$ is the same for all particles, and thus can be disregarded, since it will cancel after normalising the weights across particles. Note also that $(\vec{b}_j')^i$ differs from $\vec{b}_j^i$ only for $i = t$, since the older observations $\vec{z}^{i}$ have already fully determined $\vec{b}_j^i$ for $i < t$. 
+The term $r(\vec{z}^{t} | \vec{Z}^{t-1})$ is the same for all particles, and thus can be disregarded, since it will cancel after normalising the weights across particles. Note that $(\vec{b}_j')^i$ differs from $\vec{b}_j^i$ only for $i = t$, since the older observations $\vec{z}^{i}$ have already fully determined $\vec{b}_j^i$ for $i < t$. Also note that $w^{t}_{ij} = 1$ whenever both $(\vec{y}_j')^i = \vec{y}_j^i$ and $(\vec{y}_j')^{i-1} = \vec{y}_j^{i-1}$. Thus $w^{t}_{ij}$ only needs to be calculated for at most $2M$ values of $t$ for each $i$, specifically at the times when the coordinates $x^{i}_m$ and $x^{i-1}_m$ are observed for each $m$.
 
 Using $u = u_1$, the normalised weights become:
 \begin{eqnarray*}
 w^{t}_j &=& \frac{\prod_{i=1}^t w^{t}_{ij}}{\sum_{j=1}^n \prod_{i=1}^t w^{t}_{ij}},
 \end{eqnarray*}
 (with zero-weight particles, which can arise as described above, discarded prior to normalisation, and $n$ reduced accordingly). Note that $u_1$ has the same value for all particles and hence cancels at normalisation.
-% \begin{multline*}
-%     w_j^{t} = \frac{q((\vec{y}'_j)^{t} | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_j | \vec{Z}^{t-1})}\Bigg( \sum_{j=1}^n  \frac{q((\vec{y}_j')^{t} | \vec{Z}^{t-1}) }{q(\vec{y}^{t}_j | \vec{Z}^{t-1})}\Bigg)^{-1} 
-%     %= \\
-%     %\frac{q(\vec{({\color{red}X}')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{{\color{red}X}}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg( \sum_{i=1}^n \frac{q(\vec{({\color{red}X}')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1}) }{q(\vec{{\color{red}X}}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}\Bigg)^{-1}
-% \end{multline*}
 For $u = u_2$, the normalised weights after cancelling terms are
 \begin{eqnarray*}
 w^{t}_j &=& \frac{\frac{1}{N_j} \prod_{i=1}^t v^{t}_{ij}}{\sum_{l=1}^n \frac{1}{N_l}\prod_{i=1}^t v^{t}_{il}}
@@ -379,7 +338,52 @@ v^{t}_{ij} &=& w^{t}_{ij} f(\vec{x}_j^i | \vec{x}_j^{i-1}) g(\vec{b}_j^i | \vec{
 \end{eqnarray*}
 for $i \geq 2$. 
 
-If $\vec{B}^t$ evolves independently of $\vec{X}^t$, the partial weights simplify to
+
+
+
+\section{Simplifying the model when observations are missing at random}
+
+The model in the previous section can be substantially simplified when observations are {\em missing at random}, by which we mean that $\vec{B}^t$ evolves independently of $\vec{X}^t$, that is 
+\begin{align*}
+    \vec{b}^1 | \vec{x}^1 &\sim g_1(\vec{b}^1 ) \mbox{ and } \\
+    \vec{b}^t | \vec{x}^t, \vec{b}^{t-1} &\sim g_t(\vec{b}^t | \vec{b}^{t-1}).
+\end{align*}
+As a further simplification, in this section we limit our interest to expectations of the form:
+\begin{align*}
+    E_{p} \Big[l(\vec{X}^{t}) \Big] &=  \int_{\Omega_t'} l(\vec{X}^{t})\; p(\vec{X}^{t} | \vec{Z}^{t})\; \prod_{ \{ i \leq t  : z^t_{i} = - \} } \D x^i
+\end{align*}
+for functions $l: \Omega_t'  \rightarrow \Real$, where $\Omega_t' := \sigma^{-1}(\vec{Z}^{t})$ as before, remembering that $\vec{B}^{t}$ is fully determined by $\vec{Z}^{t}$, so that elements of $\Omega_t'$ all share the same value of $\vec{B}^{t}$. 
+
+Under these assumptions, all $g$ terms cancel in the above expression for $p(\vec{X}^t, \vec{B}^t | \vec{Z}^t)$, giving $p(\vec{X}^t, \vec{B}^t | \vec{Z}^t) = p(\vec{X}^t | \vec{Z}^t)$. Moreover, all $g$ terms except the final term $g(\vec{b}^t | \vec{b}^{t-1})$ cancel in the above expression for $q(\vec{X}^t, \vec{B}^t | \vec{Z}^{t-1})$ and this last term may be removed by summing over $\vec{b}^t$ to obtain $q(\vec{X}^t | \vec{Z}^{t-1})$. In this case, it will be convenient to redefine $h$ and $r$ as follows:
+\begin{eqnarray*}
+h(\vec{X}^t) & := & f(\vec{x}^1)\prod_{i=2}^{t} f(\vec{x}^i | \vec{x}^{i-1})
+\end{eqnarray*}
+and
+\begin{eqnarray*}
+r(\vec{Z}^t) & := & \int_{\Omega_t'}  h(\vec{X}^t) \prod_{ \{ i \leq t, m \in \{1, \ldots, M \} : z^t_{im} = - \} } \D x^i_m
+\end{eqnarray*}
+with
+\begin{eqnarray*}
+r(\vec{z}^t | \vec{Z}^{t-1}) & := & \frac{r(\vec{Z}^t)}{r(\vec{Z}^{t-1})},
+\end{eqnarray*}
+and redefine $\Omega_t'$ as the projection of $\sigma^{-1}(\vec{Z}^t)$ onto the subspace obtained by discarding the second element of the pair $(\vec{X}^t,\vec{B}^t)$. With this modified notation, we can now write:
+\[
+q(\vec{X}^1) = f(\vec{x}^1),
+\]
+on $\Omega_1 = \Real^M$ and for $t \geq 2$,
+\begin{eqnarray*}
+    q(\vec{X}^t | \vec{Z}^{t-1}) & = & \frac{f(\vec{x}^1)}{r(\vec{z}^1)}  \prod_{i=2}^{t-1} \frac{f(\vec{x}^i | \vec{x}^{i-1}) }{r(\vec{z}^i | \vec{Z}^{i-1})} f(\vec{x}^t | \vec{x}^{t-1})
+\end{eqnarray*}
+on $\Omega_t = \Omega_{t-1}' \times \Real^M $ and 
+\begin{eqnarray*}
+    p(\vec{X}^t | \vec{Z}^t) 
+& = & \frac{f(\vec{x}^1)}{r(\vec{z}^1)} \prod_{i=2}^t \frac{f(\vec{x}^i | \vec{x}^{i-1}) }{r(\vec{z}^i | \vec{Z}^{i-1})} 
+\end{eqnarray*}
+on $\Omega_t'$.
+
+Sequential importance sampling in this context can be carried out using process similar to that described in the preceding section, but without simulating $\vec{B}^t$, and with $q(\vec{X}^t, \vec{B}^t | \vec{Z}^t)$ and $p(\vec{X}^t, \vec{B}^t | \vec{Z}^t)$ replaced by  $q(\vec{X}^t | \vec{Z}^t)$ and $p(\vec{X}^t | \vec{Z}^t)$ respectively. The above reasoning remains valid, with $\vec{y}^t$ and $(\vec{y}')^t$ replaced by $\vec{X}^t$ and $(\vec{X}')^t$ respectively. 
+
+As before, there is flexibility in the choice of $u(\vec{X}^t | (\vec{X}')^t, \vec{Z}^t)$, which now is a distribution over the set $F((\vec{X}')^t, \vec{Z}^t)$ consisting of all possible $\vec{X}^t$ such that $\rho(\vec{X}^t, \vec{Z}^t) = (\vec{X}')^t$. One may set $u = u_1$, a uniform distribution over a hyper-rectangle contained in $F((\vec{X}')^t, \vec{Z}^t)$, chosen so that each undetermined coordinate of $\vec{X}^t$ is bounded independently of the others, leading to cancellation of the normalisation constant. The partial weights thus simplify to
 \begin{eqnarray*}
 w^{t}_{1j} &=& \frac{f((\vec{x}_j')^1)}{f(\vec{x}_j^1)}
 \end{eqnarray*}
@@ -387,25 +391,25 @@ and
 \begin{eqnarray*}
 w^{t}_{ij} &=& \frac{f((\vec{x}_j')^i | (\vec{x}_j')^{i-1})}{f(\vec{x}_j^i | \vec{x}_j^{i-1})}
 \end{eqnarray*}
-for $i \in \{ 2, \ldots, t-1 \}$. 
-However, the final $g$ term (for $i = t$) does not cancel in general, hence
+for $i \in \{ 2, \ldots, t \}$. Note that since $\vec{B}^t$ is not simulated, it does not need to be corrected, and the $g$ ratio is not present in the partial weight $w^{t}_{tj}$.
+
+Alternatively, one may set $u = u_2$, which now is the distribution $q(\vec{X}^t | \vec{Z}^{t-1})$ restricted to $F((\vec{X}')^t, \vec{Z}^t)$. In that case, the normalised weights after cancelling are
 \begin{eqnarray*}
-w^{t}_{tj} &=& \frac{f((\vec{x}_j')^t | (\vec{x}_j')^{t-1})}{f(\vec{x}_j^t | \vec{x}_j^{t-1})} \frac{g((\vec{b}_j')^t | \vec{b}_j^{t-1})}{g(\vec{b}_j^t | \vec{b}_j^{t-1})}
+w^{t}_j &=& \frac{\frac{1}{N_j} \prod_{i=1}^t v^{t}_{ij}}{\sum_{l=1}^n \frac{1}{N_l}\prod_{i=1}^t v^{t}_{il}}
 \end{eqnarray*}
-The alternative partial weight $v_{ij}^t$ simplifies similarly (and is again equal to the numerator of $w_{ij}^t$).
+where $N_j$ is the normalisation constant obtained by integrating $q(\vec{X}^{t} | \vec{Z}^{t-1})$ over $F((\vec{X}_j')^t, \vec{Z}^t)$. The alternative partial weights are given by
+\[
+v^{t}_{1j} = w^{t}_{1j} f(\vec{x}_j^1) = f((\vec{x}_j')^1)
+\]
+and
+\[
+v^{t}_{ij} = w^{t}_{ij} f(\vec{x}_j^i | \vec{x}_j^{i-1}) = f((\vec{x}_j')^i | (\vec{x}_j')^{i-1}) 
+\]
+for $i \geq 2$. 
 
 
 
 
-
-
-% \[
-%     w_j^{t} = q((\vec{y}'_j)^{t} | \vec{Z}^{t-1}) \Bigg( \sum_{j=1}^n  q((\vec{y}_j')^{t} | \vec{Z}^{t-1}) \Bigg)^{-1}.
-% \]
-
-
-%In order to be able to apply importance sampling we will need to prove that $\esssupp(p^*) \subseteq \esssupp(q)$
-%which is obvious when we consider deterministic substitutions where $p^*(\vec{(y')}^{t}, \vec{y}^{t} | \vec{Z}^{t}) \propto q(\vec{(y')}^{t}|\vec{Z}^{t-1})$.
 
 \section{Application to a stationary AR(1) model}
 \label{sec:3}
@@ -424,81 +428,29 @@ This process is stationary provided the initial distribution is
 \end{equation*}
 which is possible only if $|\varphi| < 1$. 
 
-In this example, the dimension of the system is $M = 1$, and the trajectory of the system is $\vec {X}^{t} = (x^1, \dots, x^{t})$. Suppose that at time $t$, only some subset of the values $\vec {X}^{t} = (x^1, \dots, x^{t})$ have so far been observed. However, those that have been observed are known without error. %We collect the values that have been observed at or before time $t$ to form $\vec{z}^{t} = (z_1^{t}, \dots, z_{t}^{t})$, where for each $i \leq t$, $z_i^{t} = x^i$ if $x^i$ has been observed at or before time $t$ and $z_i^{t} = -$ otherwise. Thus each coordinate of $\vec{z}^{t}$ belongs to an extension of the reals $\mathbb{R} \cup \{ - \}$. 
-%As time progresses, new observations become available. Thus some dashes in $\vec{z}^{t}$ will be replaced by observations in $\vec{z}^{t+1}$. However, the reverse does not occur: if we have $z_i^{t} = x^i$ for times $i$ and $t$ where $i \leq t$ then we must also have $z_i^{t^{\prime}} = x^i$ at all subsequent times $t^{\prime} > t$. 
-Note that because $M=1$, $\vec{z}^{t}$ may be represented as a row vector with $t$ coordinates, and $\vec{Z}^{t}$ may be represented as a lower triangular $t \times t$ matrix, in which row $i$ contains the vector $\vec{z}^{i}$, padded with zeroes at the right.
-%We also define $\vec{b}^{t} = (b_1^{t}, \dots, b_{t}^{t})$, where $b_i^{t} = 1$ if $z_i^{t} = x^i$, $b_i^{t} = 0$ if $z_i^{t} = -$, and $\vec{B}^{t} = (\vec{b}^{1}, \ldots, \vec{b}^{t})$. 
-Similarly, $\vec{b}^{t}$ can be represented as a row vector with $t$ coordinates and $\vec{B}^{t}$ can be represented as a lower triangular $t \times t$ binary matrix in which row $i$ is the vector $\vec{b}^{i}$. %The matrix $\vec{B}^{t}$ must satisfy the constraints that if $b_i^{t} = 1$, then $b_{i}^{t'} = 1$ for all $t' > t$ and if $b_i^{t} = 0$, then $b_{i}^{t'} = 0$ for all $t' < t$. Note $\vec{b}^{t}$ is fully determined by $\vec{z}^{t}$.
+In this example, the dimension of the system is $M = 1$, and the trajectory of the system is $\vec {X}^{t} = (x^1, \dots, x^{t})$. Suppose that at time $t$, only some subset of the values $\vec {X}^{t} = (x^1, \dots, x^{t})$ have so far been observed. However, those that have been observed are known without error. Note that because $M=1$, $\vec{z}^{t}$ may be represented as a row vector with $t$ coordinates, and $\vec{Z}^{t}$ may be represented as a lower triangular $t \times t$ matrix, in which row $i$ contains the vector $\vec{z}^{i}$, padded with zeroes at the right. Similarly, $\vec{b}^{t}$ can be represented as a row vector with $t$ coordinates and $\vec{B}^{t}$ can be represented as a lower triangular $t \times t$ binary matrix in which row $i$ is the vector $\vec{b}^{i}$.
 
 We model $b_i^{t}$, when $b_i^{t-1} = 0$, as Bernoulli with probability $\theta$:
 \begin{equation*}
     (b_i^{t} | b_i^{t-1} = 0) \sim Bernoulli(\theta).
 \end{equation*}
-Thus $\vec{B}^{t}$ evolves independently of $\vec{X}^{t}$, so that the conditional distribution of $\vec{b}^{t}$ given $(x^{t}, \vec{b}^{t-1})$ is of the form $g(\vec{b}^{t} | x^{t}, \vec{b}^{t-1} ) = g( \vec{b}^{t} | \vec{b}^{t-1} )$. As we saw above, this results in cancellation of most terms containing $\vec{b}^{t}$ or $\vec{B}^{t}$, which simplifies the expressions for the prior and posterior distributions.
+Thus $\vec{B}^{t}$ evolves independently of $\vec{X}^{t}$, so that the conditional distribution of $\vec{b}^{t}$ given $(x^{t}, \vec{b}^{t-1})$ is of the form $g(\vec{b}^{t} | x^{t}, \vec{b}^{t-1} ) = g( \vec{b}^{t} | \vec{b}^{t-1} )$. As we saw above, in this case the sequential importance sampling weights do not depend on $\vec{B}^t$.
 
-%\subsection{Bayesian inference for an AR(1) model}
-%\label{sec:4}
+
+
+
+
 \subsection{Sequential importance sampling for an AR(1) model}
 \label{sec:5}
 
-To keep this first example simple, we limit our interest to approximating expectations of the form:
-\begin{align*}
-    E_{p} \Big[l(\vec{X}^{t}) \Big] &=  \int_{\Omega_t'} l(\vec{X}^{t})\; p(\vec{X}^{t} | \vec{Z}^{t})\; \prod_{ \{ i \leq t  : z^t_{i} = - \} } \D x^i
-\end{align*}
-for functions $l: \Omega_t'  \rightarrow \Real$. Since these expectations do not depend on $\vec{B}^t$, we can dispense with $\vec{y}^t$ and $(\vec{y}')^t$ as defined in Section~\ref{sec:2}, and instead deal directly with uncorrected and corrected particles $\vec{X}_j^t$ and $(\vec{X}')_j^t$ respectively, where $j = 1, \ldots, n$. To estimate such expectations, we want to use the sequential importance strategy described in Section~\ref{sec:2}. 
+We first use the sequential importance strategy described in Section~\ref{sec:2} with $u = u_1$. At time $t$, the prior density $q(\vec{X}^{t} | \vec{Z}^{t-1})$ is defined on the subspace $\Omega_t = \prod_{i=1}^t \mathbb{X}_i^{t-1} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t-1} = \mathbb{R}$ for $z_i^{t-1} = -$, and $\mathbb{X}_i^{t-1} = \{ z_i^{t-1} \}$ otherwise. That is, $\Omega_t$ is the subspace of $\mathbb{R}^t$ corresponding to observed co-ordinates being fixed. Note we adopt the convention $z_t^{t-1} = -$, since the system state $x^t$ is not observed at time $t-1$.  The posterior density $p(\vec{X}^{t} | \vec{Z}^{t})$ is defined on the subspace $\Omega_t' = \prod_{i=1}^t \mathbb{X}_i^{t} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t} = \mathbb{R}$ for $z_i^{t} = -$ and $\mathbb{X}_i^{t} = \{ z_i^{t}\}$ otherwise. 
 
-At time $t$, the prior density $q(\vec{X}^{t} | \vec{Z}^{t-1})$ 
-%that represents our knowledge about the system trajectory before we observe $\vec{z}^{t}$. This prior 
-is defined on the subspace $\Omega_t = \prod_{i=1}^t \mathbb{X}_i^{t-1} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t-1} = \mathbb{R}$ for $z_i^{t-1} = -$, and $\mathbb{X}_i^{t-1} = \{ z_i^{t-1} \}$ otherwise. That is, $\Omega_t$ is the subspace of $\mathbb{R}^t$ corresponding to observed co-ordinates being fixed. Note we adopt the convention $z_t^{t-1} = -$, since the system state $x^t$ is not observed at time $t-1$.  The posterior density $p(\vec{X}^{t} | \vec{Z}^{t})$ 
-%is obtained by re-normalising $q$ over values consistent with $\vec{Z}^{t}$. It 
-is defined on the subspace $\Omega_t' = \prod_{i=1}^t \mathbb{X}_i^{t} \subseteq \mathbb{R}^t$ with $\mathbb{X}_i^{t} = \mathbb{R}$ for $z_i^{t} = -$ and $\mathbb{X}_i^{t} = \{ z_i^{t}\}$ otherwise. 
-
-% The density is given by:
-% \begin{equation*}
-%     p(\vec{X}^{t} | \vec{Z}^{t}) = \frac{ q(\vec{X}^{t} |\vec{Z}^{t-1})} {r(\vec{z}^{t} | \vec{Z}^{t-1})}
-% \end{equation*}
-% where 
-% \begin{equation*}
-%     r(\vec{z}^{t} | \vec{Z}^{t-1}) = \int_{\Omega'_t} q(\vec{X}^{t} |\vec{Z}^{t-1}) \prod_{\{i \leq t: z_i^{t} = -\}} \D x^i.
-% \end{equation*}
-% The prior $q(\vec{X}^{t} | \vec{Z}^{t-1})$ represents our knowledge about the system trajectory at time $t$, before we observe $\vec{z}^{t}$. Using the independence of $\vec{X}^t$ and $\vec{B}^t$, we have
-% \begin{equation}
-%     q(\vec{X}^{t} | \vec{Z}^{t-1}) = p(\vec{X}^{t-1} | \vec{Z}^{t-1}) p(x^t | x^{t-1}).
-%     \label{eq:1}
-% \end{equation}
-
-
-% We define a probability $p^*$ on $\Omega^* = \Omega \times \Omega'$ such that the marginal distribution of $p^*$ on $\Omega'$ is $p$, that is:
-
-% \begin{equation*}
-%     p(\vec{(X')}^t | \vec{Z}^t) = \int_{\Omega_t} p^*(\vec{X}^t, \vec{(X')}^t | \vec{Z}^t)\; \prod_{ \{ i \leq t  : z^{t-1}_{i} = - \} } \D x^i.
-% \end{equation*}
-
-% We can therefore use the identity
-
-% \begin{align*}
-%     E_{p}[l(\vec{(X')}^{t})]  &=  E_{p^*}[l(\pi (\vec{X}^{t}, \vec{(X')}^{t}))].
-% \end{align*}
-% and estimate the right hand side expectation via importance sampling
-
-% \begin{align*}
-%     E_{p^*}[l(\pi (\vec{X}^{t}, \vec{(X')}^{t})] \approx \sum_{j=1}^n  w^{t}_j l(\pi (\vec{X}^{t}_j, \vec{(X')}^{t}_j))
-% \end{align*}
-% with normalised weights given by
-
-% \begin{multline*}
-%     w^{t}_j = \frac{q(\vec{(X')}^{t}_j | \vec{Z}^{t-1}) }{q(\vec{X}^{t}_j | \vec{Z}^{t-1})}\Bigg( \sum_{j=1}^n  \frac{q(\vec{(X')}^{t}_j | \vec{Z}^{t-1}) }{q(\vec{X}^{t}_j | \vec{Z}^{t-1})}\Bigg)^{-1}.
-% \end{multline*}
-% Notice that since we are potentially correcting every previous event at every iteration, the weights for previous times also need to be recalculated at every iteration. However, there will be many cancellations in the calculation of the weights, making the process manageable and not computationally expensive.
-
-For every particle $i$, the unnormalised weights at time $t$ for $b' \in \{0,1\}$ and $b \in \{0,1\}$ are calculated with the following formula
-
-\begin{align} \label{eq:2}
-    &\frac{q(\vec{(X')}^{t} | \vec{Z}^{t-1}) }{q(\vec{X}^{t} | \vec{Z}^{t-1})} =
-    \frac{\bigg \{ \prod_{s=2}^{t}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x'_s - \varphi x'_{s-1})^{2} \bigg ] \bigg \} }{\bigg \{ \prod_{s=2}^{t}  \frac{1}{\sqrt{2 \pi \sigma^{2}}} \exp \bigg [ { - \frac{1}{2 \sigma^{2}} }  (x_s - \varphi x_{s-1})^{2} \bigg ] \bigg \} } \nonumber \\
-    &\frac{p^{b'_t} (1 - p)^{1-b'_t}  }{p^{b_t} (1 - p)^{1-b_t} }
+For each particle $j$, the partial weights at time $t$ are calculated with the following formula
+\begin{align} \label{eq:w1}
+    w_{1j}^t &= \frac{\exp \left[ -\frac{1 - \varphi^2}{2 \sigma^2}{((x')^1)^2} \right]}{\exp \left[ -\frac{1 - \varphi^2}{2 \sigma^2}{(x^1)^2} \right]} \mbox{ and } \\ 
+    w_{ij}^t &= \frac{\exp \left[ -\frac{1}{2 \sigma^2}{((x')^i - \varphi (x')^{i-1})^2} \right]}{\exp \left[ -\frac{1}{2 \sigma^2}{(x^i - \varphi x^{i-1})^2} \right]} \label{eq:w2}
 \end{align}
-and we will have terms cancellations in the Gaussian term when both $z_{s-1} \neq 0$ and $z_s \neq 0$, while the Bernoulli term will cancel every time that $z_s \neq 0$. Also, we will consider that the first event is known a priori, so that $p(x'_1)=p(x_1)$, and those two terms will cancel out as well.
+for $i \in \{ 2, \ldots, t-1 \}$.
 
 Our algorithm outputs a set of particles, each with an associated weight calculated as explained above, then performs a resampling step which draws from the generated particle set with probability proportional to the weights.
 
@@ -507,186 +459,151 @@ We have compared the distributions for the missing observations to distributions
 \subsection{Gold Standard: Analytical estimation of missing observations for an AR(1) model when the available observations are exact}
 \label{sec:6}
 
-{\color{red} (HHH JK Look at this section next. Can it be simplified?)}
+Here we derive analytical expressions for posterior distributions of missing values in the AR(1) context. It will be convenient to think of the missing values as organised into blocks, where a `block' is a sequence of one or more contiguous missing values.
 
-Here we derive the analytical solutions for a sequence of contiguous missing values in the AR(1) context. This can then be generalised for many blocks of missing values. The blocks can consist of only one value.
+The Kalman Smoother is not well suited to exact observations, since the one-step ahead error (for a definition see \cite{Young}) cannot be defined. However, we can use the model definition and knowledge of the observations before and after the missing terms to estimate the posterior for those missing terms analytically.
 
-We will want to find the distribution of all the missing values in light of all the observations for an AR(1) model with exact observations $p(x_V | z_A, z_B)$ where we are missing observations $z_{V \setminus \{A,B\} }$, were $V$, $A$ and $B$ are set of indexes such that $V = 1, \dots, t$, $A = 1, \dots, \tau$ and $B = m, \dots, t$ with $1 < \tau < m \leq t$.
-Notice that the Kalman Smoother is not well suited to the situation where the observations are exact since the one-step ahead error {\color{blue}(for a definition see \cite{Young})} cannot be defined. However, we can use the model definition and the knowledge of the observations before and after the missing terms to estimate the posterior for those missing terms analytically.
-
-Since this model is Markovian and the observations are exact, meaning $z_j = x_j$ for every $j \in V \setminus \{A,B\} $, the probability of an event at time $i$ knowing all the previous observations $p(x_i | z_1, \dots, z_{i-1}) = p(x_i | x_1, \dots, x_{i-1})$ will depend only on the last available observation:
-
-\begin{equation*}
-    p(x_i | x_1, \dots, x_{i-1}) = p(x_i | x_{i-1}).   
-\end{equation*}
-Also, the probability density of an event at time $i$, when we know all subsequent observations $p(x_i | z_{i+1}, \dots, z_t)$, will depend only on the first available observation using the rule of conditional probability and the fact this is an AR(1) model we can write
-
-{\color{red} perhaps that the middle steps in these first two equations can be omitted?}
+Suppose at time $t$, the system state at earlier times $\tau$ and $m$ is known, where $1 \leq \tau < m \leq t$, but the system state at intermediate times is unobserved. That is, $z^t_{\tau} = x^{\tau}$, $z^t_{m} = x^m$, but $z^t_i = -$ for $i \in \{ \tau+1, \ldots, m-1\}$. Since the AR(1) model is Markovian, any knowledge we may have about the system state prior to time $\tau$ or after time $m$ is irrelevant, given $x^{\tau}$ and $x^{m}$. Thus the posterior distribution for the system state at times $i \in \{ \tau+1, \ldots, m-1\}$ is given by
 
 \begin{align*}
-    &p(x_{i+1}, \dots, x_t | x_i) = p(x_t | x_i, x_{i+1}, \dots, x_{t-1}) p(x_{i+1}, \dots, x_{t-1} | x_i)\\
-    &= p(x_t | x_{t-1}) p(x_{t-1} | x_i, \dots x_{t-2}) p(x_{i+1}, \dots, x_{t-2} | x_i)\\
-    &= \dots\\
-    &= p(x_t | x_{t-1})p(x_{t-1} | x_{t-2}) \dots p(x_{i+1} | x_i),
+   p(x^i | \vec{z}^t)  &= p(x^i | x^{\tau}, x^m) \\
+    &= \frac{p(x^m | x^i) p(x^i | x^{\tau})}{p(x^m | x^{\tau})} \\
 \end{align*}
-and
+For a Gaussian AR(1) model, we have 
+
+\[
+p(x^i | x^{\tau}) \propto \exp\Big(-\frac{1}{2} R_{\tau,i}\Big)
+\]
+where
+
+\[
+    R_{\tau,i} = \frac{(x^i - \varphi^{i-\tau} x^{\tau})^2}{\sigma^2 \sum_{j=0}^{i-\tau-1} \varphi^{2j}}.
+\]
+Similarly,
+
 \begin{align*}
-    &p(x_{i+1}, \dots, x_t) = p(x_t | x_{i+1}, \dots, x_{t-1}) p(x_{i+1}, \dots, x_{t-1})\\
-    &= p(x_t | x_{t-1}) p(x_{t-1} | x_{i+1}, \dots x_{t-2}) p(x_{i+1}, \dots x_{t-2})\\
-    &= \dots\\
-    &= p(x_t | x_{t-1})p(x_{t-1} | x_{t-2}) \dots p(x_{i+1} | x_i) p(x_{i+1})
+    p(x^m | x^i) &\propto \exp\Big(-\frac{1}{2} R_{i,m}\Big) \mbox{ and } \\
+    p(x^m | x^{\tau}) &\propto \exp\Big(-\frac{1}{2} R_{\tau,m}\Big)
 \end{align*}
-therefore
+where $R_{i,m}$ and $R_{\tau,m}$ are given by similar expressions to that for $R_{\tau,i}$. Putting this together and normalising gives 
+
 \begin{align*}
-    &p(x_i | x_{i+1}, \dots, x_t) = \frac{p(x_{i+1},\dots, x_t | x_i) p(x_i)}{p(x_{i+1}, \dots, x_t)}\\
-    &= \frac{p(x_t | x_{t-1})\dots p(x_{i+2} | x_{i+1}) p(x_{i+1} | x_i) p(x_i)}{p(x_t | x_{t-1})\dots p(x_{i+2} | x_{i+1}) p(x_{i+1})}\\
-    &= \frac{p(x_{i+1} | x_i) p(x_i)}{p(x_{i+1})}\\
-    &= p(x_i | x_{i+1}).
+   p(x^i | \vec{z}^t)  &= c \exp\Big(-\frac{1}{2} R\Big)
 \end{align*}
-Similarly, if we know all the previous and all the following observations we have
+where $c$ is a normalisation constant and
 
 \begin{align*}
-    &p(x_i | x_1, \dots, x_{i-1}, x_{i+1}, \dots x_t) = \frac{p(x_1,\dots, x_t)}{p(x_1, \dots, x_{i-1}, x_{i+1}, \dots x_t)}\\
-    &= \frac{p(x_t | x_{t-1})\dots p(x_2 | x_1) p(x_1)}{p(x_t | x_{t-1})\dots p(x_{i+1} | x_{i-1}) \dots p(x_2 | x_1) p(x_1)}\\
-    &= \frac{p(x_{i+1} | x_i) p(x_i | x_{i-1})}{p(x_{i+1} | x_{i-1})}\\
-    &= \frac{p(x_{i-1}, x_i, x_{i+1})}{p(x_{i-1}) p(x_{i+1} | x_{i-1})}\\
-    &= \frac{p(x_{i-1}, x_i, x_{i+1})}{p(x_{i+1}, x_{i-1})}\\
-    &= p(x_i | x_{i-1}, x_{i+1}).
+    R &= \frac{(x^m - \varphi^{m-i} x^i)^2}{\sigma^2 \sum_{j=0}^{m-i-1} \varphi^{2j}} + \frac{(x^i - \varphi^{i-\tau} x^\tau)^2}{\sigma^2 \sum_{j=0}^{i-\tau-1} \varphi^{2j}} - \\
+    &\frac{(x^m - \varphi^{m -\tau} x^\tau)^2}{\sigma^2 \sum_{j=0}^{m-\tau-1} \varphi^{2j}}
 \end{align*}
-Finally, notice that an AR(1) model is time reversible, i.e. it looks the same back in time as it does forward in time.
-This can be proved using Bayes theorem as follows:
-\begin{equation*}
-    p(x_{i-1} | x_i) = \frac{p(x_i | x_{i-1}) p(x_{i-1})}{p(x_i)} = c\times \exp\Big(-\frac{1}{2} R\Big)
-\end{equation*}
-where $c$ is a constant.
-
-Since
-\begin{align*}
-    &p(x_i | x_{i-1}) = \mathcal{N}(\varphi x_{i-1}, \sigma^2)\\
-    &p(x_{i-1}) = p(x_i) = \mathcal{N} \Bigg(0, \frac{\sigma^2}{1-\varphi^2} \Bigg)\\
-\end{align*}
-we have that
-\begin{equation*}
-    R = \frac{(x_i - \varphi x_{i-1})^2}{\sigma^2} + \frac{x_{i-1}^2}{\sigma^2 / (1-\varphi^2)} - \frac{x_{i}^2}{\sigma^2 / (1-\varphi^2)}.
-\end{equation*}
-Solving we get
-
-\begin{equation*}
-    R = \frac{x_{i-1}^2 - (2\varphi x_i) x_{i-1}+ (\varphi^2 x_i^2)}{\sigma^2} = \frac{(x_{i-1} - \varphi x_i)^2}{\sigma^2}
-\end{equation*}
-which shows that
-
-\begin{equation*}
-    p(x_{i-1} | x_i) = \mathcal{N}(\varphi x_i, \sigma^2_\eta) = p(x_i | x_{i-1}).
-\end{equation*}
-We want to find the probability distribution of all the missing elements, knowing all the observations, which we have proven is the probability of all the missing elements knowing the first and the last observations
+This expression factorizes to give
 
 \begin{align*}
-    p(x_i | x_{\tau-1}, x_m) &= \frac{p(x_{\tau-1}, x_m | x_i) p(x_i)}{p(x_{\tau-1}, x_m)} \\
-    &= \frac{p(x_m | x_{\tau-1}, x_i) p(x_{\tau-1} | x_i) p(x_i)}{p(x_m | x_{\tau-1}) p(x_{\tau-1})} \\
-    &= \frac{p(x_m | x_i) p(x_i | x_{\tau-1})}{p(x_m | x_{\tau-1})} \\
-    &= c\times \exp\Big(-\frac{1}{2} R\Big)
-\end{align*}
-where $R$ is
-
-\begin{align*}
-    &R = \frac{(x_m - \varphi^{m-i} x_i)^2}{\sigma^2 \sum_{j=0}^{m-i-1} \varphi^{2j}} + \frac{(x_i - \varphi^{i-(\tau-1)} x_{\tau-1})^2}{\sigma^2 \sum_{j=0}^{i-\tau} \varphi^{2j}} - \\
-    &\frac{(x_m - \varphi^{m -(\tau-1)} x_{\tau-1})^2}{\sigma^2 \sum_{j=0}^{m-\tau} \varphi^{2j}}
-\end{align*}
-that will factorize to
-
-\begin{align*}
-    &R = \frac{\sum_{j=0}^{m-\tau} \varphi^{2j}}{\sigma^2 \sum_{j=0}^{m-t-1} \varphi^{2j} \sum_{j=0}^{i-\tau} \varphi^{2j}} \\
-    &\Bigg\{ x_i - \Bigg[\frac{\varphi^{m-i} \sum_{j=0}^{i-\tau} \varphi^{2j} x_{m} + \varphi^{i-\tau+1} \sum_{j=0}^{m-i-1} \varphi^{2j} x_{\tau-1}}{\sum_{j=0}^{m-\tau} \varphi^{2j}}\Bigg] \Bigg\}^2
+    &R = \frac{\sum_{j=0}^{m-\tau - 1} \varphi^{2j}}{\sigma^2 \sum_{j=0}^{m-i-1} \varphi^{2j} \sum_{j=0}^{i-\tau-1} \varphi^{2j}} \\
+    &\Bigg\{ x^i - \Bigg[\frac{\varphi^{m-i} \sum_{j=0}^{i-\tau-1} \varphi^{2j} x^{m} + \varphi^{i - \tau} \sum_{j=0}^{m - i - 1} \varphi^{2j} x^{\tau}}{\sum_{j=0}^{m-\tau-1} \varphi^{2j}}\Bigg] \Bigg\}^2
 \end{align*}
 therefore
 
 \begin{align*}
-      &p(x_i | x_{\tau-1}, x_{m}) = \\
-      &\mathcal{N} \Bigg(\frac{\varphi^{m-i} \sum_{j=0}^{i-\tau} \varphi^{2j} x_{m} + \varphi^{i-\tau+1} \sum_{j=0}^{m-i-1} \varphi^{2j} x_{\tau-1}}{\sum_{j=0}^{m-\tau} \varphi^{2j}}, \\ &\frac{\sigma^2 \sum_{j=0}^{m-i-1} \varphi^{2j} \sum_{j=0}^{i-\tau} \varphi^{2j}}{\sum_{j=0}^{m-\tau} \varphi^{2j}} \Bigg).
+      &p(x^i | x^{\tau}, x^{m}) = \\
+      &\mathcal{N} \Bigg(\frac{\varphi^{m-i} \sum_{j=0}^{i-\tau-1} \varphi^{2j} x^{m} + \varphi^{i-\tau} \sum_{j=0}^{m-i-1} \varphi^{2j} x^{\tau}}{\sum_{j=0}^{m-\tau -1} \varphi^{2j}}, \\ &\frac{\sigma^2 \sum_{j=0}^{m-i-1} \varphi^{2j} \sum_{j=0}^{i-\tau - 1} \varphi^{2j}}{\sum_{j=0}^{m-\tau - 1} \varphi^{2j}} \Bigg).
 \end{align*}
 We have run our simulations with 1,000 particles and 30 times and compared our methodology with this analytical solution showing that our algorithm and the gold standard agree well (see Figure 1).
+
+
+
+
 
 \section{Application to an invasive species model}
 \label{sec:7}
 
-This second implementation illustrates the applicability of our method to invasive species models. For simplicity, we consider a one-dimensional environment such as a river without tributaries or confluences. We divide the length of the river into $N$ sections or cells and suppose the first introduction of the invasive species occurs in a cell with index $m$. From this cell, the invasion can propagate only in the immediately adjacent sections of the river, namely the cells indexed by $m-1$ and $m+1$. At each time step, a cell becomes infested from an adjacent infested cell with probability $\theta$. We represent the state of the system at time $i \in \{ 1, \dots, t \}$ by a binary vector $\vec{x}^{i} = (x_1^{i}, \dots, x_{N}^{i})$. These vectors all have length $N$, and their elements indicate the state of each cell at time $i$: 1 if the cell is invaded and 0 if the cell has not been invaded. The invasion will be complete, (that is, all cells will be invaded) at an unknown time $T$. 
-The invasion expands in two directions (left and right) simultaneously with the same probability $\theta$ of expansion of the invasion by one cell applicable in both directions. It is convenient to collect these vectors to form a $t\times N$ matrix $\vec{X}^{t}$, in which each row $i$ is the binary vector $\vec{x}^{i}$
+This second example illustrates the applicability of our method to invasive species models. For simplicity, we consider a one-dimensional environment such as a river without tributaries or confluences. We divide the length of the river into $M$ sections or cells and suppose the first introduction of the invasive species occurs in a cell with index $\mu$. From this cell, the invasion can propagate only in the immediately adjacent sections of the river, namely the cells indexed by $\mu-1$ and $\mu+1$ (an unrealistic assumption for most water-borne invasive species, but convenient for illustrative purposes). At each time step, a cell becomes infested from an adjacent infested cell with probability $\theta$. We represent the state of the system at time $t \in \{ 1, \dots, T \}$ by a binary vector $\vec{x}^{t} = (x_1^{t}, \dots, x_{M}^{t})$. These vectors indicate the state of each cell at time $t$: $x_m^t = 1$ if cell $m$ is infested and $x_m^t = 1$ otherwise. The invasion will be complete, (that is, all cells will be infested) at an unknown time $T$. 
+The invasion expands in two directions (left and right) simultaneously with the same probability $\theta$ of expansion by one cell applicable in both directions. It is convenient to collect these vectors to form a $t\times M$ matrix $\vec{X}^{t}$, in which each row $i$ is the binary vector $\vec{x}^{i}$.
 
-We will store information regarding which cells have been observed to contain the invasive species at or before time $i = 1, \dots, t$ in binary vectors $\vec{z}^{i} = (z_1^{i}, \dots, z_{N}^{i})$, where $z_s^{i} = 1$ if $x_s^{i} = 1$ and the invasive species has been detected at location $s$ at or before time $i$, and $z_s^{i} = 0$ otherwise. As for the AR(1) model example, once a cell has been observed it will remain observed at all subsequent times, therefore if $z_s^{i} = 1$ at time $i$, then we must also have $z_s^{i^{*}} = 1$ at all subsequent times $i^{*} > i$. These vectors will define a $t \times N$ matrix $\vec{Z}^{t}$, in which each row $i$ is a vector $\vec{z}^{i}$.
+We store information regarding which cells have been observed to contain the invasive species at or before time $t$ in a binary matrix $\vec{b}^t = (b_{im}^t)$, where $b_{im}^t = 1$ if the state of cell $m$ at time $i$ is known by time $t$, and $b_{im}^t = 0$ otherwise. The observations available at time $t$ are represented by a matrix $\vec{z}^t = (z_{im}^t)$, where we set $z_{im}^t = x^i_m$ if $b_{im}^t = 1$ and $z_{im}^t = -$ otherwise. However, in this example only presences may be observed, so $b_{im}^t = 1$ implies $x_m^i = 1$ and thus $z_{im}^t = 1$. Thus $\vec{b}^t$ and $\vec{z}^t$ fully determine each other: $z_{im}^t = 1$ if and only if $b_{im}^t = 1$, and $z_{im}^t = -$ if and only if $b_{im}^t = 0$. Moreover, $\vec{b}^t$ fully determines $\vec{b}^{t'}$ at any earlier time $t' < t$ by discarding the matrix rows corresponding to times after $t'$, and similarly for $\vec{z}^t$. Thus it is not necessary to form $\vec{B}^t = (\vec{b}^1,\ldots,\vec{b}^t)$ or $\vec{Z}^t = (\vec{z}^1,\ldots,\vec{z}^t)$ as in the general case: the same information is already contained in $\vec{b}^t$ or $\vec{z}^t$.
 
-We will model the new observations on the left and on the right of the previously observed nests in the following way. We will consider observations made by a probe that will check only those unobserved cells adjacent to cells where the invasive species has been detected. For example, if a cell is observed as invaded at time $t-1$, at time $t$ the adjacent cell in which no invader has previously been detected will be probed. If that cell is both invaded and observed, adjacent cells will also be probed, and so on until a cell in which no invaders are detected is found. The probe might fail to observe an invader that is present, and hence searching may stop without finding all invaded cells. The probability of observing invaders in an infested cell is denoted $\varphi$. Notice that in this example we don't need to define the matrix $\vec{B}^t$ as $\vec{B}^t$ and $\vec{Z}^t$ coincide, meaning that if I observe and what I observe are expressed by the same quantity, namely a 1.
+We will model the new observations on the left and on the right of the previously observed nests in the following way. We will consider observations made by a probe that will check only those unobserved cells adjacent to cells where the invasive species has previously been detected. For example, if a cell is observed as infested at time $t-1$, at time $t$ the adjacent cell in which no invader has previously been detected will be probed. If that cell is found to be infested, adjacent cells will also be probed, and so on until a cell in which no invaders are detected is found. The probe might fail to observe an invader that is present, and hence searching may stop without finding all invaded cells. The probability of observing invaders in an infested cell is denoted $\varphi$. 
 
-In this example, as for the AR(1) model, corrections are deterministic.
+In this example, as for the AR(1) model, corrections are deterministic. That is, values of $\vec{X}^t$ and $\vec{b}^t$ simulated prior to receiving the new observations $\vec{z}^t$, will be corrected to the values $(\vec{X}')^t$ and $(\vec{b}')^t$ implied by $\vec{z}^t$ when those observations become available.
 
 \subsection{Bayesian inference in a partially observed state space}
 \label{sec:8}
 
-We want to determine the posterior distribution in light of observations $p(\vec{X}^{t} | \vec{Z}^{t})$ and this is obtained, as for the AR(1) model, by renormalising the prior at time $t$, $q(\vec{X}^{t}, \vec{z}^{t} | \vec{Z}^{t-1})$, over values consistent with the observations $\vec{Z}^{t}$
+We want to determine the posterior distribution $p(\vec{X}^{t}, \vec{b}^{t} | \vec{z}^{t})$ and this is obtained, as for the AR(1) model, by renormalising the prior at time $t$, $q(\vec{X}^{t}, \vec{b}^{t} | \vec{z}^{t-1})$, over values consistent with the observations $\vec{z}^{t}$
 
 \begin{equation*}
-    p(\vec{X}^{t} | \vec{Z}^{t})  =  \frac{q(\vec{X}^{t}, \vec{z}^{t} | \vec{Z}^{t-1})}{r(\vec{z}^{t} | \vec{Z}^{t-1})}
+    p(\vec{X}^{t}, \vec{b}^{t} | \vec{z}^{t})  =  \frac{q(\vec{X}^{t}, \vec{b}^{t} | \vec{z}^{t-1})}{r(\vec{z}^{t} | \vec{z}^{t-1})}
 \end{equation*}
-where {\color{blue}
+where 
 \begin{equation*}
-    r(\vec{z}^{t} | \vec{Z}^{t-1}) = \sum_{\vec{x}\in A} q(\vec{X}^{t} = \vec{x}, \vec{z}^{t} | \vec{Z}^{t-1})
+    r(\vec{z}^{t} | \vec{z}^{t-1}) = \sum_A q(\vec{X}^{t}, \vec{b}^{t} | \vec{z}^{t-1})
 \end{equation*}
-with $A = \{ \vec{x} = x_1, \dots, x_N \; \text{\: s.t. \: } x_s = z_s^t \text{\: if \:} z_s^t = 1 \text{\: and \:} x_s \in \{ 0,1 \} \text{\: if \:} z_s^t = - \}$}.
+with $A = \{ \vec{X}^t \in 2^{t \times M} | x^i_m = 1 \mbox{ whenever } z_{im}^t = 1 \}$.
 
-The prior for time $t$, $q(\vec{X}^{t}, \vec{z}^t | \vec{Z}^{t-1})$ represents our knowledge about the state before we observe $\vec{z}^{t}$ and can be written as
+The prior for time $t$, $q(\vec{X}^{t}, \vec{b}^t | \vec{z}^{t-1})$ represents our knowledge about $(\vec{X}^{t}, \vec{b}^t)$ before we observe $\vec{z}^{t}$ and can be written as
 \begin{align}
-    & q(\vec{X}^{t}, \vec{z}^{t} | \vec{Z}^{t-1}) = p(\vec{z}^{t} | \vec{X}^{t}, \vec{Z}^{t-1}) p(\vec{x}^{t} | \vec{X}^{t-1}) p(\vec{X}^{t-1} | \vec{Z}^{t-1}) \label{eq:3}
+    & q(\vec{X}^{t}, \vec{b}^{t} | \vec{z}^{t-1}) = g(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) f(\vec{x}^{t} | \vec{x}^{t-1}) p(\vec{X}^{t-1}, \vec{b}^{t-1} | \vec{Z}^{t-1}). \label{eq:3}
 \end{align}
-since the process $x$ does not depend on the observations, so $p(\vec{x}^{t} | \vec{X}^{t-1}, \vec{Z}^{t-1}) = p(\vec{x}^{t} | \vec{X}^{t-1})$.
-
-The distribution for the observations will be:
+The distribution for the observations is:
 \begin{align*}
-    & p(\vec{z}^{t} | \vec{X}^{t}, \vec{Z}^{t-1}) = p(\vec{z}^{t} | \vec{x}^{t}, \vec{z}^{t-1}) \\
-    & = p_R(\vec{z}^{t} | \vec{x}^{t}, \vec{z}^{t-1}) p_L(\vec{z}^{t} | \vec{x}^{t}, \vec{z}^{t-1})
+    & g(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) = g_R(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) g_L(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1})
 \end{align*}
-where $p_R(\vec{z}^{t} | \vec{x}^{t}, \vec{z}^{t-1})$ is the probability of detecting invaders on the right of the cells previously observed as invaded and $p_L(\vec{z}^{t} | \vec{x}^{t}, \vec{z}^{t-1})$ is the probability of detecting invaders on the left of the cells previously observed as invaded. These two events are independent.
+where $g_R(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1})$ is the probability of detecting invaders on the right of the cells previously observed as infested and $g_L(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1})$ is the probability of detecting invaders on the left of the cells previously observed as infested. These two events are independent.
 
-Let $a^{t}$ be the largest integer in the set $\{ s : z_s^{t} = 1 \}$, that is, the index of the highest numbered cell at which the invader has been observed at time $t$ on the right of the invasion. Then the number of new probes at which the invader is successfully detected at time $t$ is $a^{t} - a^{t-1}$. Probing on the right can stop in two ways: either because all invaded sites on the right have been found, in which case $p_R(\vec{z}^{t} | \vec{x}^{t}, \vec{z}^{t-1}) = \varphi^{a^{t} - a^{t-1}}$, or because the last probe on the right failed to detect an invaded cell, in which case $p_R(\vec{z}^{t} | \vec{x}^{t}, \vec{z}^{t-1}) = \varphi^{a^{t} - a^{t-1}} (1 - \varphi)$.
+Let $a^{t}$ be the largest integer in the set $\{ m : b_{tm}^{t} = 1 \}$, that is, the index of the highest numbered cell at which the invader has been observed at time $t$ on the right of the invasion. Then the number of new probes at which the invader is successfully detected at time $t$ is $a^{t} - a^{t-1}$. Probing on the right can stop in two ways: either because all invaded sites on the right have been found, in which case $g_R(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) = \varphi^{a^{t} - a^{t-1}}$, or because the last probe on the right failed to detect an invaded cell, in which case $g_R(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) = \varphi^{a^{t} - a^{t-1}} (1 - \varphi)$.
 
-Similarly, let now $c^{t}$ be the smallest integer in the set $\{ s : z_s^{t} = 1 \}$, that is, the index of the smallest cell at which the invader has been observed at time $t$ on the left of the invasion. Then the number of new probes at which the invader is successfully detected at time $t$ is $c^{t} - c^{t-1}$.
+Similarly, let $c^{t}$ be the smallest integer in the set $\{ m : b_{tm}^{t} = 1 \}$, that is, the index of the smallest cell at which the invader has been observed at time $t$ on the left of the invasion. Then the number of new probes at which the invader is successfully detected at time $t$ is $c^{t} - c^{t-1}$.
 
 The distribution for the observation will therefore be:
 \begin{align*}
-    p(\vec{z}^{t} | \vec{x}^{t}, \vec{z}^{t-1}) = &\varphi^{(a^{t} - a^{t-1})} \bigg(1 - \varphi \bigg)^{1-\one {a^{t}=\gamma^{t}}}\\
+    g(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) = &\varphi^{(a^{t} - a^{t-1})} \bigg(1 - \varphi \bigg)^{1-\one {a^{t}=\gamma^{t}}}\\
     &\varphi^{(c^{t} - c^{t-1})} \bigg( 1 - \varphi \bigg)^{1-\one {c^{t}=\beta^{t}}}
 \end{align*}
 were $\gamma^{t}$ is the limit of the invasion on the right and $\beta^{t}$ is the limit of the invasion on the left. Notice that for simplicity we will assume that we observe the beginning of the invasion at time $t=1$. 
 
-The distribution for the invasion if the expansion can happen in two directions is:
+The distribution $f(\vec{x}^{t} | \vec{x}^{t-1})$ if the expansion can happen in two directions is:
 \begin{equation*}
-    p(\vec{x}^{t} | \vec{X}^{t-1}) = p(\vec{x}^{t} | \vec{x}^{t-1}) = p_R(\vec{x}^{t} | \vec{x}^{t-1}) p_L(\vec{x}^{t} | \vec{x}^{t-1}) 
+    f(\vec{x}^{t} | \vec{x}^{t-1}) = f_R(\vec{x}^{t} | \vec{x}^{t-1}) f_L(\vec{x}^{t} | \vec{x}^{t-1}) 
 \end{equation*}
-separating the expansion on the left and on the right of the invasion.
-These two expansions are independent. Then, $p_R(\vec{x}^{t} | \vec{x}^{t-1}) = \theta$ if the invasion has expanded one cell to the right, and $p_R(\vec{x}^{t} | \vec{x}^{t-1}) = 1 - \theta$ if no expansion to the right has occurred, and it's 0 for any other $\vec{x}^{t}$. The same applies to the expansion on the left.
-
-Therefore,
+separating the expansion on the left and on the right of the invasion, since
+these two expansions are independent. Then, $f_R(\vec{x}^{t} | \vec{x}^{t-1}) = \theta$ if the invasion has expanded one cell to the right, and $f_R(\vec{x}^{t} | \vec{x}^{t-1}) = 1 - \theta$ if no expansion to the right has occurred, and $f_R(\vec{x}^{t} | \vec{x}^{t-1}) = 0$ for any other $\vec{x}^{t}$. The same applies to the expansion on the left. Therefore,
 \begin{align*}
-    p(\vec{x}^{t} | \vec{X}^{t-1}) &= p_R(\vec{x}^{t} | \vec{x}^{t-1}) p_L(\vec{x}^{t} | \vec{x}^{t-1})\\
+    f(\vec{x}^{t} | \vec{x}^{t-1}) &= f_R(\vec{x}^{t} | \vec{x}^{t-1}) f_L(\vec{x}^{t} | \vec{x}^{t-1})\\
     & = \theta^{k} (1-\theta)^{1-k}\theta^{h} (1-\theta)^{1-h} 
 \end{align*}
-with $k \in \{0,1\}$ and $h \in \{0,1\}$, {\color{blue} where $k$ is 1 if the invasion expanded one cell to the right and $h$ is 1 if the invasion expanded one cell to the left.}
+with $k \in \{0,1\}$ and $h \in \{0,1\}$, where $k = 1$ if the invasion expanded one cell to the right and $k = 0$ otherwise, and $h = 1$ if the invasion expanded one cell to the left and $h = 0$ otherwise.
 
 Substituting and expanding the recursion in equation \eqref{eq:3} we have
-
 \begin{align}
-    & q(\vec{X}^{t},\vec{z}^{t} | \vec{Z}^{t-1}) =  \prod_{i=2}^{t} \varphi^{(a^{i} - a^{i-1})}\bigg(1 - \varphi \bigg)^{1-\one {a^i=\gamma^i}} \nonumber \\
+    & q(\vec{X}^{t},\vec{b}^{t} | \vec{b}^{t-1}) =  \prod_{i=2}^{t} \varphi^{(a^{i} - a^{i-1})}\bigg(1 - \varphi \bigg)^{1-\one {a^i=\gamma^i}} \nonumber \\
     & \varphi^{(c^{i} - c^{i-1})} \bigg(1 - \varphi\bigg)^{1-\one {c^i=\beta^i}} \; \prod_{i=2}^{\min\{t,r\}} \theta^{k_i} (1-\theta)^{1-k_i}  \label{eq:4} \\ 
     & \prod_{i=2}^{\min\{t,l\}} \theta^{h_i} (1-\theta)^{1-h_i} \nonumber
 \end{align}
-where $l$ is the time at which the invasion has reached the left end of the modelled region, $r$ is the time at which the invasion has reached the right end of the modelled region, {\color{blue} $k_i \in \{0,1\}$ and $h_i \in \{0,1\}$ where $k_i$ is 1 if the invasion expanded one cell to the right at time $i$ and $h_i$ is 1 if the invasion expanded one cell to the left at time $i$}.
+where $l$ is the time at which the invasion has reached the left end of the modelled region, $r$ is the time at which the invasion has reached the right end of the modelled region, $k_i \in \{0,1\}$ and $h_i \in \{0,1\}$ where $k_i = 1$  if the invasion expanded one cell to the right at time $i$ and $k_i = 0$ otherwise, and $h_i = 1$ if the invasion expanded one cell to the left at time $i$ and $h_i = 0$ otherwise.
 
-Similarly to the AR(1) model, since our corrections are deterministic, the unnormalised weights are calculated as follows:
+
+
+
+
+
+
+For each particle j, the partial weights at time t are calculated with the following formula
+
 \begin{equation*}
-    w^{t}_i = \frac{q(\vec{(X')}^{t}_i,\vec{(z')}^{t}_i | \vec{Z}^{t-1})}{q(\vec{X}^{t}_i,\vec{z}^{t}_i | \vec{Z}^{t-1})}
+    w_{1j}^t = 1
 \end{equation*}
-where the primed are the corrected terms. Again, there will be many cancellations in the calculations of the weights.
 
-Figure 2 shows a series of heat maps for 3 possible invasions and observations simulated from the distributions in the river example. The map is a visualization of the probability of finding an invader in each location at each time for different values of the observation parameter $\varphi$ but for the same value of the expansion  parameter $\theta$. The length of the vertical axis represents the time at which the simulated invasion reached an end and all cells are occupied: for example in figure A1 at time 165 in the simulated invasion all the cells are invaded. The image shows how we get a more accurate representations of the invasion with a higher number of observations. We can also see that the algorithm becomes less accurate when we have only few observations.
+\begin{align*}
+    w_{ij}^t = & \frac{\varphi^{(a')^i} \Big(1-\varphi \Big)^{1-\one {(a')^i = \gamma^i}} \varphi^{(c')^i}(1-\varphi)^{1-\one {(c')^i = \beta^i}}}{\varphi^{a^i} \Big(1-\varphi \Big)^{1-\one {a^i = \gamma^i}} \varphi^{c^i} \Big(1-\varphi \Big)^{1-\one {c^i = \beta^i}}} \\ \nonumber
+    & \Bigg(\frac{\theta^{(k')_i} (1-\theta )^{1-(k')_i} }{ \theta^{k_i} (1-\theta )^{1-k_i}} \Bigg)^{\one {i \leq min\{ t, r\}} } \\ \nonumber
+    & \Bigg( \frac{ \theta^{(h')_i} (1-\theta )^{1-(h')_i} }{ \theta^{h_i} (1-\theta )^{1-h_i} } \Bigg)^{\one {i \leq min\{ t, l\}}}.
+\end{align*}
+%Similarly to the AR(1) model, since our corrections are deterministic, the unnormalised weights are calculated as follows:
+%\begin{equation*}
+%    w^{t}_i = \frac{q(\vec{(X')}^{t}_i,\vec{(b')}^{t}_i | \vec{b}^{t-1})}{q(\vec{X}^{t}_i,\vec{b}^{t}_i | \vec{b}^{t-1})}
+%\end{equation*}
+%where the primed are the corrected terms. Again, there will be many cancellations in the calculations of the weights.
+Figure 2 shows a series of heat maps for 3 possible invasions and observations simulated from the distributions in the river example. The map is a visualization of the probability of finding an invader in each location at each time for different values of the observation parameter $\varphi$ but for the same value of the expansion  parameter $\theta$. The length of the vertical axis represents the time at which the simulated invasion reached an end and all cells are occupied: for example in figure A1 at time 165 in the simulated invasion all the cells are invaded. The image shows how we get a more accurate representation of the invasion with a higher number of observations. We can also see that the algorithm becomes less accurate when we have only few observations.
 
 \begin{figure*}
     \subfloat[fig 1]{\includegraphics[width=0.5\linewidth]{ar1_001.PNG}}
@@ -703,6 +620,10 @@ Figure 2 shows a series of heat maps for 3 possible invasions and observations s
     \caption{RIVER INVASION: Simulations with 1,000 particles and 50 cells of 3 possible river invasions all with probability of invasion $\theta = 0.3$ but with different values of the parameter $\varphi$ for the probability of the observations. Figures A1, B1 and C1 show the simulations of the 3 invasions while figures A2, B2 and C2 show the same simulations but with the observations superimposed in red. A1 and A2 show the invasion with $\varphi = 0.3$, B1 and B2 show the invasion with $\varphi = 0.1$. Figure C1 and C2 show the invasion with $\varphi = 0.8$.}
     \label{fig:2}
 \end{figure*}
+
+
+
+
 
 \section{Conclusions and further developments}
 \label{sec:9}
@@ -783,48 +704,53 @@ Zhang, X., Khwaja A. S., Luo J., Housfater A.S., Anpalagan A.: Multiple Imputati
 \clearpage
 \appendix
 
+
+
+
+
+
 \begin{algorithm}[H]
-\caption{SIR with corrections for an AR(1) model}\label{euclid}
+\caption{SIR with corrections for an AR(1) model}\label{SIR_AR1}
  \begin{algorithmic}
 
  \State  \bf{Initialize:} \normalfont At time t = 1
             
 \begin{enumerate}
-	\item For $i = 1, \dots , n$
+	\item For $j = 1, \dots , n$
 	\begin{enumerate}
-		\item Sample $(x_{1})_i \sim \mathcal{N} \Bigg (0, \frac{\sigma^2}{1- \varphi^2} \Bigg)$ and $(b_1)_i \sim Bernoulli(\theta)$
+		\item Sample $(x_{1})_j \sim \mathcal{N} \Bigg (0, \frac{\sigma^2}{1- \varphi^2} \Bigg)$ and $(b_1)_j \sim Bernoulli(\theta)$
 		\item Evaluate the importance weights up to a normalising constant:
 		\[
-		\tilde{w}^{1}_{i} = 1
+		\tilde{w}^{1}_{j} = 1
 		\]
 	\end{enumerate}
-	\item For $i = 1, \dots , n$ normalise the importance weights: 
+	\item For $j = 1, \dots , n$ normalise the importance weights: 
 	\[
-	w^{1}_{i} = \frac{1}{n}
+	w^{1}_{j} = \frac{1}{n}
 	\]
 \end{enumerate}
 
  \State  \bf{Iterate:} \normalfont For $t$ from 2 to $N$
 
 \begin{enumerate}
-	\item For $i = 1, \dots , n$
+	\item For $j = 1, \dots , n$
 	\begin{enumerate}
-  		\item sample $(x_t)_i \sim \mathcal{N} (\varphi (x_{t-1})_i, \sigma^{2})$ and $b^t_{i} \sim Bernoulli(\theta)$.
-		\item {Correct every element of $\vec{x}^t_i$ in light of the data $\vec{z}^t$ to obtain new samples $(\vec{x'})^t_i$ directly substituting the new data: for $s = 1, \dots ,t$ if $(z^t)_s \neq -$, $((x')_i^t)_s = (z^t)_s$ else if $(z^t)_s = -$, $((x')_i^t)_s = (x^t_i)_s$.}
-		\item Correct every element of $\vec{b}_i^t$ in light of the data $\vec{z}^t$ to obtain new samples $(\vec{b'})^t_i$ substituting 0s when $(z^t)_s = -$ and 1s otherwise for $s = 1, \dots, t$.
-		\item Evaluate the weights up to a normalising constant using equation (\ref{eq:2}):
+  		\item sample $(x_t)_j \sim \mathcal{N} (\varphi (x_{t-1})_j, \sigma^{2})$ and $b^t_{j} \sim Bernoulli(\theta)$.
+		\item {Correct every element of $\vec{x}^t_j$ in light of the data $\vec{z}^t$ to obtain new samples $(\vec{x'})^t_j$ directly substituting the new data: for $s = 1, \dots ,t$ if $(z^t)_s \neq -$, $((x')_j^t)_s = (z^t)_s$ else if $(z^t)_s = -$, $((x')_j^t)_s = (x^t_j)_s$.}
+		\item Correct every element of $\vec{b}_i^t$ in light of the data $\vec{z}^t$ to obtain new samples $(\vec{b'})^t_j$ substituting 0s when $(z^t)_s = -$ and 1s otherwise for $s = 1, \dots, t$.
+		\item Evaluate the weights up to a normalising constant using equations (\ref{eq:w1}) (\ref{eq:w2}):
 		\[
-		\tilde{w}^{t}_{i} = \frac{q(\vec{(x')}^{t}_i, \vec{(B')}^{t}_i | \vec{Z}^{t-1})}{q(\vec{x}^{t}_i, \vec{B}^{t}_i | \vec{Z}^{t-1})}
+		\tilde{w}^{t}_{j} = \frac{q(\vec{(x')}^{t}_j, \vec{(B')}^{t}_j | \vec{Z}^{t-1})}{q(\vec{x}^{t}_j, \vec{B}^{t}_j | \vec{Z}^{t-1})}
 		\]
 	\end{enumerate}
-	\item For $i = 1, \dots , n$ normalise the importance weights:
+	\item For $j = 1, \dots , n$ normalise the importance weights:
 	\[
-	w^{t}_{i} = \frac{\tilde{w}^t_i}{\sum_{k=1}^{n}\tilde{w}^{t}_k}
+	w^{t}_{j} = \frac{\tilde{w}^t_j}{\sum_{k=1}^{n}\tilde{w}^{t}_k}
 	\]
 	\item Perform resampling
 	\begin{enumerate}
 	    \item Draw $n$ particles from the current particle set with probabilities proportional to their weights. Replace the current particle set with the new $n$ particles.
-	    \item Set $w^t_i=1/n$
+	    \item Set $w^t_j=1/n$
 	\end{enumerate}
 \end{enumerate}
   
@@ -832,49 +758,55 @@ Zhang, X., Khwaja A. S., Luo J., Housfater A.S., Anpalagan A.: Multiple Imputati
 \end{algorithm}
 
 \begin{algorithm}[H]
-\caption{SIR with corrections for an river invasion}\label{euclid}
+\caption{SIR with corrections for an river invasion}\label{SIR_River}
  \begin{algorithmic}
 
- \State  \bf{Initialize:} \normalfont At time t = 1
+
+
+
+
+
+
+\State  \bf{Initialize:} \normalfont At time t = 1
             
 \begin{enumerate}
-	\item For $i = 1, \dots , n$
+	\item For $j = 1, \dots , n$
 	\begin{enumerate}
 	    \item For $s = 1, \dots, N$
-		First observation $z_m$ known: For each particle, at time 1, fill the invasion vector of $\vec{x}_i^t$ size N with $(x_{m})^1_i = 1$ and $(x_{s})^1_i = 0$ if $s \neq m$. 
-		For each particle, at time 1, fill the invasion vector $\vec{z}_i^t$ of size N with $(z_m)^1_i = 1$ and $(z_{s})^1_i = 0$ if $s \neq m$.
+		First observation $z_{\mu}$ known: For each particle, at time 1, fill the invasion vector of $\vec{x}_j^t$ size N with $(x_{\mu})^1_j = 1$ and $(x_{s})^1_j = 0$ if $s \neq \mu$. 
+		For each particle, at time 1, fill the invasion vector $\vec{z}_j^t$ of size N with $(z_{\mu})^1_j = 1$ and $(z_{s})^1_j = 0$ if $s \neq \mu$.
 		\item Evaluate the importance weights up to a normalising constant:
 		\[
-		\tilde{w}^{1}_{i} = 1
+		\tilde{w}^{1}_{j} = 1
 		\]
 	\end{enumerate}
-	\item For $i = 1, \dots , n$ normalise the importance weights: 
+	\item For $j = 1, \dots , n$ normalise the importance weights: 
 	\[
-	w^{1}_{i} = \frac{1}{n}
+	w^{1}_{j} = \frac{1}{n}
 	\]
 \end{enumerate}
 
  \State  \bf{Iterate:} \normalfont For $t$ from 2 to $T$
 
 \begin{enumerate}
-	\item For $i = 1, \dots , n$
+	\item For $j = 1, \dots , n$
 	\begin{enumerate}
-  		\item Sample $(r)^t_i \sim Bernoulli(\theta)$ and $(l)^t_i \sim Bernoulli(\theta)$. For $s = 1, \dots, N$ for each particle, at time t, fill the invasion vector $\vec{x}_i^t$ of size N with the values of $\vec{x}_i^{t-1}$ then substitute $(x_s)^t_i = (r)^t_i$ for $s$ s.t. $(x_{s-1})^{t-1}_i = 1$ and $(x_s)^{t-1}_i = 0$ and substitute $(x_s)^t_i = (l)^t_i$ for $s$ s.t. $(x_s)^{t-1}_i = 0$ and $(x_{s+1})^{t-1}_i = 1$.
-  		\item Sample k elements $(a_k)^t_i \sim Bernoulli(\varphi)$ until the first 0 is sampled, and h elements $(b_h)^t_i \sim Bernoulli(\varphi)$ until the first 0 is sampled. For $s = 1, \dots, N$ for each particle, at time t, fill the observation vector $\vec{z}_i^t$ of size N with the values of $\vec{z}_i^{t-1}$ then substitute the k elements $(z_{s+k})^t_i = (r)^t_i$ for $s$ s.t. $(z_{s-1})^{t-1}_i = 1$ and $(z_s)^{t-1}_i = 0$ and substitute the h elements $(z_{s-h})^t_i = (l)^t_i$ for $s$ s.t. $(z_s)^{t-1}_i = 0$ and $(z_{s+1})^{t-1}_i = 1$.
-		\item Correct every element of $\vec{x}^t_i$ in light of the data $\vec{z}^t$ to obtain new samples $(\vec{x'})^t_i$ directly substituting the new data: for $s = 1, \dots ,N$ if $(z^t)_s = 1$, $((x')_i^t)_s = 1$ else if $(z^t)_s = 0$, $((x')_i^t)_s = (x^t_i)_s$. Correct every element of $\vec{z}^t_i$ in light of the data $\vec{z}^t$ to obtain $(\vec{z'})^t_i$ simply substituting $(\vec{z'})^t_i$ with $\vec{z}^t$.
+  		\item Sample $(r)^t_j \sim Bernoulli(\theta)$ and $(l)^t_j \sim Bernoulli(\theta)$. For $s = 1, \dots, N$ for each particle, at time t, fill the invasion vector $\vec{x}_j^t$ of size N with the values of $\vec{x}_j^{t-1}$ then substitute $(x_s)^t_j = (r)^t_j$ for $s$ s.t. $(x_{s-1})^{t-1}_j = 1$ and $(x_s)^{t-1}_j = 0$ and substitute $(x_s)^t_j = (l)^t_j$ for $s$ s.t. $(x_s)^{t-1}_j = 0$ and $(x_{s+1})^{t-1}_j = 1$.
+  		\item Sample k elements $(a_k)^t_j \sim Bernoulli(\varphi)$ until the first 0 is sampled, and h elements $(b_h)^t_j \sim Bernoulli(\varphi)$ until the first 0 is sampled. For $s = 1, \dots, N$ for each particle, at time t, fill the observation vector $\vec{z}_j^t$ of size N with the values of $\vec{z}_j^{t-1}$ then substitute the k elements $(z_{s+k})^t_j = (r)^t_j$ for $s$ s.t. $(z_{s-1})^{t-1}_j = 1$ and $(z_s)^{t-1}_j = 0$ and substitute the h elements $(z_{s-h})^t_j = (l)^t_j$ for $s$ s.t. $(z_s)^{t-1}_j = 0$ and $(z_{s+1})^{t-1}_j = 1$.
+		\item Correct every element of $\vec{x}^t_j$ in light of the data $\vec{z}^t$ to obtain new samples $(\vec{x'})^t_j$ directly substituting the new data: for $s = 1, \dots ,N$ if $(z^t)_s = 1$, $((x')_j^t)_s = 1$ else if $(z^t)_s = 0$, $((x')_j^t)_s = (x^t_j)_s$. Correct every element of $\vec{z}^t_j$ in light of the data $\vec{z}^t$ to obtain $(\vec{z'})^t_j$ simply substituting $(\vec{z'})^t_j$ with $\vec{z}^t$.
 		\item Evaluate the weights up to a normalising constant using the values for $q$ from equation (\ref{eq:4}):
 		\[
-		\tilde{w}^{t}_{i} = \frac{q(\vec{(X')}^{t}_i, \vec{(z')}^{t}_i | \vec{Z}^{t-1})}{q(\vec{X}^{t}_i, \vec{z}^{t}_i | \vec{Z}^{t-1})}
+		\tilde{w}^{t}_{j} = \frac{q(\vec{(X')}^{t}_j, \vec{(z')}^{t}_j | \vec{Z}^{t-1})}{q(\vec{X}^{t}_j, \vec{z}^{t}_j | \vec{Z}^{t-1})}
 		\]
 	\end{enumerate}
-	\item For $i = 1, \dots , n$ normalise the importance weights:
+	\item For $j = 1, \dots , n$ normalise the importance weights:
 	\[
-	w^{t}_{i} = \frac{\tilde{w}^t_i}{\sum_{k=1}^{n}\tilde{w}^{t}_k}
+	w^{t}_{j} = \frac{\tilde{w}^t_j}{\sum_{k=1}^{n}\tilde{w}^{t}_k}
 	\]
 	\item Perform resampling
 	\begin{enumerate}
 	    \item Draw $n$ particles from the current particle set with probabilities proportional to their weights. Replace the current particle set with the new $n$ particles.
-	    \item Set $w^t_i=1/n$
+	    \item Set $w^t_j=1/n$
 	\end{enumerate}
 \end{enumerate}
   
@@ -886,7 +818,7 @@ Zhang, X., Khwaja A. S., Luo J., Housfater A.S., Anpalagan A.: Multiple Imputati
 
 Define a probability measure $\P^*$ having density $p^*$ on $\Omega^*_t$ such that the marginal distribution of $\P^*$ on $\Omega_t'$ is $\P$, that is $\P = \P^* \circ \pi^{-1}$, where $\P$ is the measure with density $p$ on $\Omega_t'$. (Here the measurable sets in $\Omega_t$, $\Omega_t'$ and $\Omega_t^*$, are constructed from Borel sets on $\Real^M$ and subsets of $2^M$ in the manner implied by the sequence of cross-products and restrictions used to define $\Omega_t$, $\Omega_t'$ and $\Omega_t^*$. Similarly, reference measures are constructed from Lebesgue measure on $\Real^M$ and counting measure on $2^M$.)
 
-By the disintegration theorem (see \cite{Rohlin}) there exists a family of measures $\{ \nu_{\vec{(y')}^t} \}_{\vec{(y')}^t \in \Omega'{\color{red}_t}}$ on $\Omega^*{\color{red}_t}$ such that for every measurable Borel function $m : \Omega^*_t \rightarrow [0, \infty]$
+By the disintegration theorem (see \cite{Rohlin}) there exists a family of measures $\{ \nu_{\vec{(y')}^t} \}_{\vec{(y')}^t \in \Omega'_t}$ on $\Omega^*_t$ such that for every measurable Borel function $m : \Omega^*_t \rightarrow [0, \infty]$
 \begin{align*}
     &\int_{\Omega^*_t} m(\vec{(y')}^t, \vec{y}^t)\diff \P^* = \\
     & \int_{\Omega_t'} \bigg( \int_{\pi^{-1}(\vec{(y')}^t)} m(\vec{(y')}^t, \vec{y}^t) \diff \nu_{\vec{(y')}^t}  \bigg) \diff \P((\vec{y'})^t).
@@ -911,5 +843,3 @@ Moreover,
 
 
 \end{document}
-
-notice 

@@ -77,25 +77,33 @@
 \begin{document}
 
 
-In many data analysis tasks we will want to estimate unknown quantities from some give observations. We usually also have some prior information about the phenomenon we want to analyse, and this allow us to formulate Bayesian models to make inferences on the unknown quantities from the posterior distribution of those models. However, this posterior distribution often does not have a closed form and cannot be evaluated analytically. When this happens we can employ Monte Carlo methods, a class of computational algorithms used to generate approximate solutions through repeated random sampling to problems where analytical solutions don't exist or are hard to implement.
+We are now going to introduce the Particle Filtering and Smoothing techniques of which our new Sequential Importance Sampling with correction is a new application.
+The literature is rich with books and tutorials on the theory and applications of Particle Filters of which we cite only a few (\cite{DoucetBook}, \cite{DoucetTutorial} \cite{Speekenbrink} .....). Here we are just trying to introduce to the reader the relevant concepts of Filtering and Smoothing techniques necessary to understand our approach introduced in chapter \ref{ch:SIS}
+
+
+\section{Hidden Markov Models} \label{sec:HMM}
+
+In many data analysis tasks we will want to estimate unknown quantities from some give observations. We usually also have some prior information about the phenomenon we want to analyse, and this allow us to formulate Bayesian models to make inferences on the unknown quantities from the posterior distribution of those models. However, this posterior distribution often does not have a closed form and cannot be evaluated analytically. When this happens we can employ Monte Carlo methods, a class of computational algorithms used to generate approximate solutions through repeated random sampling (see Chapter \ref{sec:MonteCarlo}).
 
 Often the observations that we receive arrive sequentially in time and we will want to perform inference on-line, i.e. updating our predictions each time we receive new data. Sequential Monte Carlo (SMC) methods are a set of Monte Carlo algorithms that deal with this kind of problems. 
-Different SMC algorithms like boostrap filters, condensation, particle filters, Monte Carlo Filters, interacting particle approximations and survival of the fittest have been applied to a wide range of problems in many fields. For example in economics (cite), signal processing (cite), target tracking (cite), neuroscience (cite), and biology (cite) ... to name a few. In particular for invasive species ...
+Different SMC algorithms like boostrap filters, condensation, particle filters, Monte Carlo Filters, interacting particle approximations and survival of the fittest, have been applied to a wide range of problems in many fields. For example in economics (cite), signal processing (cite), target tracking (cite), neuroscience (cite), and biology (cite) ... to name a few. In particular for invasive species ...
 
-Stochastic Particle Algorithms are a type of SMC methods used for solving State Space Models also called Hidden Markov Models (HMM). State space models will contain two sequence of random variable: the hidden or unobserved state and a sequence of noisy observations. The hidden states, $\{ X_t \}$ with $t \in \mathbb{N}$ and $X_t \in \mathcal{X}$ (VVV define $\mathcal{X}$) will be modelled from a discrete-time Markov process (VVV deifne a Markov process) with initial distribution $\mu(x_1)$ and transition equation $f(x_t | x_{t-1})$ representing the probability distribution associated with moving from one state to the next. Notice that the densities are all with respect to a dominating measure that we will denote, with abuse of notation $\d x_t$. The observations $\{ Y_t \}$ with $t \in \mathbb{N}$ and $Y_t \in \mathcal{Y}$ will depend only on $x_t$ and will have marginal distribution $g(y_t | x_t)$ with respect to a dominating measure $\d y_t$. For simplicity we will consider only the homogeneous case where the transition and the observation densities are independent of the time index $t$. The generalization to the non homogeneous case is straightforward. In summary the model is described by
+Stochastic Particle Algorithms are a type of SMC methods used for solving General State Space Models (SSM) also called Hidden Markov Models (HMM). State space models will contain two sequences of random variable: the hidden or unobserved state and a sequence of noisy observations. 
 
-\begin{align*}
-    & X_1 \sim \mu(x_1), \nonumber \\
+The hidden process $\vec{X} = \{X_t : t \in T = \mathbb{N}^* \}$ is a discrete Markov process, so its future is independent of the past given the present. More formally $\vec{X}$ is a stochastic process on a topological measure space $(\Omega, \mathcal{F})$ with state space $(\mathcal{X}, \mathcal{S})$, so $X_t \in \mathcal{X}$ is the state of the system at time $t \in T$ and we also assume that we have a collection of $\sigma$-algebras $\mathcal{F}_t$ with the property that $X_t$ is measurable with respect to $\mathcal{F}_t$ for $t \in T$ and $\mathcal{F}_t \subseteq \mathcal{F}_{t+1}$. Intuitively $\mathcal{F}_t$ is the collection of all events up to time $t \in T$. A discrete Markov process is such that for a probability measure $\mathbb{P}$ we have $\mathbb{P}(X_{t+1} \in A | \mathcal{F}_t) = \mathbb{P}(X_{t+1} \in A | X_t)$ for all $t \in T$ and $A \in \mathcal{S}$. This process has initial probability distribution function $\mu(x_1)$ and transition probability distribution function $f(x_t | x_{t-1})$ representing the probability distribution associated with moving from one state to the next. Here the probability densities are defined with respect to a dominating measure that with abuse of notation we denote $\d x_t$. 
+
+The observations process $\vec{Y} = \{Y_t : t \in T = \mathbb{N}^* \}$ is a stochastic process with state space $\mathcal{Y}$ for which the observations $Y_t$ at time $t$ are independent of all previous times, but will depend on the state of the hidden process $X_t$. The marginal densities with respect to a dominating measure $\d y_t$ will be $g(y_t | x_t)$.
+
+For simplicity here we will consider only the homogeneous case where the transition and the observation densities are independent of the time index $t$ but the argument can be generalised to the non-homogeneous case. 
+
+In summary the model is described by
+
+\begin{align}
+    & X_1 \sim \mu(x_1), \label{eq:1X_1}\\
     & X_t | (X_{t-1} = x_{t-1}) \sim f(x_t | x_{t-1}) \quad \text{for} \quad t\geq 1, \label{eq:1X_t} \\ 
     & Y_t | (X_t = x_t) \sim g(y_t | x_t) \quad \text{for} \quad t\geq 1. \label{eq:1Y_t}
-\end{align*}
-The equations above determine a Bayesian model in which the first two define a prior distribution of the hidden process $\{ X_t \}$ and the last one defines the likelihood function:
-
-\begin{align*}
-    & p(x_1, \dots, x_t) = \mu(x_1) \prod_{k=2}^t f(x_k | x_{k-1}), \\
-    & p(y_1, \dots, y_t | x_1, \dots, x_t) = \prod_{k=1}^t g(y_k | x_k).
-\end{align*}
-In particular for a linear and Gaussian model we have $\mathcal{X} = \mathbb{R}^{t_x}$ and $\mathcal{Y} = \mathbb{R}^{t_y}$ with
+\end{align}
+As an important example, for a linear and Gaussian model we have $\mathcal{X} = \mathbb{R}^{t_x}$ and $\mathcal{Y} = \mathbb{R}^{t_y}$ with
 
 \begin{align*}
     X_1 &\sim \mathcal{N}(0, \Sigma),\\
@@ -104,15 +112,21 @@ In particular for a linear and Gaussian model we have $\mathcal{X} = \mathbb{R}^
 \end{align*}
 where $V_t \widesim{i.i.d.} \mathcal{N}(0, I_{t_v})$, $W_t \widesim{i.i.d.} \mathcal{N}(0, I_{t_w})$ and $A, B, C, D$ are matrices of appropriate dimensions. 
 
+The equations (\ref{eq:1X_1}), (\ref{eq:1X_t}) and (\ref{eq:1Y_t}) determine a Bayesian model in which the first two define a prior distribution of the hidden process $\{ X_t \}$ and the last one defines the likelihood function:
+
+\begin{align*}
+    & p(x_1, \dots, x_t) = \mu(x_1) \prod_{k=2}^t f(x_k | x_{k-1}), \\
+    & p(y_1, \dots, y_t | x_1, \dots, x_t) = \prod_{k=1}^t g(y_k | x_k).
+\end{align*}
 We generally look to address three classes of problems with SMC methods: filtering, smoothing and parameter estimation:
 
 \begin{itemize}
     \item Filtering and Marginal likelihood computation: we will want to sequentially approximate the distributions $\{ p(x_1, \dots, x_t | y_1, \dots, y_t) \}$ and the marginal likelihood $\{ p(y_1, \dots, y_t) \}$.
     \item Smoothing: we will want to estimate the past states of all available data, so we attempt to sample from a joint distribution $p(x_1, \dots, x_T | y_1, \dots, y_T)$ and approximate the associated marginals $\{ p(x_n | y_1, \dots, y_T)\}$ with $n = 1, \dots, T$. Notice that in general particle filtering technique can be used to solve this problems but perform poorly when $T$ is large \cite{DoucetTutorial}.
-    \item Parameter estimation: in addition to estimate the states we might also want to estimate the unknown parameter from the data.
+    \item Parameter estimation: in addition to estimating the states we might also want to estimate the unknown parameter from the data.
 \end{itemize}
 
-Here we will focus on the filtering problem which is the what our new method addresses. The inference about the hidden values $(X_1, \dots, X_t)$ given the observations $(Y_1 = y_1, \dots, Y_t = y_t)$ relies on the evaluation of the posterior
+Let us consider first the filtering problem. The inference about the hidden values $(X_1, \dots, X_t)$ given the observations $(Y_1 = y_1, \dots, Y_t = y_t)$ relies on the evaluation of the posterior
 
 \begin{equation*}
     p(x_1, \dots, x_t | y_1, \dots, y_t) = \frac{p(x_1, \dots, x_t, y_1, \dots, y_t)}{p(y_1, \dots, y_t)}
@@ -136,7 +150,7 @@ thus the posterior can be written recursively as follows
 with
 
 \begin{equation} \label{eq:condobs}
-    p(y_t | y_1, \dots, y_{t-1}) = \int p(x_1, \dots, x_{t-1}| y_1, \dots, y_{t-1}) f(x_t|x_{t-1})g(y_t|x_t) \d (x_{t-1}, x_t).
+    p(y_t | y_1, \dots, y_{t-1}) = \int p(x_{t-1}| y_1, \dots, y_{t-1}) f(x_t|x_{t-1})g(y_t|x_t) \d (x_{t-1}, x_t).
 \end{equation}
 We can also introduce the prediction distribution $p(x_t | y_1, \dots, y_{t-1})$ integrating out $x_1, \dots, x_{t-1}$ in (\ref{eq:recpost}) obtaining
 
@@ -154,7 +168,7 @@ We have seen that $\{ p(x_1, \dots, x_t | y_1, \dots, y_t) \}$ can be computed s
     p(y_1, \dots, y_t) = p(y_1)\prod_{k=2}^t p(y_t | y_1, \dots, y_{t-1})
 \end{equation*}
 were $p(y_t | y_1, \dots, y_{t-1})$ was defined in (\ref{eq:condobs}).
-For finite state-spaces HMM where $Pr(X_1 = k) = \mu(k)$ and $Pr(X_t = k | X_{t-1} = l) = f(k|l)$ the integrals correspond to finite sums ant the discrete probability distributions can be computed exactly. 
+For finite state-spaces HMM where $Pr(X_1 = k) = \mu(k)$ and $Pr(X_t = k | X_{t-1} = l) = f(k|l)$ the integrals correspond to finite sums and the discrete probability distributions can be computed exactly. 
 
 When data can be modelled by a linear Gaussian state-space model we can derive exact analytical solutions using the Kalman Filter introduced by Rudolf Emil K\'alm\'an in 1960 \cite{Kalman}. However, data is often non-linear and non-Gaussian and therefore other methods have been developed to solve analytically this kind of models, like the Extendend Kalman Filter \cite{Anderson} \cite{Jazwinski}, the Gaussian sum approximation \cite{Soreson} and the grid-based filters \cite{Bucy}. The first two methods can lead to poor results, while the grid based one can lead to accurate results but can be hard to implement (while there is a citation here, it might be useful to understand and explain why those methods are not ideal in some settings). SMC methods offer an alternative method that is flexible, easy to implement, parallelisable and applicable in general settings\cite{DoucetBook}. The price to pay for this flexibility is the high computational cost that these algorithm require.
 
@@ -162,23 +176,30 @@ Particle filters (PF), introduced in 1993 by Gordon et al. \cite{Gordon} are a s
 
 We want to underline again that SMC methods are a general class of Monte Carlo Methods, and particle methods for filtering and smoothing are only examples, although the most common perhaps, of SMC algorithms \cite{DoucetTutorial}. SMC method sample sequentially from a succession of target probability densities $\{ \pi_t(x_1, \dots, x_t) \}$ of increasing dimension where each distribution $\pi_t(x_1, \dots, x_t)$ is defined on the product space $\mathcal{X}^t$. If we can write
 
-\begin{equation*}
+\begin{equation} \label{eq:pi1}
     \pi_t(x_1, \dots, x_t) = \frac{\gamma_t(x_1, \dots, x_t)}{Z_t}
-\end{equation*}
+\end{equation}
 were
 
-\begin{equation*}
+\begin{equation} \label{eq:Z1}
     Z_t = \int \gamma_t(x_1, \dots, x_t) \d (x_1, \dots, x_t)
-\end{equation*}
-might be unknown and we require that $\gamma_t : \mathcal{X}^t \rightarrow \mathbb{R}^+$ is known pointwise, SMC provide an approximation for $\pi_1(x_1)$ and an estimate of $Z_1$ at time 1 then an approximation of $\pi_2(x_1, x_2)$ and an estimate of $Z_2$ at time 2 and so on.
+\end{equation}
+might be unknown, and we require that $\gamma_t : \mathcal{X}^t \rightarrow \mathbb{R}^+$ is known pointwise, SMC provide an approximation for $\pi_1(x_1)$ and an estimate of $Z_1$ at time 1 then an approximation of $\pi_2(x_1, x_2)$ and an estimate of $Z_2$ at time 2 and so on.
 
 So, in the context of filtering we could have $\gamma_t(x_1, \dots, x_t) = p(x_1, \dots, x_t, y_1, \dots, y_t)$, $Z_t = p(y_1, \dots, y_t)$ and $\pi(x_1, \dots, x_t) = p(x_1, \dots, x_t | y_1, \dots, y_t)$, but this is only one possible choice of the target distribution.
 
-The literature on Sequential Monte Carlo methods and Particle Filters in particular is vast and continuously evolving. Here we want to mention \cite{} as only a few useful reference material on the subject.
+The literature on Sequential Monte Carlo methods and Particle Filters in particular is vast and continuously evolving. Here we want to mention \cite{DoucetBook} \cite{DoucetTutorial} \cite{Kantas} as only a few useful reference material on the subject.
 
-\section{Monte Carlo Methods}
+In the following chapters we give a quick definition of Monte Carlo methods and of Importance sampling. We then define the classical Sequential Importance Sampling filtering algorithm.
 
-Let us first assume that we can sample $N$ independent random variables form the density $\pi_t(x_1, \dots, x_t)$ for some fixed $t$, obtaining $N$ independent random variables $(X_1, \dots, X_t)^i \sim \pi_t(x_1, \dots, x_t)$ for $i = 1, \dots, N$. We can then approximate $\pi_t(x_1, \dots, x_t)$ with the empirical measure
+
+
+
+
+
+\section{Monte Carlo Methods} \label{sec:MonteCarlo}
+
+Let us first assume that we can sample $N$ independent random variables form a density $\pi_t(x_1, \dots, x_t)$ for some fixed $t$, obtaining $N$ independent random variables $(X_1, \dots, X_t)^i \sim \pi_t(x_1, \dots, x_t)$ for $i = 1, \dots, N$. We can then approximate $\pi_t(x_1, \dots, x_t)$ with the empirical measure
 
 \begin{equation*}
     \hat{\pi}_t(x_1, \dots, x_t) = \frac{1}{N} \sum_{i=1}^N \delta_{(X_1, \dots, X_t)^i}(x_1, \dots, x_t),
@@ -186,7 +207,7 @@ Let us first assume that we can sample $N$ independent random variables form the
 where $\delta_{X^l}(x)$ is the Dirac delta function located at $X^l$. Similarly we can approximate $\pi_t(x_k)$ so that
 
 \begin{equation*}
-    \hat{\pi}_t(x_k) = \frac{1}{N} \sum_{i=1}^N \delta_{X_t^i}(x_k),
+    \hat{\pi}_t(x_k) = \frac{1}{N} \sum_{i=1}^N \delta_{X_k^i}(x_k),
 \end{equation*}
 or the expectation of any function $\varphi_t : \mathcal{X}^t \rightarrow \mathbb{R}$ given by
 
@@ -196,46 +217,284 @@ or the expectation of any function $\varphi_t : \mathcal{X}^t \rightarrow \mathb
 can be estimated by
 
 \begin{equation*}
-    I^{MC}_t(\varphi_t) \coloneqq \int \varphi_t(x_1, \dots, x_t) \hat{\pi} (x_1, \dots, x_t) \d (x_1, \dots, x_t) = \frac{1}{N} \sum_{i=1}^N \varphi_t((X_1, \dots, X_t)^i).
+    I^{MC}_t(\varphi_t) \coloneqq \int \varphi_t(x_1, \dots, x_t) \hat{\pi}_t (x_1, \dots, x_t) \d (x_1, \dots, x_t) = \frac{1}{N} \sum_{i=1}^N \varphi_t((X_1, \dots, X_t)^i).
 \end{equation*}
 This estimate is unbiased as
 
 \begin{equation*}
-    E[I^{MC}_t(\varphi_t)] = \frac{1}{N}\sum_{i=1}^N E[\varphi_t((X_1, \dots, X_t)^i)] = \frac{1}{N} \sum_{i=1}^N I_t(\varphi_t) = I_t(\varphi_t)
+    E[I^{MC}_t(\varphi_t)] = \frac{1}{N} \sum_{i=1}^N I_t(\varphi_t(X_1, \dots, X_t)^i) = I_t(\varphi_t)
 \end{equation*}
-and is similarly easy to check that
+and since the variance is the expectation of the squared deviation of a random variable from its mean we also get.
 
 \begin{equation*}
     Var(I^{MC}_t(\varphi_t)) = \frac{1}{N} \bigg( \int \varphi^2(x_1, \dots, x_t) \pi(x_1, \dots, x_t) \d (x_1, \dots, x_t) - I^2_t(\varphi_t)\bigg).
 \end{equation*}
 
-\section{Importance Sampling}
+\section{Importance Sampling (IS)}
 
-Often, we cannot sample from $\pi_t (x_1, \dots, x_t)$. This problem can be solved using Importance Sampling, which is a form of Monte Carlo integration used to evaluate an intractable density that has the same support of a density from which we can sample. We will introduce an \textit{importance density} $q_t(x_1, \dots, x_t)$ such that
+Often, we cannot sample from $\pi_t (x_1, \dots, x_t)$. In this case we can use a form of Monte Carlo integration called Importance Sampling. To apply Importance Sampling we first introduce an \textit{importance density} (also known as \textit{proposal distribution} or \textit{importance function}) $q_t(x_1, \dots, x_t)$ whose support contains the support of $\pi_t (x_1, \dots, x_t)$ so that
 
 \begin{equation*}
     \pi_t(x_1, \dots, x_t) > 0 \Rightarrow q_t(x_1, \dots, x_t) > 0.
 \end{equation*}
-In this case we have
+and from which it is easy to sample. We can then write
 
-\begin{align*}
+\begin{align} \label{eq:pi2}
     &\pi_t(x_1, \dots, x_t) = \frac{w_t(x_1, \dots, x_t)q_t(x_1, \dots, x_t)}{Z_t}, \\
-    &Z_t = \int w_t(x_1, \dots, x_t)q_t(x_1, \dots, x_t) \d (x_1, \dots, x_t)
-\end{align*}
+    &Z_t = \int w_t(x_1, \dots, x_t)q_t(x_1, \dots, x_t) \d (x_1, \dots, x_t) \label{eq:Z2}
+\end{align}
 were $w_t(x_1, \dots, x_t)$ is the unnormalised weight function
 
+\begin{equation}
+    w_t(x_1, \dots, x_t) = \frac{\gamma_t(x_1, \dots, x_t)}{q_t(x_1, \dots, x_t)}
+\end{equation}
+also sometimes called \textit{likelihood ratio} of $\gamma_t$ and $q_t$ and that is the Radon-Nikodym derivative of the respective measures.
+
+Assume we draw $N$ independent samples from the importance distribution, $X^i_j \sim q_t(x_1, \dots, x_t)$ with $i = 1, \dots, N$ and $j = 1, \dots, t$. Substituting the empirical measure of the samples $X^i_j$ in equations (\ref{eq:pi2}) and (\ref{eq:Z2}) we have.
+
 \begin{equation*}
-    w_t(x_1, \dots, x_t) = \frac{\gamma_t(x_1, \dots, x_t)}{q_t(x_1, \dots, x_t)}.
+    \hat{\pi}_t(x_1, \dots, x_t) = \sum_{i=1}^N W_t^i \delta_{(X_1, \dots, X_t)^i}(x_1, \dots, x_t)
 \end{equation*}
-So we can choose the importance density from which it is easy to sample. Assume we draw $N$ independent samples $X^i_j \sim q_t(x_1, \dots, x_t)$ with $i = 1, \dots, N$ and $j = 1, \dots, t$. Then the empirical measure of the samples $X^i_j$ is  then the Monte Carlo estimator approximate the expectation $\mathbb{E(X)}$
+and
+
+\begin{equation*}
+    \hat{Z}_t =  \frac{1}{N} \sum_{i=1}^N w_t (X_1, \dots, X_t)^i,
+\end{equation*}
+where
+
+\begin{equation*}
+    W_t^i = \frac{w_t (X_1, \dots, X_t)^i}{\sum_{j=1}^N w_t (X_1, \dots, X_t)^j}.
+\end{equation*}
+IS provides an unbiased estimate of the normalising constant. If we are interested in computing the expectation of a function $\varphi_t : \mathcal{X}^t \rightarrow \mathbb{R}$ such that $I_t(\varphi_t) = \int \varphi_t (x_1, \dots, x_t) \pi_t (x_1, \dots, x_t) \d (x_1, \dots, x_t)$ we can then use the estimate
+
+\begin{equation*}
+    I^{IS}_t(\varphi_t) \coloneqq \int \varphi_t(x_1, \dots, x_t) \hat{\pi}_t (x_1, \dots, x_t) \d (x_1, \dots, x_t) = \sum_{i=1}^N W^i_t\varphi_t((X_1, \dots, X_t)^i).
+\end{equation*}
+This is not an unbiased estimate but it is consistent, meaning that is asymptotically (for $N \rightarrow \infty$) unbiased. Its asymptotic bias is given by \cite{DoucetTutorial}
+
+\begin{equation*}
+    \lim_{N \rightarrow \infty} N (I^{IS}_t(\varphi_t) - I_t(\varphi_t)) = - \int \frac{\pi_t^2 (x_1, \dots, x_t)}{q_t (x_1, \dots, x_t)} (\varphi_t (x_1, \dots, x_t) -  I_t(\varphi_t)) \d (x_1, \dots, x_t).
+\end{equation*}
+We call this estimator the normalised IS.
+
+If we know analytically the normalising constant, then we can calculate an unbiased importance estimate where the weight function will be
+
+\begin{equation*}
+    w_t(x_1, \dots, x_t) = \frac{\pi_t(x_1, \dots, x_t)}{q_t(x_1, \dots, x_t)}
+\end{equation*}
+and the expectation of $\varphi_t$ will be
+
+\begin{equation*}
+    I_t(\varphi_t) = \int \varphi_t (x_1, \dots, x_t) w_t(x_1, \dots, x_t) q_t (x_1, \dots, x_t) \d (x_1, \dots, x_t)
+\end{equation*}
+so that the estimator becomes
+
+\begin{equation*}
+    I^{IS}_t(\varphi_t) \coloneqq \frac{1}{N} \sum_{i=1}^N w^i_t\varphi_t((X_1, \dots, X_t)^i).
+\end{equation*}
+This usually has a higher variance than the normalised estimator.
 
 
 
-\subsection{Sequential Importance Sampling}
 
-Moreover, if we can sample from $\pi_t (x_1, \dots, x_t)$ but we will want to do it sequentially for each value of $t$, the algorithm will have a computational complexity which will increase at least linearly with $t$. 
 
-\subsection{Degeneracy and choice of importance function}
+
+
+
+\section{Sequential Importance Sampling (SIS)} \label{sec:SIS}
+
+In some instances we might want to sample from $\pi_t (x_1, \dots, x_t)$ sequentially in time. Even if we can sample directly from $\pi_t (x_1, \dots, x_t)$, the computational complexity of this sampling scheme is typically at least linear in the number of variables $t$. Therefore an algorithm that samples exactly from $\pi_t (x_1, \dots, x_t)$ sequentially would have a complexity increasing at least linearly with $t$ \cite{DoucetTutorial}.
+
+In SIS we choose an importance density that has the following structure:
+
+\begin{equation*}
+    q_t (x_1, \dots, x_t) = q_{t-1} (x_1, \dots, x_{t-1}) q_t(x_t | x_1, \dots, x_{t-1}) = q_1 (x_1) \prod_{k=2}^t q_t(x_k | x_1, \dots, x_{k-1}).
+\end{equation*}
+It follows that to obtain $N$ samples, that we will call particles, $X^i_j \sim q_t (x_1, \dots, x_t)$ for $i = 1, \dots, N$ and $j = 1, \dots, t$ we first sample $X^i_1 \sim q_1 (x_1,)$ at time 1, then $X^i_k \sim q_k (x_k | X^i_1, \dots, X^i_{k-1})$ at time $k$ for $k = 2, \dots, t$. The relative unnormalised weights can then be computed recursively
+
+\begin{equation*}
+    w_t (x_1, \dots, x_t) = \frac{\gamma_t (x_1, \dots, x_t)}{q_t (x_1, \dots, x_t)} = \frac{\gamma_{t-1} (x_1, \dots, x_{t-1})}{q_{t-1} (x_1, \dots, x_{t-1})} \frac{\gamma_t (x_1, \dots, x_t)}{\gamma_{t-1} (x_1, \dots, x_{t-1}) q_t(x_t | x_1, \dots, x_{t-1})}.
+\end{equation*}
+which we can write as
+
+\begin{equation*}
+    w_t (x_1, \dots, x_t) = w_{t-1} (x_1, \dots, x_{t-1}) \cdot \alpha_t (x_1, \dots, x_t)) =  w_1 (x_1)\prod_{k = 2}^t \alpha_k (x_1, \dots, x_k))
+\end{equation*}
+where the quantity $\alpha_t (x_1, \dots, x_t)$ is the \textit{incremental importance function} and is given by
+
+\begin{equation*}
+    \alpha_t (x_1, \dots, x_t) = \frac{\gamma_t (x_1, \dots, x_t)}{\gamma_{t-1} (x_1, \dots, x_{t-1}) q_t(x_t | x_1, \dots, x_{t-1})}.
+\end{equation*}
+The SIS algorithm proceeds as follows, with each step carried out for $i = 1, \dots, N$:
+
+\begin{algorithm}[H]
+\caption{Sequential Importance Sampling}\label{SIS}
+    \begin{algorithmic}
+        \State  \bf{Initialize:} \normalfont At time t = 1
+            \begin{enumerate}
+	            \item Sample $(X_{1})^i \sim q_1(x_1)$.
+	            \item Evaluate the importance weights: $w_1(X_1^i)$ and $W^i_1 \propto w_1(X_1^i)$.
+            \end{enumerate}
+        \State  \bf{Iterate:} \normalfont For $t \geq 2$
+            \begin{enumerate}
+	            \item Sample $(X_{t})^i \sim q_t(x_t | (X_1, \dots, X_{t-1})^i)$.
+	            \item Evaluate the importance weights: 
+	                \begin{align*}
+	                    w_n((X_1, \dots, X_t)^i) & = w_{t-1}((X_1, \dots, X_{t-1})^i) \cdot \alpha_t (X_1, \dots, X_t)^i \\ 
+	                    W^i_n & \propto w_n((X_1, \dots, X_t)^i).
+	                \end{align*}
+	        \end{enumerate}
+    \end{algorithmic}
+\end{algorithm}
+
+In IS and SIS the choice of the importance function will affect the performance of the algorithm. A sensible choice would be an importance function that minimise the variance of the importance weights $w_t(x_i, \dots, x_t)$. If we select $q_t(x_t | x_1, \dots, x_{t-1}) = \pi_t(x_t | x_1, \dots, x_{t-1})$, since 
+
+\begin{equation*}
+    \pi(x_t | x_1, \dots, x_{t-1}) = \frac{\gamma_t(x_t | x_1, \dots, x_{t-1})}{Z_t}
+\end{equation*}
+with ${Z_t} = \int \gamma_t(x_t | x_1, \dots, x_{t-1}) \d x_t$, the conditional weights will be
+\begin{equation*}
+    w_t(x_t | x_1, \dots, x_{t-1}) = \alpha_t(x_1, \dots, x_t) = \frac{\gamma_t(x_1, \dots, x_{t-1})}{\gamma_{t-1}(x_1, \dots, x_{t-1})} = \frac{\int \gamma_t(x_1, \dots, x_t) \d x_t}{\gamma_{t-1}(x_1, \dots, x_{t-1})}
+\end{equation*}
+and will have zero variance.
+
+
+
+
+
+
+\section{Sequential Importance Resampling (SIR)} \label{sec{SIR}}
+
+It can be proven that the variance of the IS estimates for the normalization constant increase typically exponentially with $t$ \cite{Kong}. This applies to SIS too, since SIS is a special version of IS in which we use importance distributions of a recursive form.
+Another issue that arise in SIS is particle degeneracy, in which after a few iteration all but a few importance weights are close to zero.
+Resampling is a technique that is useful in both instances.
+
+As we have seen, an IS approximation $\hat{\pi}(x_1, \dots, x_t)$ of the target distribution $\pi(x_1, \dots, x_t)$ is based on weighted samples from the importance distribution $q_t(x_1, \dots, x_t)$ and does not provide samples approximately distributed according to the target distribution. To obtain approximate samples from $\pi(x_1, \dots, x_t)$ we can resample, meaning sampling from the IS approximation $\hat{\pi}(x_1, \dots, x_t)$ selecting $(X_1, \dots, X_t)^i$ with probability $W_t^i$. We can obtain samples for $N$ particles from $\hat{\pi}(x_1, \dots, x_t)$ associating a number of offspring $N^i_t$ with each particle $(X_1, \dots, X_t)^i$ in such a way that $(N_t^1, \dots, N^N_t)$ follows a multinomial distribution with parameter vector $(N, (W_t^1, \dots, W_t^N))$ and associating a weight $1/N$ with each offspring. We then approximate $\hat{\pi}(x_1, \dots, x_t)$ by the resampled empirical measure
+
+\begin{equation*}
+    \overline{\pi}(x_1, \dots, x_t) = \sum_{i=1}^N \frac{N^i_t}{N} \delta_{(X_1, \dots, t)^i}(x_1, \dots, x_t)
+\end{equation*}
+where $E[N^i_t | (W_t^1, \dots, W_t^N) ] = N W^i_t$. It follows that $\overline{\pi}(x_1, \dots, x_t)$ is an unbiased estimator.
+
+There are a number of resampling schemes that have been proposed besides the Multinomial Resampling above. The moste used one are Systemaric Resamling and Residual Resampling \cite{DoucetTutorial}.
+
+When resampling we obtain samples distributed approximately according to $\pi(x_1, \dots, x_t)$, however, if we want to estimate $I_t(\varphi_t)$ we would obtain an estimate of lower variance using $\hat{\pi}(x_1, \dots, x_t)$ than $\overline{\pi}(x_1, \dots, x_t)$. The advantage though is that by resampling we have a high probability of removing particles with low weights so we can focus on regions of high probability. There is always the possibiltiy of wasting some useful particles that might have a low weight at time $t$ and a high weight at the subsequent time $t+1$, however resampling remains highly beneficial.
+
+The resampling procedure can cause particle impoverishment in the long run. This means that as the number of iteration increase, fewer particles have significant weight. It is inherently impossible to accurately represent a distribution on a space of arbitrarily high dimension with a sample of fixed, finite size and we cannot circumvent the issue by increasing the number of samples at every iteration as this would lead to an exponential growth in the samples....
+
+When we add a resampling step to the Sequential Importace Sampling algoritm we obtain a new algorithm which is the general Sequential Monte Carlo algorithm also called Sequential Importance Sampling with Resampling or Sequential Importance Resampling (SIR).
+
+In SIR we first compute the IS approximation $\hat{\pi}_1$ of $\pi_1$ at time $t = 1$ which is a weighted collection of particles $\{ \frac{1}{N}, \overline{X}_1^i \}$. We then resample to eliminate with high probability the particles with low weights. At time $t = 2$ we perform a SIS step sampling $X_2^i$ from $q_2(x_2 | \overline{X^i_1})$, so that $\big( \overline{X}_1^i, X^i_2 \big)$ is approximately distributed according to $\pi_1(x_1) q_2(x_2 | x_1)$ and the importance weights are equal to the incremental weights $\alpha_2(x_1, x_2)$. We then resample the particles in accordance to the normalised weights obtaining the collection of equally-weighted particles $\big\{ \frac{1}{N}, (\overline{X}_1, \dots, \overline{X}_t)^i \big\}$ and so on. The algorithm can be summarised as follow:
+
+\begin{algorithm}[H]
+\caption{Sequential Importance Resampling}\label{SIR}
+    \begin{algorithmic}
+        \State  \bf{Initialize:} \normalfont At time t = 1
+            \begin{enumerate}
+	            \item Sample $(X_{1})^i \sim q_1(x_1)$.
+	            \item Evaluate the importance weights: $w_1(X_1^i)$ and $W^i_1 \propto w_1(X_1^i)$.
+	            \item Resample $\{ W_1^i, X_1^i \}$ to obtain $N$ equally-weighted particles $\big\{ \frac{1}{N}, \overline{X}_1^i \big\}$.
+            \end{enumerate}
+        \State  \bf{Iterate:} \normalfont For $t \geq 2$
+            \begin{enumerate}
+	            \item Sample $(X_{t})^i \sim q_t(x_t | (\overline{X}_1, \dots, \overline{X}_{t-1})^i)$.
+	            \item Evaluate the incremental weights $\alpha_t((X_1, \dots, X_t)^i)$ and $W^i_t \propto \alpha_t(X_1, \dots, X_t)^i$
+	            \item  Resample $\{ W_t^i, (X_1, \dots, X_t)^i \}$ to obtain $N$ equally-weighted particles $\big\{ \frac{1}{N}, (\overline{X}_1, \dots, \overline{X}_t)^i \big\}$.
+	        \end{enumerate}
+    \end{algorithmic}
+\end{algorithm}
+
+We have seen that resampling introduce noise so if particles have unnormalised weights with a small variance the resampling step might not be necessary. For this reason it could be better to resample only when the variance of those weights is superior to a certain threshold. To assess this threshold we make use of a quantity called \textit{Effective Sample Size} (ESS), which is given at time $t$ by
+
+\begin{equation*}
+    ESS = \Bigg( \sum_{i=1}^N (W_t^i)^2\Bigg)^{-1}.
+\end{equation*}
+The Effective Sample Size takes values between $1$ and $N$ and we resample only when its value is below $N/2$. The algorithm in which we use this form of adaptive resampling step is summarise below 
+
+\begin{algorithm}[H]
+\caption{Sequential Monte Carlo with Adaptive Resampling}\label{Adaptive}
+    \begin{algorithmic}
+        \State  \bf{Initialize:} \normalfont At time t = 1
+            \begin{enumerate}
+	            \item Sample $(X_{1})^i \sim q_1(x_1)$.
+	            \item Evaluate the importance weights: $w_1(X_1^i)$ and $W^i_1 \propto w_1(X_1^i)$.
+	            \item If resampling criterion satisfied then resample $\{ W_1^i, X_1^i \}$ to obtain $N$ equally-weighted particles $\big\{ \frac{1}{N}, \overline{X}_1^i \big\}$ and set $\big\{ \overline{W}_1^i, \overline{X}_1^i \big\} \leftarrow \big\{ \frac{1}{N}, \overline{X}_1^i \big\}$ otherwise set $\big\{ \overline{W}_1^i, \overline{X}_1^i \big\} \leftarrow \big\{ W^i_1, X_1^i \big\}$.
+            \end{enumerate}
+        \State  \bf{Iterate:} \normalfont For $t \geq 2$
+            \begin{enumerate}
+	            \item Sample $(X_{t})^i \sim q_t \big(x_t | (\overline{X}_1, \dots, \overline{X}_{t-1})^i \big)$ and set $\big(X_{1}, \dots, X_{t} \big)^i \leftarrow \big(\overline{X}_1, \dots, \overline{X}_{t-1}, X_t \big)^i$.
+	            \item Evaluate the incremental weights $\alpha_t((X_1, \dots, X_t)^i)$ and $W^i_t \propto \overline{W}^i_{t-1} \alpha_t(X_1, \dots, X_{t-1})^i$
+	            \item If resampling criterion satisfied then resample $\{ W_1^t, (X_1, \dots, X_t)^i \}$ to obtain $N$ equally-weighted particles $\big\{ \frac{1}{N}, \overline{X}_1^i \big\}$ and set $\big\{ \overline{W}_t^i, \overline{X}_t^i \big\} \leftarrow \big\{ \frac{1}{N}, \overline{X}_t^i \big\}$ otherwise set $\big\{ \overline{W}_t^i, \overline{X}_t^i \big\} \leftarrow \big\{ W^i_t, X_t^i \big\}$.
+	        \end{enumerate}
+    \end{algorithmic}
+\end{algorithm}
+
+
+
+
+
+\section{Particle Filtering} \label{sec:PF}
+
+In section \ref{sec:HMM} we have seen that in the filtering context we want to compute a numerical approximation of $\{ p(x_1, \dots, x_t | y_1, \dots, y_t) \}$ with $t \geq 1$ sequentially in time. We can therefore apply the Sequential Monte Carlo methodologies described above to the target distribution $\pi_t(x_1, \dots, x_t) = p(x_1, \dots, x_t | y_1, \dots, y_t)$.
+
+We first consider the simple case in which $\gamma_t (x_1, \dots, x_t) =  p(x_1, \dots, x_t , y_1, \dots, y_t)$ is chosen so that $\pi_t (x_1, \dots, x_t) = p(x_1, \dots, x_t | y_1, \dots, y_t)$ and $Z_t = p( y_1, \dots, y_t)$. The importance distribution that minimises the variance as we have seen would be
+
+\begin{equation*}
+    q_t( x_t | x_1, \dots, x_{t-1}) = \pi_t( x_t | x_1, \dots, x_{t-1})
+\end{equation*}
+where 
+
+\begin{equation*}
+    \pi_t( x_t | x_1, \dots, x_{t-1}) = p(x_t | y_t, x_{t-1}) = \frac{f(x_t | x_{t-1})g(y_t | x_t)}{p(y_t | x_{t-1})}
+\end{equation*}
+and
+
+\begin{equation*}
+    \alpha_t(x_1, \dots, x_t) = p(y_t | x_{t-1}).
+\end{equation*}
+and this shows that a sensible choice of the importance distribution would be 
+
+\begin{equation*}
+    q_t( x_t | x_1, \dots, x_{t-1}) = q(x_t | y_t, x_{t-1}).
+\end{equation*}
+With this importance distribution we the incremental weight will be
+
+\begin{equation*}
+    \alpha_t(x_1, \dots, x_t) = \alpha_t(x_{t-1}, x_t) = \frac{f(x_t | x_{t-1})g(y_t | x_t)}{q(x_t | y_t, x_{t-1})}.
+\end{equation*}
+The algorithm for the filtering is
+
+\begin{algorithm}[H]
+\caption{SIR Filtering with adaptive resampling}\label{Filtering}
+    \begin{algorithmic}
+        \State  \bf{Initialize:} \normalfont At time t = 1
+            \begin{enumerate}
+	            \item Sample $(X_{1})^i \sim q_1(x_1 | y_1)$.
+	            \item Evaluate the importance weights: $w_1(X_1^i) = \frac{\mu(X^i_1)g(y_1 | X^i_1)}{q(X_1^i | y_1)}$ and $W^i_1 \propto w_1(X_1^i)$.
+	            \item If resampling criterion satisfied then resample $\{ W_1^i, X_1^i \}$ to obtain $N$ equally-weighted particles $\big\{ \frac{1}{N}, \overline{X}_1^i \big\}$ and set $\big\{ \overline{W}_1^i, \overline{X}_1^i \big\} \leftarrow \big\{ \frac{1}{N}, \overline{X}_1^i \big\}$ otherwise set $\big\{ \overline{W}_1^i, \overline{X}_1^i \big\} \leftarrow \big\{ W^i_1, X_1^i \big\}$.
+            \end{enumerate}
+        \State  \bf{Iterate:} \normalfont For $t \geq 2$
+            \begin{enumerate}
+	            \item Sample $(X_{t})^i \sim q_t \big(x_t | y_t,  \big(\overline{X}_1, \dots, \overline{X}_{t-1} \big)^i \big)$ and set $\big(X_{1}, \dots, X_{t} \big)^i \leftarrow \big(\overline{X}_1, \dots, \overline{X}_{t-1}, X_t \big)^i$..
+	            \item Evaluate the incremental weights: 
+	                \begin{align*}
+	                    \alpha_t((X_1, \dots, X_t)^i) & = \frac{f(X^i_t | X^i_{t-1})g(y_t | X^i_t)}{q(X_t^i | y_t, X^i_{t-1})}
+	                \end{align*}
+	                and $W^i_t \propto \overline{W}^i_{t-1} \alpha_t(X_1, \dots, X_{t-1})^i$
+	            \item If resampling criterion satisfied then resample $\{ W_1^t, (X_1, \dots, X_t)^i \}$ to obtain $N$ equally-weighted particles $\big\{ \frac{1}{N}, \overline{X}_1^i \big\}$ and set $\big\{ \overline{W}_t^i, \overline{X}_t^i \big\} \leftarrow \big\{ \frac{1}{N}, \overline{X}_t^i \big\}$ otherwise set $\big\{ \overline{W}_t^i, \overline{X}_t^i \big\} \leftarrow \big\{ W^i_t, X_t^i \big\}$.
+	        \end{enumerate}
+    \end{algorithmic}
+\end{algorithm}
+As a simple and popular example, the bootstrap filter uses the state transition density $f(x_t | x_{t-1})$ as the importance density, so that the incremental weight will be 
+
+\begin{equation*}
+    \alpha_t(x_{t-1}, x_t) = g(y_t | x_t)
+\end{equation*}
+simplifying sampling and calculations.
+
+\section{Particle Smoothing}
+
+
 
 \section{Other SMC methods}
 

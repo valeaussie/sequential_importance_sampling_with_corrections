@@ -29,7 +29,7 @@
 \renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
 
 
-\title{Final Milestone MPhil: Novel Approaches on the Reconstruction of partially detected evolving Systems}
+\title{Final Milestone MPhil: Novel Approach to the Reconstruction of Partially Detected Evolving Systems with Applications in Invasive Species Modellings}
 \author[Valentina Di Marco]{\textbf {Valentina Di Marco\\ \footnotesize Supervisors: Assoc. Professor Jonathan Keith (Monash University) and Distinguished Professor Kerrie Mengersen (Queensland University of Technology), \\ \footnotesize In collaboration with: Dr. Daniel Spring (University of Melbourne)}}
 
 \date{\today}
@@ -53,58 +53,100 @@
 
 
 
+
+
+
+\section{State of Research}
+
+\begin{frame}
+\frametitle{State of Current Work}
+    \begin{itemize}
+    \setlength\itemsep{1em}
+        \item A first paper on our new Sequential Methodology to reconstruct missing data in evolving systems will be submitted this month to the journal `Statistics and Computing'.
+        \item Also, the draft of a second paper applying the above method to a new model for the fire ants has been finalised but needs to be reviewed by the supervisors. The code for this paper is still in the working.
+        \item Chapters 3, 4, 5 and 6 and part of chapter 2 of the thesis have been completed. These are the main chapters of the thesis as of now, however,
+        \item the Introduction and conclusion chapters are still in the works as well as the appendixes. All the chapters of the thesis still need to be reviewed by the supervisors Also, the outline of the thesis might still change.
+    \end{itemize}
+\end{frame}
+
+
+
+
+
 \section{Motivation}
 
 \begin{frame}
 \frametitle{What problem are we trying to solve}
-We are considering
-\begin{itemize}
-\setlength\itemsep{1em}
-    \item Systems that evolve in time and are only partially observed.
-    \item Observations that are exact and arrive sequentially in time.
-\end{itemize}
-We will want to impute the missing observations for all elements created up to the current time.
+In our research we are considering A systems that evolves in time, and observations of this system that are precise but only partial. These observations will arrive sequentially in time while the system keeps evolving.
+
+We will want to \textcolor{Fuchsia}{impute the missing observations} for all elements created up to the current time. 
+
+However, the observations we receive can render previously imputed missing values implausible and may even conflict with what has been simulated.
+
+This means that imputed missing values must be corrected each time we receive new data.
+
+Notice that we will not only correct the newly simulated elements in our method, but we will also correct missing values imputed at earlier time steps so that they are consistent with the new observations.
+ 
 \end{frame}
+
+
+
+
 
 
 \begin{frame}
-    \frametitle{What applications}
-    The original motivation was to facilitate the analysis of the Red Imported Fire Ant (RIFA) invasion in Queensland.
-    \begin{itemize}
-        \item For detected nests, the location can be precisely determined, but there is an unknown number of undetected nests with unknown location. 
-        \item To infer the current extent of the invasion, we impute plausible locations of undetected individuals. 
-        \item These imputations are only informed guesses, and will require constant correction as new detections arrive. 
-        \item In addition, new nests are constantly being produced as the state of the system is constantly evolving.
-    \end{itemize}
-    To handle this kind of problems we introduce a new Sequential Importance Sampling  strategy (`SIS with corrections'), which will allow us to make corrections each time new data is acquired.
+\frametitle{What applications}
+Our original motivation was to facilitate the analysis of the Red Imported Fire Ant invasion in Queensland.
+
+Here for detected nests the location can be precisely determined, but there is an unknown number of undetected nests with unknown location.
+
+To infer the current extent of the invasion, we impute plausible locations of undetected individuals. 
+
+But these imputations are only informed guesses, and will require constant correction as new detections arrive. 
+
+In addition, new nests are constantly being produced as the state of the system is constantly evolving.
+
+Reconstructing the history of the invasion is useful for example when we want to understand the validity of an eradication program to plan for future programs.
+
+To handle this kind of problems we introduce a \textcolor{Fuchsia}{new Sequential Importance Sampling  strategy (`SIS with corrections')}, which will allow us to make corrections each time new data is acquired.
 \end{frame}
+
+
+
+
 
 
 \begin{frame}
-    \frametitle{Other applications}
-    \begin{itemize}
-    \setlength\itemsep{1em}
-        \item Evolution of a species’ geographic range also for non invasive species.
-        \item Bush fire \cite{}.
-        \item Crime detection \cite{}.
-        \item Infectious disease \cite{}.
-    \end{itemize}
+\frametitle{Other applications}
+Our method however has applications in other fields for example we might want to understand the evolution of a species’ geographic range for non invasive species. 
+    
+We can also think of applications in bush fire modelling, imaging and signal reconstruction and even crime detection. 
+
+Another important application would be in infectious disease modelling. For example when we have farm animals that might carry a disease and the movements of goods and animals between farms can spread that disease to other farms.
 \end{frame}
+
+
 
 
 
 \section{Existing methods}
 
 \begin{frame}
-    \frametitle{Existing methods}
-    \begin{itemize}
-        \setlength\itemsep{2em}
-        \item In some cases, it is possible to obtain analytical solutions to compute the evolving sequence of posterior distributions, however, data is often complex and analytical solutions might be precluded.
-        \item Sequential Monte Carlo methods are one of many solutions that can deal with this issue. If we have many samples from the posterior distribution we can approximate the posterior. 
-        \item When it is impossible to obtain samples from these distributions directly we can use alternative Monte Carlo methods, like Importance Sampling.
-        \item Importance Sampling however has the drawback that every time new data becomes available, one needs to recompute the importance weights over the entire state sequence. this means that as the time increases the computational complexity increases. Sequential importance sampling is a modification of Importance Sampling that can overcome this problem.
-    \end{itemize}
+\frametitle{Existing methods}
+ We know that missing data can reduce the statistical power of a study and can produce biased estimates leading to invalid conclusions. Data-sets with missing elements are very common in many fields and so many solutions to overcome this problems are used and many are continuously presented.
+ 
+ Rubin first described and divided the types of missing data according to the assumptions based on the reasons for the missing data. MCAR being missing completely at random, MAR being missing at random (the missing data mechanism does not depend on the underlying systems) and MNAR being missing not at random.
+ 
+Common methods are row deletions where we omit the cases with missing data or the use of mean to impute missing data. These methods are not really good as we get biased estimations if data is not missing completely at random.
+        
+Better methods are Expectation Maximization, Data augmentation and multiple imputation, but these methods don't make use past observations and the state transition equation so we can improve also on those.
+
+More recent methods have been presented like the Multiple Imputation Particle Filer for Markov models introduced by Giang (Zhang) and the construction of bridges between between last and next observations using a the Sequential Monte Carlo method introduced by Del Moral and Murray.
 \end{frame}
+
+
+
+
 
 \section{Our method: SIS With Corrections}
 
@@ -113,15 +155,20 @@ We will want to impute the missing observations for all elements created up to t
     Consider an $M$-dimensional system evolving in \textcolor{Fuchsia}{discrete time}.
     \begin{itemize}
         \item The \textcolor{PineGreen}{states of this system} at times $t = 1, \dots, T$ are represented by random vectors $\bm{x}^t = (x^t_1, \dots, x^t_M) \in \Real^M$ defined on a probability space $(\Omega, \F, \P)$. So, the \textcolor{PineGreen}{trajectory of the system} up to time $t$ is represented by a random matrix $\bm{X}^t = (\bm{x}^1, \ldots, \bm{x}^t)$. 
-        \item Our \textcolor{PineGreen}{state of knowledge} regarding the trajectory of the system up to time $t$ is represented by a random binary matrix $\bm{b}^t = (b^t_{im}) \in 2^{t \times M}$, where $b^t_{im} = 1$ if the value of $x^i_m$ is known by time $t$, and $b^t_{im} = 0$ if the value of $x^i_m$ is still unknown at time $t$. We then define $\bm{B}^t = (\bm{b}^1,\ldots,\bm{b}^t)$.
+        \item Our \textcolor{PineGreen}{state of knowledge of the trajectory} of the system up to time $t$ is represented by a random binary matrix $\bm{b}^t = (b^t_{im}) \in 2^{t \times M}$, where $b^t_{im} = 1$ if the value of $x^i_m$ is known by time $t$, and $b^t_{im} = 0$ if the value of $x^i_m$ is still unknown at time $t$. We also define $\bm{B}^t = (\bm{b}^1,\ldots,\bm{b}^t)$.
         \item We define an \textcolor{PineGreen}{observation matrix} $\bm{z}^t = (z^t_{im})$, where $z^t_{im} = x^i_m$ if $b^t_{im} = 1$, and $z^t_{im} = -$ if $b^t_{im} = 0$. The symbol `$-$' is used to represent an unknown system coordinate. We also define $\bm{Z}^t = (\bm{z}^1,\ldots,\bm{z}^t)$.
     \end{itemize}
-Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We therefore define a function $\sigma_t: \Real^{t \times M} \times \left( \prod_{i=1}^t 2^{i \times M} \right) \rightarrow \prod_{i=1}^t (\Real \cup \{ - \})^{i \times M}$ such that $\bm{Z}^t = \sigma_t(\bm{X}^t, \bm{B}^t)$.
+Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. 
+
+We therefore define a function $\sigma_t: \Real^{t \times M} \times \left( \prod_{i=1}^t 2^{i \times M} \right) \rightarrow \prod_{i=1}^t (\Real \cup \{ - \})^{i \times M}$ such that \textcolor{Fuchsia}{$\bm{Z}^t = \sigma_t(\bm{X}^t, \bm{B}^t)$}.
 \end{frame}
+
+
+
 
 \begin{frame}
     \frametitle{SIS With Corrections: at time $t=1$}
-    At time $t=1$, our knowledge of the system is represented by a prior distribution with density $q(\bm{X}^1, \bm{B}^1)$ on $\Omega_1 = \Real^M \times 2^M$ and the posterior distribution after observing $\bm{Z}^1$ has a density on $\Omega_1' = \sigma^{-1}(\bm{Z}^1)$ given by:
+    At time $t=1$, our knowledge of the system is represented by a prior distribution with density $q(\bm{X}^1, \bm{B}^1)$ on $\Omega_1 = \Real^M \times 2^M$ and \textcolor{PineGreen}{the posterior distribution} after observing $\bm{Z}^1$ has a density on $\Omega_1' = \sigma^{-1}(\bm{Z}^1)$ given by:
     \begin{equation*}
         p(\bm{X}^1, \bm{B}^1 |\bm{Z}^1) = \frac{q(\bm{X}^1, \bm{B}^1)} {r(\bm{z}^1)} 
     \end{equation*}
@@ -129,12 +176,16 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
     \begin{align*}
         r(\bm{z}^1)  &= \int_{\Omega_1'} q(\bm{X}^1, \bm{B}^1) \prod_{ \{m \in \{1, \ldots, M \} : z^1_{1m} = - \} } \D x^1_m.
     \end{align*}
-    Note that the preceding equation integrates over the elements of $\bm{X}^1$ that are not determined by $\bm{Z}^1$. Thus $r(\bm{z}^1)$ is the integral of $q(\bm{X}^1, \bm{B}^1)$ over $\Omega_1'$. 
+    \textcolor{PineGreen}{Note that the preceding equation integrates over the elements of $\bm{X}^1$ that are not determined by $\bm{Z}^1$}.
 \end{frame}
+
+
+
+
 
 \begin{frame}
     \frametitle{SIS With Corrections: at time $t \geq 2$}
-    Our knowledge of the trajectory of the system at time $t \geq 2$, before we acquire the next observation matrix $\bm{z}^t$, is represented by a prior distribution with density $q(\bm{X}^t, \bm{B}^t | \bm{Z}^{t-1})$ on the subspace $\Omega_t = \sigma^{-1}(\bm{Z}^{t-1}) \times \Real^M \times 2^{t \times M}$. After observing $\bm{z}^t$, certain pairs $(\bm{X}^t, \bm{B}^t)$ with non-zero prior density will be incompatible with the new observations, and the posterior density must therefore restrict $(\bm{X}^t, \bm{B}^t)$ to $\Omega_t' = \sigma^{-1}(\bm{Z}^t)$. The posterior density over $\Omega_t'$ must therefore be
+    similarly at time $t \geq 2$ our knowledge of the trajectory of the system at time $t \geq 2$, before we acquire the next observation matrix $\bm{z}^t$, is represented by a prior distribution with density $q(\bm{X}^t, \bm{B}^t | \bm{Z}^{t-1})$ on the subspace $\Omega_t = \sigma^{-1}(\bm{Z}^{t-1}) \times \Real^M \times 2^{t \times M}$. After observing $\bm{z}^t$, certain pairs $(\bm{X}^t, \bm{B}^t)$ with non-zero prior density will be incompatible with the new observations, and the posterior density must therefore restrict $(\bm{X}^t, \bm{B}^t)$ to $\Omega_t' = \sigma^{-1}(\bm{Z}^t)$. The posterior density over $\Omega_t'$ must therefore be
     \begin{equation*}
         p(\bm{X}^t, \bm{B}^t |\bm{Z}^t) = \frac{q(\bm{X}^t, \bm{B}^t | \bm{Z}^{t-1})}{r(\bm{z}^t | \bm{Z}^{t-1})} 
     \end{equation*}
@@ -144,6 +195,10 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
     \end{align*}
     Note that the preceding equation integrates over the elements of $\bm{X}^t$ that are not determined by $\bm{Z}^t$. Thus $r(\bm{z}^t | \bm{Z}^{t-1})$ is the integral of $q(\bm{X}^t, \bm{B}^t | \bm{Z}^{t-1})$ over $\Omega_t'$.
 \end{frame}
+
+
+
+
 
 
 \begin{frame}
@@ -176,6 +231,10 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
 \end{frame}
 
 
+
+
+
+
 \begin{frame}
     \frametitle{SIS With Corrections: approximation of the posterior}
     We want to approximate the distribution $p(\bm{X}^{t}, \bm{B}^{t} | \bm{Z}^{t})$ by iterative sampling, and thus obtain Monte Carlo estimates of expectations of the form:
@@ -191,6 +250,11 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
     \end{itemize}
 \end{frame}
 
+
+
+
+
+
 \begin{frame}
     \frametitle{SIS With Corrections: why we need corrections}
     Consider a particle $(\bm{X}^{t-1}_j,\bm{B}^{t-1}_j)$ constructed at time point $t$, for $j = 1, \ldots, n$, where $n$ is a fixed number of particles.
@@ -204,6 +268,11 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
         \end{itemize}
     \end{itemize}
 \end{frame}
+    
+    
+    
+    
+    
     
 \begin{frame}
     \frametitle{SIS With Corrections: deterministic corrections}
@@ -221,6 +290,9 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
 \end{frame}
 
 
+
+
+
 \begin{frame}
     \frametitle{SIS With Corrections: Auxiliary variable}
     At each iteration, in order to simulate via a two-step process in which we generate a sample and then correct in light of data, we propose to use an auxiliary variable in the following manner.
@@ -234,15 +306,18 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
 \end{frame}
 
 
+
+
+
 \begin{frame}
     \frametitle{SIS With Corrections: $p^*$ and $q^*$}
-    A key identity underlying this strategy is the following.
+    A key identity (see proof in appendix) underlying this strategy is the following.
     \begin{equation*}
         E_{p}[l(\bm{(y')}^{t})]  =  E_{p^*}[l(\pi (\bm{y}^{t}, \bm{(y')}^{t})]
     \end{equation*}
     In this equation, the expectation on the left is over $\Omega_t'$, whereas the expectation on the right is over $\Omega_t^*$.
     
-    Here we are here interested in a deterministic correction, so we define both $p^*$ and $q^*$ on a subspace of $\Omega_t^*$ consisting of points of the form $(\bm{y}^{t}, \rho(\bm{y}^{t}, \bm{Z}^{t}))$. The densities $p^*$ and $q^*$ are defined with respect to a reference measure on this subspace, constructed with the aid of Rohlin's disintegration theorem (\cite{Rohlin}).
+    Here we are here interested in a deterministic correction, so we define both $p^*$ and $q^*$ on a subspace of $\Omega_t^*$ consisting of points of the form $(\bm{y}^{t}, \rho(\bm{y}^{t}, \bm{Z}^{t}))$.
     
     Since $\bm{y}^{t}$ determines $\bm{(y')}^{t}$, but the reverse is not necessarily true, the new densities are of the form:
     \begin{align*}
@@ -250,26 +325,26 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
         p^*(\bm{y}^{t},\bm{(y')}^{t}) &= u(\bm{y}^{t} | \bm{(y')}^{t}) p(\bm{(y')}^{t} | \bm{Z}^{t})
     \end{align*}
     where $\bm{(y')}^{t} = \rho(\bm{y}^{t}, \bm{Z}^{t})$. Here $u$ is the density of some distribution over the set $F(\bm{(y')}^{t}) = \{ \bm{y} \in \Omega^t  :  \rho(\bm{y}, \bm{Z}^{t}) = \bm{(y')}^{t}\}$.
+    The set $F(\bm{(y')}^{t})$ contains all elements of the uncorrected space that can be corrected to $\bm{(y')}^{t}$.
 \end{frame}
+
+
+
+
 
 \begin{frame}
     \frametitle{SIS With Corrections: the distribution $u$}
-    The set $F(\bm{(y')}^{t})$ contains all elements of $\Omega^t$ that can be corrected to $\bm{(y')}^{t}$. It can be characterised as the set of elements of the form $(\bm{X}^{t},\bm{B}^{t}) \in \Omega^t$ such that:
-    \begin{enumerate}
-        \item $\bm{b}^{j} = (\bm{b}')^{j}$ for all $j < t$,
-        \item $b_{im}^{t} = (b_{im}')^t$ whenever $(b_{im}')^t = (b_{im}')^{t-1}$, otherwise $b_{im}^{t} \in \{ 0, 1 \}$, and
-        \item $x_{m}^{i} = (x_{m}')^{i}$ whenever $(b_{im}')^t = (b_{im}')^{t-1}$, otherwise $x_{m}^{i} \in \Real$.
-    \end{enumerate}
-    Thus $F(\bm{(y')}^{t})$ is isomorphic to $\Real^k \times 2^k$, where $k$ is the number of newly observed coordinates.
-    
     \begin{itemize}
         \item The density $u$ must ensure $\esssupp(p^*) \subseteq \esssupp(q^*)$, (a requirement for valid importance sampling (\cite{Geweke})).
         \item Here we consider $u$ to be the uniform density on a bounded (to ensure integrability) subset of $F(\bm{(y')}^{t})$.
-        \item If the bounded set is a hyper-rectangle, with each undetermined coordinate of $\bm{y}^{t}$ bounded independently of the others, the normalising constant of $u$ depends on $k$, but is otherwise independent of $\bm{(y')}^{t}$.
-        \item If $\bm{y}^t$ is outside this hyper-rectangle, then $u(\bm{y}^t) = 0$, and this will result in zero-weighted particle. However, bounds can be set large enough that zero-weighted particles occur only infrequently.
+        \item If the bounded set is a hyper-rectangle, with each undetermined coordinate of $\bm{y}^{t}$ bounded independently of the others, the normalising constant of $u$ depends on the number of the newly observed coordinates $k$, but is otherwise independent of $\bm{(y')}^{t}$.
+        \item If the simulated element $\bm{y}^t$ is outside this hyper-rectangle, then $u(\bm{y}^t) = 0$, and this will result in zero-weighted particle. However, bounds can be set large enough that zero-weighted particles occur only infrequently.
     \end{itemize}
        
 \end{frame}
+
+
+
 
 
 \begin{frame}
@@ -289,33 +364,33 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
     \begin{eqnarray*}
         w^{t}_{1j} &=& \frac{f((\bm{x}_j')^1)}{f(\bm{x}_j^1)} \frac{g((\bm{b}_j')^1 | (\bm{x}_j')^1)}{g(\bm{b}_j^1 | \bm{x}_j^1)}
     \end{eqnarray*}
-    and
+    and the weights for all the subsequent times will be
     \begin{eqnarray*}
         w^{t}_{ij} &=& \frac{f((\bm{x}_j')^i | (\bm{x}_j')^{i-1})}{f(\bm{x}_j^i | \bm{x}_j^{i-1})} \frac{g((\bm{b}_j')^i | (\bm{x}_j')^i, \bm{b}_j^{i-1})}{g(\bm{b}_j^i | \bm{x}_j^i, \bm{b}_j^{i-1})}
     \end{eqnarray*}
+    \textcolor{Red}{Notice that the terms $u$ and $r$ will cancel after normalisation.}
 \end{frame}
+
+
 
 
 \begin{frame}
-    \frametitle{Our method: The weights}
-    for $i \geq 2$.
-    Note the terms $u$ and $r$ are the same for all particles, and can be disregarded, since it will cancel after normalising the weights across particles. Note also that $(\bm{b}_j')^i$ differs from $\bm{b}_j^i$ only for $i = t$, since the older observations $\bm{z}^{i}$ have already fully determined $\bm{b}_j^i$ for $i < t$. 
-
-    Therefore the normalised weights become:
-    \begin{eqnarray*}
-        w^{t}_j &=& \frac{\prod_{i=1}^t w^{t}_{ij}}{\sum_{j=1}^n \prod_{i=1}^t w^{t}_{ij}}.
-    \end{eqnarray*}
-    were
-    \begin{equation*}
-        w^{t}_{ij} = \frac{f((\bm{x}'_j)^i | (\bm{x}'_j)^{i-1})}{f(\bm{x}^i_j | \bm{x}^{i-1}_j)} 
-    \end{equation*}
-    for $i = 1 \dots, t-1$ and since the final $g$ term will not cancel
-        \begin{eqnarray*}
-            w^{t}_{tj} &=& \frac{f((\bm{x}_j')^t | (\bm{x}_j')^{t-1})}{f(\bm{x}_j^t | \bm{x}_j^{t-1})} \frac{g((\bm{b}_j')^t | \bm{b}_j^{t-1})}{g(\bm{b}_j^t | \bm{b}_j^{t-1})}.
-        \end{eqnarray*}
-
-
+    \frametitle{SIS With Corrections: Notes}
+    \begin{itemize}
+        \item We can simplify the model for observations that are \textcolor{PineGreen}{MAR (missing at random)} (i.e. $\bm{B}^t$ evolves independently of $\bm{X}^t$) (see appendix).
+        \item \textcolor{PineGreen}{The density $u$ is arbitrary} and we can choose it so that we don't have zero-weighted particles (see appendix).
+        \item We have 3 applications for this new model: 
+        \begin{itemize}
+            \item an \textcolor{PineGreen}{AR(1) model},
+            \item a \textcolor{PineGreen}{river invasion},
+            \item the \textcolor{PineGreen}{RIFA invasion} in Queensland.
+        \end{itemize}
+        In the first two examples observations are simulated from the system's model.
+        \item In the RIFA application the \textcolor{PineGreen}{corrections will not be deterministic}.
+        \item The RIFA model is \textcolor{PineGreen}{time-continuous}.
+    \end{itemize}
 \end{frame}
+
 
 
 
@@ -325,8 +400,7 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
     \frametitle{Application to an AR(1) Model}
     \begin{itemize}
     \setlength\itemsep{2em}
-        \item This new method has been applied to a Gaussian, linear and stationary AR(1) model with missing observations
-        \item The observations were simulated from the model.
+        \item The model we have chosen for the first application is a Gaussian, linear and stationary AR(1) model with missing observations.
         \item For every particle $i$, the unnormalised weights at time $t$ for $b' \in \{0,1\}$ and $b \in \{0,1\}$ are calculated with the following formula
         \end{itemize}
     \begin{align*} \label{eq:2}
@@ -336,6 +410,9 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
     \end{align*}
     where the primed are the corrected terms.
 \end{frame}
+
+
+
 
 
 \begin{frame}
@@ -349,13 +426,18 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
         \end{align*}
         Where $\tau-1$ is the index of the last observation before the block of missing values and $m$ is the fist observation after the block of missing values and $t = \tau, \dots, m-1$.
     \end{itemize}
+    (make a note on cancellations)
 \end{frame}
+
+
+
+
+
 
 \begin{frame}
 \frametitle{Simulations compared with gold standard for an AR(1) model}
 \begin{figure}
-%\begin{minipage}{1\textwidth}
-%\centering
+
     \captionsetup{font=footnotesize}
     \subfloat{\includegraphics[width=0.3\linewidth]{Thesis/ar1_001.PNG}}
     \subfloat{\includegraphics[width=0.3\linewidth]{Thesis/ar1_002.PNG}}\\
@@ -364,9 +446,13 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
     \subfloat{\includegraphics[width=0.3\linewidth]{Thesis/ar1_005.PNG}}
     \caption{AR(1) MODEL: Simulations with 1,000 particles and 30 times compared to the gold standard for the 5 missing times of the AR(1) model. In Green the value for the observation. The AR(1) model had parameter $\varphi = 0.5$, variance $\sigma^2 = 1$. The Bernoulli distribution had parameter $p = 0.2$}
 \label{fig:1}
-%\end{minipage}
 \end{figure}
 \end{frame}
+
+
+
+
+
 
 \section{Application: A River Invasion}
 
@@ -383,6 +469,10 @@ Observations are without error so are determined by $\bm{X}^t, \bm{B}^t$. We the
         \item The probe might fail to observe an invader that is present, and hence searching may stop without finding all invaded cells.
     \end{itemize}
 \end{frame}
+
+
+
+
 
 \begin{frame}
 \frametitle{Application to the River Invasion}
@@ -412,35 +502,32 @@ Here $l$ is the time at which the invasion has reached the left end of the model
             Simulation of 3 invasions with 1,000 particles and 50 cells all with $\theta = 0.3$. The left column shows the simulations while the left column shows the same simulations with observations superimposed in solid red. A1 and A2 show the invasion with $\varphi = 0.3$, B1 and B2 show the invasion with $\varphi = 0.1$. Figure C1 and C2 show the invasion with $\varphi = 0.8$.
             \label{fig:2}
             \column{.6\linewidth}
-            %\includegraphics[width=\textwidth]{Thesis/river_007.png}
+            \includegraphics[width=\textwidth]{Thesis/river_007.png}
         \end{columns}
     \end{figure*}
 \end{frame}
 
 
-\section{Application: The RIFA invasion}
+
 
 \begin{frame}
-\frametitle{The RIFA invasion Model}
-A key feature of our model is that it does not need to include the phylogeny of the nests in the likelihood, which should result in a much lower computational time when running the inference code. This will allow the model to be adapted to any type of problems where control strategies will have to be decided rapidly as new data is acquired. Notice that the phylogeny can can be reconstructed if needed. Also the new SIS method presents and efficient way to recalculate the weights as new observations arrive since it does not require to run again the entire code and many cancellations will occur during the calculation. 
-
-
-\begin{itemize}
-\item We need a model that can be fast and can be applied to point data as opposed to grid data.
-\item This new model has the following features:
+    \frametitle{The RIFA invasion Model}
     \begin{itemize}
-        \item Does not need to consider the phylogeny of the nests (faster), However, the phylogeny can be reconstructed if needed.
-        \item Considers the detection process in parallel with the founding events.
-        \item Includes unobserved nests alongside observed nests in the detection likelihood.
-        \item Also, the application of the new `SIS with corrections' approach to this model presents and efficient way to recalculate the weights as new observations arrive since it does not require to run again the entire code.
+        \item We aim to design a \textcolor{PineGreen}{model that can be adapted to any type of problems where control strategies will have to be decided rapidly as new data is acquired}.
+        \item  \textcolor{PineGreen}{The real spread of the RIFA invasion is unknown} and this makes planning effective eradication programs difficult.
+        \item \textcolor{PineGreen}{The history of the invasion is also only partially known}, and determining the real effects of past eradication efforts can be hard.
+        \item \cite{Keith} proposed an agent-based model for the RIFA invasion focused on reconstructing the historical trajectory of the invasion to determine if the eradication strategy then applied was successful.
+        \item In our new approach we are seeking to \textcolor{PineGreen}{simplify and improve on Keith and Spring model} with the aim to reduce the running time without compromising on flexibility and completeness
+        \item A key feature of our model is that \textcolor{PineGreen}{we does not need to include the phylogeny of the nests in} (but the phylogeny can can be reconstructed if needed).
     \end{itemize}
-\end{itemize}
 \end{frame}
 
 
 
+
+
 \begin{frame}
-\frametitle{RIFA Model: the intensity function}
+    \frametitle{RIFA Model: the intensity function}
     Here we consider a self-exciting spatial-temporal point process $N$ as a generalization of an Hawkes model \cite{Hawkes71}. We can then specify an intensity function $\lambda(x, y, t)$ which represents the infinitesimal expected  rate of events at time $t$ and location $(x, y)$.
     \begin{equation*}
         \lambda(x, y, t) = \mu(x, y, t) + \int_{0}^{t} \iint_{S} g(x - x', y - y', f - f') \d N(x', y', f')
@@ -448,14 +535,17 @@ A key feature of our model is that it does not need to include the phylogeny of 
     where $\mu$ is the background term and $g$ is the clustering density.
 \end{frame}
 
+
+
+
+
 \begin{frame}
-\frametitle{RIFA Model: the intensity function}
+    \frametitle{RIFA Model: the intensity function}
     We will consider the background to be zero, and we will consider the time and space elements of the clustering density to be independent.
-    Also, the temporal behavior of the process is independent of the spatial behavior we can rewrite the conditional intensity as
     \begin{equation*}
         \lambda(x, y, f) = \int_{0}^{f} \iint_{S} r(f-f') l\Big((x - x'), (y - y')\Big) \d N(x', y', f')
     \end{equation*}
-    where $m$ and $l$ are the triggering functions for time and space respectively.
+    where $r$ and $l$ are the triggering functions for time and space respectively.
 
     Since N is a counting measure, we can write this equation as
 
@@ -465,12 +555,15 @@ A key feature of our model is that it does not need to include the phylogeny of 
     where the sum is over all the $p$ parent nests $(x_p, y_p, f_p)$ with $t_p < t$.
 \end{frame}
 
+
+
+
+
 \begin{frame}
 \frametitle{RIFA Model: Maturation time}
     Each parent nest will be able to found more than one nest, with the number of nests founded per nest per month being a parameter $\zeta$, therefore the temporal triggering kernel will be a step function. Also the nests will have a maturation time $t_m$ of 8 months, meaning that before this time they will not be able to produce new nests. 
 
     The step function will be:
-
     \begin{equation*}
         r (f - f_p | \zeta) =
         \begin{cases}
@@ -482,18 +575,24 @@ A key feature of our model is that it does not need to include the phylogeny of 
 \end{frame}
 
 
+
+
+
 \begin{frame}
 \frametitle{RIFA Model: Jumps}
-    Biological invasions spread through local movements and by long-distance jumps \cite{Suarez}. We will therefore consider two unknown founding types: a local founding event with $U_i = 0$ and the long-distance jump with $U_i = 1$. The vector of jump type is therefore $U = (U_1, \dots, U_N)$ with $N$ the total number of founded nests.
-
-    The vector of jumps types will have probability density function
+    Biological invasions spread through \textcolor{PineGreen}{local movements} and by \textcolor{PineGreen}{long-distance jumps (\cite{Suarez})}. We will therefore consider two unknown founding types: a local founding event with $U_i = 0$ and the long-distance jump with $U_i = 1$. The vector of jump type is therefore $U = (U_1, \dots, U_N)$ with $N$ the total number of founded nests and will have probability density function
 
     \begin{equation*}
         p(U| \gamma ) = {N \choose \nu}(\gamma)^{2\nu}(1 - \gamma)^{2(N - \nu)}
     \end{equation*}
     where $\gamma$ is the probability of a long jump and $\nu$ is the number of long-distance jumps.
+\end{frame}
 
-    The  radial distance of the new nests from the parent nest will be distributed exponentially for the local founding event and with a L\'evy distribution for the long-distance jumps. The distribution over the angular direction will be uniform.
+
+
+\begin{frame}
+\frametitle{RIFA Model: Jumps}
+    The radial distance of the new nests from the parent nest will be \textcolor{PineGreen}{distributed exponentially for the local founding event} and with a \textcolor{PineGreen}{L\'evy distribution for the long-distance jumps}. \textcolor{PineGreen}{The distribution over the angular direction will be uniform}.
     Therefore the probability distributions for the short jumps $l_0$ and for the long jumps $l_1$ will be
 
     \begin{equation*}
@@ -506,9 +605,12 @@ A key feature of our model is that it does not need to include the phylogeny of 
     where $J$ is the Jacobian and $r$ is the radial distance between the parents nests and the newly founded nests.
 \end{frame}
 
+
+
+
 \begin{frame}
-\frametitle{RIFA Model: Nests Killed as Detected}
-    We also make the assumption that nests are killed as soon as they are detected, so we introduce an indicator function $I(t_d - t)$ such that
+    \frametitle{RIFA Model: Nests Killed as Detected}
+    We also make the assumption that \textcolor{PineGreen}{nests are killed as soon as they are detected}, so we introduce an indicator function $I(t_d - t)$ such that
 
     \begin{equation*}
         I (t_d - t) =
@@ -517,13 +619,36 @@ A key feature of our model is that it does not need to include the phylogeny of 
             0, & \mbox{otherwise}
         \end{cases}
     \end{equation*}
-    where $t_d$ represents the time of detection. So the conditional intensity function will be
-
+    where $t_d$ represents the time of detection. 
+\end{frame}
+    
+    
+    
+    
+ \begin{frame}
+    \frametitle{RIFA Model: The Intensity Function}
+    So \textcolor{PineGreen}{the intensity function will be}
     \begin{equation*}
         \lambda(x, y, t, f) = \sum_{p:f_p < f} r(f - f_p | \zeta) I(t_d - t) p(U | \gamma) l_0(x, y | U, \sigma) l_1(x, y | U, c)
     \end{equation*}
     where we must have $f_p\leq t_d$.
 \end{frame}
+
+
+
+
+\begin{frame}
+    \frametitle{RIFA Model: The Intensity Function}
+    So \textcolor{PineGreen}{the intensity function will be}
+    \begin{equation*}
+        \lambda(x, y, t, f) = \sum_{p:f_p < f} r(f - f_p | \zeta) I(t_d - t) p(U | \gamma) l_0(x, y | U, \sigma) l_1(x, y | U, c)
+    \end{equation*}
+    where we must have $f_p\leq t_d$.
+\end{frame}
+
+
+
+
 
 \begin{frame}
 \frametitle{RIFA Model: Poisson Cluster Process}
@@ -535,6 +660,9 @@ A key feature of our model is that it does not need to include the phylogeny of 
     The likelihood, or joint pdf, at time $T$, will then be that of an inhomogeneous Poisson process for the founding process with intensity $\lambda(x, y, t)$
 \end{frame}
 
+
+
+
 \begin{frame}
 \frametitle{RIFA Model: Detection Process}
     We will consider the detection processes in parallel with the founding events in a similar way as in Jewell's model for infectious diseases (\cite{Jewell}) : The time from establishment to notification $(t_i - f_i)$ of an offspring nest $i$ is a random variable exponentially distributed with parameter $\varphi$
@@ -542,8 +670,10 @@ A key feature of our model is that it does not need to include the phylogeny of 
     \begin{equation*}
     h(t_{i} - f_{i} | \varphi) = \varphi \exp (- \varphi(t_{i} - f_{i})).
     \end{equation*}
-    
 \end{frame}
+
+
+
 
 \begin{frame}
 \frametitle{RIFA Model: The Likelihood}
@@ -557,8 +687,11 @@ A key feature of our model is that it does not need to include the phylogeny of 
     where $t_{i} = \infty$ if nest $i$ has not been detected at time $T$ and where $n$ is the number of nests founded. The quantity $h(t_{i} - f_{i})$ is the contribution of the observed nests, while $\int_{T}^{\infty} h(t - f_{i}) \d t$ is the contribution of the unobserved nest.
 \end{frame}
 
+
+
+
 \begin{frame}
-\frametitle{RIFA Model: The Likelihood}
+    \frametitle{RIFA Model: The Likelihood}
     Substituting the function $h$ and evaluating the last integral in equation above we get
 
     \begin{equation*}
@@ -567,44 +700,131 @@ A key feature of our model is that it does not need to include the phylogeny of 
             & \prod_{\{ i : t_{i} < T \} } \varphi \exp (- \varphi (t_{i} - f_{i})) \prod_{ \{ i : t_{i} = \infty \} } \exp \bigg( - \varphi(T - f_{i}) \bigg).
         \end{aligned}
     \end{equation*}
-    Notice that natural deaths are not considered in our model, so nests are immortal until detected and removed.
+    \textcolor{PineGreen}{Notice that natural deaths are not considered in our model, so nests are immortal until detected and removed.}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{RIFA Model: The Markovian System}
+    \begin{itemize}
+        \item define the \textcolor{PineGreen}{time intervals} $\tau_j = (T_{j-1}, T_j]$ where $T_j$ is the time at which we receive a new set of observations.
+        \item \textcolor{PineGreen}{The states of this system} at times $T_j$ are represented by random sets $\bm{a}^{T_j} = (a^{T_j}_1, \dots, a^{T_j}_{N^{T_j}}) \in \mathbb{R}^{4\times N^{T_j}}$ where $N^{T_j}$ is the unknown number of nests alive at time $T_j$ and whose elements $a^{T_j}_k = (t_k^{T_j}, f_k^{T_j}, x_k^{T_j}, y_k^{T_j})$ with $k = 1, \dots , N^{T_j}$ represent the nests indexed by $k$ and containing \textcolor{PineGreen}{the time of founding $f_k$, the time of observation $t_k$ corresponding to the time of death, and the coordinates $x_k$ and $y_k$}.
+        \item \textcolor{PineGreen}{The trajectory of the system} from $T_0$ to $T_i$ is represented by the random set $\bm{A}^{T_i} = (\bm{a}^1, \dots, \bm{a}^{T_i})$.
+        \item \textcolor{PineGreen}{The observation set} $\bm{z}^{T_i} \in \mathbb{R}^{i \times M^{T_i} \times 3}$ where $M^{T_i}$ is the total number of nests detected up to time $T_i$. The elements $z^{T_j}_l = (t^{T_j}_l, x^{T_j}_l, y^{T_j}_l)$ will contain the time of observation and coordinates of the observed nest indexed by $l$ with $l = 1, \dots, M^{T_j}$. We will also define $\bm{Z}^{T_i} = (\bm{z}^1, \dots, \bm{z}^{T_i})$.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{RIFA Model: The Markovian System}
+    \textcolor{PineGreen}{The likelihood defined above $L(\bm{a}^{T_i} | \bm{A}^{T_{i-1}})$ is the density distribution characterising the system and the observations}. Notice that \textcolor{Red}{the model is Markovian}, therefore each $\bm{a}^{T_i}$ is conditionally independent of $\bm{A}^{T_{i-2}} = (\bm{a}^{T_1}, \dots, \bm{a}^{T_{i-2}})$, given $\bm{a}^{T_{i-1}}$ and we will therefore have $L(\bm{a}^{T_i} | \bm{A}^{T_{i-1}}) = L(\bm{a}^{T_i} | \bm{a}^{T_{i-1}})$.
     
-    This quantity will define the transition function $f(\bm{a}^{T_i} | \bm{A}^{T_{i-1}})$ of the system from one state to the next and will be the prior $q$ which represent the current state of the system. Notice that the model is Markovian, therefore each $\bm{a}^{T_i}$ is conditionally independent of $\bm{A}^{T_{i-2}} = (\bm{a}^{T_1}, \dots, \bm{a}^{T_{i-2}})$, given $\bm{a}^{T_{i-1}}$ and we will therefore have $f(\bm{a}^{T_i} | \bm{A}^{T_{i-1}}) = f(\bm{a}^{T_i} | \bm{a}^{T_{i-1}})$. 
+    At time $T_1$ the joint prior distribution for $\bm{A}^{T_1}$ will be
+    \begin{equation*}
+        q(\bm{A}^{T_1}) = L(\bm{a}^{T_1}),
+    \end{equation*}
+    and for $T_i$ with $i \geq 2$
+    \begin{equation*}
+        q(\bm{A}^{T_i} | \bm{Z}^{T_{i-1}}) =  \frac{L(\bm{a}^{T_1})}{r(\bm{z}^{T_1})} \prod_{j=2}^{i-1} \frac{L(\bm{a}^{T_j} | \bm{a}^{T_{j-1}})}{r(\bm{z}^{T_j} | \bm{Z}^{T_{j-1}})} \times L(\bm{a}^{T_i} | \bm{a}^{T_{i-1}})
+    \end{equation*}
+    so \textcolor{PineGreen}{the joint posterior distribution} will be
+    \begin{equation*}
+        p(\bm{A}^{T_i} | \bm{Z}^{T_i}) = \frac{L(\bm{a}^{T_1})}{r(\bm{z}^{T_1})} \prod_{j=2}^{i} \frac{L(\bm{a}^{T_j} | \bm{a}^{T_{j-1}})}{r(\bm{z}^{T_j} | \bm{Z}^{T_{j-1}})}.
+    \end{equation*}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{RIFA Model: The Corrections}
+    Assumptions:
+    \begin{itemize}
+        \item Each particle that has been simulated up to time $T_i$ can be corrected in a finite number of ways when we receive a new set of observations $\bm{z}^{T_i}$.
+        \item Nests can be only corrected once.
+        \item Corrections are made with probability $H_{z^{T_i}}((\bm{A}^{T_i})' | \bm{A}^{T_i})_{\zeta}$, where $(\bm{A}^{T_i})'$ is the vector of the corrected nests at time $T_i$.
+    \end{itemize}
+    The probability $H_{z^{\tau_i}}$ of the new configuration of nests $\zeta$ will depend on the distances between the simulated nests and the observed nests in the following way:
+    \begin{itemize}
+        \item Let us consider a simulated nest $a_j$ and an observation $z_h$.
+        \item Then $a_j$ can be corrected by $z_h$ with probability $p_{a_j z_h} = p(a_j \leftrightarrow z_h) = e^{-d_{a_j z_h}}$ where $d_{a_j z_h}$ is the Euclidean distance between $a_j$ and $z_h$.
+    \end{itemize}
 \end{frame}
 
 
 
+
 \begin{frame}
-\frametitle{RIFA Model: The Corrections}
-    Assume that each particle that has been simulated up to time $T_i$ can be corrected in a finite number of ways when we receive a new set of observations $\bm{z}^{T_i}$. We also make the assumption that a nests can be only corrected once and if corrected at time $T_j$ it will not be corrected again in future times. These corrections are made with probability $H_{z^{T_i}}((\bm{A}^{T_i})' | \bm{A}^{T_i})_{\zeta}$, where $(\bm{A}^{T_i})'$ is the vector of the corrected nests at time $T_i$.
-
-    The probability $H_{z^{\tau_i}}((\bm{A}^{T_i})' | \bm{A}^{T_i})_{\zeta}$ of the new configuration of nests $\zeta$ will depend on the distances between the simulated nests and the observed nests in the following way. 
-    
-    Let us consider a simulated nest $a_j$ and an observation $z_h$. Then $a_j$ can be corrected by $z_h$ with probability $p_{a_j z_h} = p(a_j \leftrightarrow z_h) = e^{-d_{a_j z_h}}$ where $d_{a_j z_h}$ is the Euclidean distance between $a_j$ and $z_h$. Notice that when the distance is $d_{s_j z_h} = 0$ the probability $p_{s_j z_h}$ is 1 and the observation coincide with the simulated nest. The probability of a certain new configuration of nests will therefore be $H_{z^{T_i}}((\bm{A}^{T_i})' | \bm{A}^{T_i})_{\zeta} \propto (\prod_{h = 1}^{M^{T_i}} (p_{a_j z_h}))_{\zeta}$ and after normalization $H_{z^{T_i}}((\bm{A}^{T_i})' | \bm{A}^{T_i})_{\zeta} = (\prod_{h = 1}^{M^{T_i}} (p_{a_j z_h}))_{\zeta} / \sum_{\zeta} (\prod_{h = 1}^{M^{T_i}} (p_{a_j z_h}))_{\zeta} $ where the sum is over all the possible configurations. Each set of simulated particles that have not been corrected, can be corrected in only a finite number of ways to produce an element of the non-empty finite set $O_{\bm{z}^{T_i}} (\bm{A}^{T_i})$ that contains all the allowed corrections. The correction is made selecting an element $(\bm{A}^{T_i})'$ from the set $O_{\bm{z}^{T_i}} (\bm{A}^T)$ with probability $H_{z^{T_i}}((\bm{A}^{T_i})' | \bm{A}^{T_i})_{\zeta}$. Configurations of nests where the distances between observed and simulated nests are small will be more probable than the one where those distances are big.
-
-    Let us call $s$ the number of simulated nests that we want to correct and $o$ the number of observed nests. The way we make the substitution is valid regardless of the values of $s$ and $o$ and the number of possible configurations is that obtained in ordered sampling without replacement. If we have more observed nests than simulated nests, we will correct all simulated nests and add all the remaining observed nests to the new configuration. Similarly if we have more simulated nests than observed one we will correct only the number of nests that we observe and leave the remaining nests to be corrected at a later stage.
-    It follows that the number of possible configurations will be $\frac{s!}{(s-o)!}$ if $s > o$, $o!$ if $s = o$, and $\frac{o!}{(o-s)!}$ if $o < s$.
-
-    Each time a nest is corrected its new location will correspond to the location of one of the observed nest and the time of observation will be corrected too with the observed one.
+    \frametitle{RIFA Model: The Corrections}
+    Assumptions:
+    \begin{itemize}
+        \item \textcolor{PineGreen}{Each particle} that has been simulated up to time $T_i$ \textcolor{PineGreen}{can be corrected in a finite number of ways} when we receive a new set of observations $\bm{z}^{T_i}$.
+        \item \textcolor{PineGreen}{Nests can be only corrected once}.
+        \item \textcolor{PineGreen}{Corrections are made with probability $H_{z^{T_i}}((\bm{A}^{T_i})' | \bm{A}^{T_i})_{\zeta}$}, where $(\bm{A}^{T_i})'$ is the vector of the corrected nests at time $T_i$.
+    \end{itemize}
+    \textcolor{PineGreen}{The probability $H_{z^{\tau_i}}$ of the new configuration of nests $\zeta$ will depend on the distances between the simulated nests and the observed nests} in the following way:
+    \begin{itemize}
+        \item Let us consider a simulated nest $a_j$ and an observation $z_h$.
+        \item Then $a_j$ can be corrected by $z_h$ with probability $p_{a_j z_h} = p(a_j \leftrightarrow z_h) = e^{-d_{a_j z_h}}$ where $d_{a_j z_h}$ is the Euclidean Distance between $a_j$ and $z_h$.
+    \end{itemize}
 \end{frame}
 
+
+
+
 \begin{frame}
-\frametitle{RIFA Model: The weights}
-    Using similar arguments to the one used for the models with discrete times we get the weights
+    \frametitle{RIFA Model: The Corrections}
+    \textcolor{PineGreen}{The probability distribution of the configurations of nests} will therefore be 
+    \begin{equation*}
+            H_{z^{T_i}}((\bm{A}^{T_i})' | \bm{A}^{T_i})_{\zeta} = \Bigg(\prod_{h = 1}^{o^{T_i}} (p_{a_j z_h}) \Bigg)_{\zeta} / \sum (\prod_{h = 1}^{o^{T_i}} (p_{a_j z_h}))_{\zeta} 
+    \end{equation*} 
+    where the sum is over all the possible configurations and $o^{T_i}$ is the number of observed nests at time $T_i$. 
+    
+    Each set of simulated particles that has not been corrected can be corrected in a finite number of ways to produce an element of the non-empty finite set $O_{\bm{z}^{T_i}} (\bm{A}^{T_i})$ that contains all the allowed corrections. The correction is made selecting an element $(\bm{A}^{T_i})'$ from the set $O_{\bm{z}^{T_i}} (\bm{A}^T)$ with probability $H_{z^{T_i}}((\bm{A}^{T_i})' | \bm{A}^{T_i})_{\zeta}$.
+\end{frame}
+
+
+
+
+
+\begin{frame}
+    \frametitle{RIFA Model: The weights}
+    Using similar arguments used before the weights will be
     \begin{equation*}
         w^{T_i}_k \propto \frac{p^*(\bm{(A')}^{T_i}_k, \bm{A}^{T_i}_k | \bm{Z}^{T_i})} {q^*(\bm{(A')}^{T_i}_k, \bm{A}^{T_i}_k | \bm{Z}^{T_{i-1}})}
     \end{equation*}
     which with non deterministic corrections will become
-
     \begin{equation*}
-        w^{T_i}_k \propto \frac{r(\bm{z}^{T_i}| \bm{Z}^{T_{i-1}}) q(\bm{(A')}^{T_i}_k | \bm{Z}^{T_{i-1}}) u(\bm{(A)}^{T_i}) H_{(z')^{T_i}} (\bm{A}^{T_i}_k | \bm{(A')}^{T_i}_k)}{q(\bm{A}^{T_i} | \bm{Z}^{T_{i-1}}) H_{z^{T_i}} (\bm{(A')}^{T_i}_k | \bm{A}^{T_i}_k)}.
+        w^{T_i}_k \propto \frac{q(\bm{(A')}^{T_i}_k | \bm{Z}^{T_{i-1}}) u(\bm{(A)}^{T_i}) H_{(z')^{T_i}} (\bm{A}^{T_i}_k | \bm{(A')}^{T_i}_k)}{q(\bm{A}^{T_i} | \bm{Z}^{T_{i-1}}) r(\bm{z}^{T_i}| \bm{Z}^{T_{i-1}})  H_{z^{T_i}} (\bm{(A')}^{T_i}_k | \bm{A}^{T_i}_k)}.
     \end{equation*}
-    The quantities $H_{(z')^{T_i}} (\bm{A}^{T_i}_k | \bm{(A')}^{T_T}_k)$ and $H_{z^{T_i}} (\bm{(A')}^{T_i}_k | \bm{A}^{T_i}_k)$ are identical at each step and will cancel out. Also $u(\cdot)$ and $r(\cdot)$ will cancel out after normalisation and the normalised weights will be
-
+    The quantities $H_{(z')^{T_i}} (\bm{A}^{T_i}_k | \bm{(A')}^{T_T}_k)$ and $H_{z^{T_i}} (\bm{(A')}^{T_i}_k | \bm{A}^{T_i}_k)$ are identical at each step and will cancel out. Also $u$ and $r$ will cancel out after normalisation and we will have
     \begin{equation*}
-        W^{T_i}_k = \frac{q(\bm{(A')}^{T_i}_k | \bm{Z}^{T_{i-1}})}{q(\bm{A}^{T_i}_k | \bm{Z}^{T_{i-1}})} \Bigg( \sum_{s=1}^n \frac{q(\bm{A}^{T_i}_s | \bm{Z}^{T_{i-1}})}{q(\bm{(A')}^{T_i}_s | \bm{Z}^{T_{i-1}})} \Bigg).
+        \begin{aligned}
+            w^{T_i}_k & = \frac{q(\bm{(A')}^{T_i}_k | \bm{Z}^{T_{i-1}})}{q(\bm{A}^{T_i}_k | \bm{Z}^{T_{i-1}})} \Bigg( \sum_{s=1}^n \frac{q(\bm{A}^{T_i}_s | \bm{Z}^{T_{i-1}})}{q(\bm{(A')}^{T_i}_s | \bm{Z}^{T_{i-1}})} \Bigg)\\
+            & \propto \frac{L((\bm{a}')^{T_1})\prod_{j=2}^{i} L((\bm{a}')^{T_j} | \bm{a}^{T_{j-1}})}{L(\bm{a}^{T_1})\prod_{j=2}^{i} L(\bm{a}^{T_j} | \bm{a}^{T_{j-1}})}.
+        \end{aligned}
     \end{equation*}
 \end{frame}
+
+
+
+
+
+
+\begin{frame}
+\frametitle{Timeline}
+    I am planning to complete the MPhil in the first half of 2021, in advance of the deadline (06/04/2022) and will apply for the PhD program pending the panel advice
+    \begin{itemize}
+    \setlength\itemsep{1em}
+        \item Submit first paper (last week of January - First Paper 90\% completed).
+        \item Finalize code and submit second paper (aiming for end of February - Second Paper 60\% completed).
+        \item Finalise Introduction, conclusions and appendix of thesis. Check and fix existing chapters (March - Thesis 80\% completed).
+    \end{itemize}
+    The code for this project can be found at https://github.com/valeaussie.
+\end{frame}
+
+
+
+
+
 
 \begin{frame}[shrink=15]
 \frametitle{Bibliography}
@@ -613,8 +833,12 @@ A key feature of our model is that it does not need to include the phylogeny of 
 {\small \bibitem [\protect\citeauthoryear{Beer}{1990}]{Beer} 
 Beer, T.: The Australian National Bushfire model project. Math Comput. Model. 13(12), 49-56 (1990)
 
-\bibitem [\protect\citeauthoryear{Del Moral}{2014}]{Del Moral} 
-Del Moral, P., Murraly, L.M.: Sequential Monte Carlo with Highly Informative Observations. Math Comput. Model. 13(12), 49-56 (1990)
+\bibitem [\protect\citeauthoryear{Del Moral and Murray}{2014}]{DelMoral} 
+Del Moral, P., Murraly, L.M.: Sequential Monte Carlo with Highly Informative Observations. Math Comput. Model. 13(12), 49-56 (2014)
+
+\bibitem [\protect\citeauthoryear{Dempster}{1977}]{Dempster} 
+Dempster, A. P., Laird, N. M., Rubin, D. B.: Maximum Likelihood from Incomplete Data Via the EM Algorithm. Journal of the Royal Statistical Society: Series B (Methodological) 39, 1-22 (1977)
+
 
 \bibitem [\protect\citeauthoryear{Geweke}{1989}]{Geweke} 
 Geweke, B.: Bayesian Inference in Econometric Models Using Monte Carlo Integration. Econometrica 57(6): 1317–1339 (1989).
@@ -625,7 +849,7 @@ Geweke, B.: Bayesian Inference in Econometric Models Using Monte Carlo Integrati
 
 \bibitem [\protect\citeauthoryear{Jewell et al.}{2009}]{Jewell} Jewell, C. P., Kypraios, T., Neal, P.: Bayesian analysis for emerging infectious diseases. Bayesian Anal. 4(3): 465-496 (2009).
 
-\bibitem [\protect\citeauthoryear{Keith}{2013}]{Keith} 
+\bibitem [\protect\citeauthoryear{Keith and Spring}{2013}]{Keith} 
 Keith J. M., Spring D.: Agent-based Bayesian approach to monitoring the progress of invasive species eradication programs. Pro.c Natl. Acad. Sci. 110(33): 13428-13433 (2013)
 
 \bibitem [\protect\citeauthoryear{Malathy}{2011}]{Malathy} 
@@ -659,6 +883,123 @@ Zhang, X-P. et al.: Multiple Imputations Particle Filters: Convergence and Perfo
 \end{frame}
 
 
+\begin{frame}{Appendix 1: Proof of the identity in slide \ref{identity}}
+    Define a probability measure $\P^*$ having density $p^*$ on $\Omega^*_t$ such that the marginal distribution of $\P^*$ on $\Omega_t'$ is $\P$, that is $\P = \P^* \circ \pi^{-1}$, where $\P$ is the measure with density $p$ on $\Omega_t'$. 
+
+    Here the measurable sets in $\Omega_t$, $\Omega_t'$ and $\Omega_t^*$, are constructed from Borel sets on $\Real^M$ and subsets of $2^M$ in the manner implied by the sequence of cross-products and restrictions used to define $\Omega_t$, $\Omega_t'$ and $\Omega_t^*$. Similarly, reference measures are constructed from Lebesgue measure on $\Real^M$ and counting measure on $2^M$.)
+
+    By the disintegration theorem (see \cite{Rohlin}) there exists a family of measures $\{ \nu_{\bm{(y')}^t} \}_{\bm{(y')}^t \in \Omega'_t}$ on $\Omega^*_t$ such that for every measurable Borel function $m : \Omega^*_t \rightarrow [0, \infty]$
+    \begin{align*}
+        &\int_{\Omega^*_t} m(\bm{(y')}^t, \bm{y}^t)\diff \P^* = \\
+     & \int_{\Omega_t'} \bigg( \int_{\pi^{-1}(\bm{(y')}^t)} m(\bm{(y')}^t, \bm{y}^t) \diff \nu_{\bm{(y')}^t}  \bigg) \diff \P((\bm{y'})^t).
+    \end{align*}
+\end{frame}
+
+
+
+\begin{frame}
+    It follows that for any event $A$,
+    \begin{align*}
+        &\P(A) = \P^{*}(\pi^{-1}(A)) = \\
+        &\int_{\Omega_t^*} I_A(\pi(\bm{(y')}^t, \bm{y}^t)) p^*(\bm{(y')}^t, \bm{y}^t | \bm{Z}^t) \D \P^*  = \\
+        & \int_{\Omega_t'} I_A(\bm{(y')}^t) \Bigg[ \int_{\pi^{-1}(\bm{(y')}^t)} p^*(\bm{(y')}^t, \bm{y}^t | \bm{Z}^t) \D \nu_{\bm{(y')}^t} (\bm{y}^t) \Bigg] \D \P (\bm{(y')}^t)
+    \end{align*}
+    and hence
+    \begin{equation*}
+        p(\bm{(y')}^t | \bm{Z}^t) = \int_{\pi^{-1}(\bm{(y')}^t)} p^*(\bm{(y')}^t, \bm{y}^t | \bm{Z}^t) \D \nu_{\bm{(y')}^t}(\bm{y}^t).
+    \end{equation*}
+    Moreover,
+    \begin{align*}
+        &E_{p}[l(\bm{(y')}^{t})]  = \int_{\Omega_t'} l(\bm{(y')}^{t})\; p(\bm{(y')}^{t} | \bm{Z}^{t}) \D \P (\bm{(y')}^{t}) \\
+        &= \int_{\Omega_t'} l(\bm{(y')}^{t})\Bigg[\int_{\pi^{-1}(\bm(y'))} p^*(\bm{(y')}^{t}, \bm{y}^{t} | \bm{Z}^{t}) \D \nu_{\bm{(y')}^t}(\bm{y}^t) \Bigg] \D \P \bm{(y')}^{t} \\ 
+        &= \int_{\Omega_t^*} l(\pi(\bm{(y')}^{t}, \bm{y}^{t}))\; p^*(\bm{(y')}^{t}, \bm{y}^{t} | \bm{Z}^{t}) \D \P^*(\bm{(y')}^t, \bm{y}^t) \\ 
+        &= E_{p^*}[l(\pi (\bm{(y')}^{t}, \bm{y}^{t}))].
+    \end{align*}
+\end{frame}
+
+
+\begin{frame}{Appendix 2: Observations missing at random}
+    If $\bm{B}^t$ evolves independently of $\bm{X}^t$we have $\bm{b}^t | \bm{x}^t, \bm{b}^{t-1} \sim g_t(\bm{b}^t | \bm{b}^{t-1})$.
+    
+    Here we limit our interest to expectations of the form:
+    \begin{align*}
+        E_{p} \Big[l(\bm{X}^{t}) \Big] &=  \int_{\Omega_t'} l(\bm{X}^{t})\; p(\bm{X}^{t} | \bm{Z}^{t})\; \prod_{ \{ i \leq t  : z^t_{i} = - \} } \D x^i
+    \end{align*}
+    for functions $l: \Omega_t'  \rightarrow \Real$, where $\Omega_t' := \sigma^{-1}(\bm{Z}^{t})$ as before, remembering that $\bm{B}^{t}$ is fully determined by $\bm{Z}^{t}$, so that elements of $\Omega_t'$ all share the same value of $\bm{B}^{t}$. 
+
+    Since these expectations do not depend on $\bm{B}^t$, the $g$ terms can be brought outside the integrals in the expressions above. Thus all $g$ terms cancel in the expression for $p(\bm{X}^t, \bm{B}^t | \bm{Z}^t)$. Moreover, all $g$ terms except the final term $g(\bm{b}^t | \bm{b}^{t-1})$ cancel in for $q(\bm{X}^t, \bm{B}^t | \bm{Z}^{t-1})$ and this last term may be removed by summing over $\bm{B}^t$. In this case, it will be convenient to redefine $h$ and $r$ as follows:
+    \begin{eqnarray*}
+        h(\bm{X}^t) & := & f(\bm{x}^1)\prod_{i=2}^{t} f(\bm{x}^i | \bm{x}^{i-1})
+    \end{eqnarray*}
+    \end{frame}
+    
+    
+    
+    
+    \begin{frame}
+    and
+        \begin{eqnarray*}
+        r(\bm{Z}^t) & := & \int_{\Omega_t'}  h(\bm{X}^t) \prod_{ \{ i \leq t, m \in \{1, \ldots, M \} : z^t_{im} = - \} } \D x^i_m
+    \end{eqnarray*}
+    with
+    \begin{eqnarray*}
+        r(\bm{z}^t | \bm{Z}^{t-1}) & := & \frac{r(\bm{Z}^t)}{r(\bm{Z}^{t-1})}.
+    \end{eqnarray*}
+    Note the set $\Omega_t'$ also needs to be redefined as the projection of $\sigma^{-1}(\bm{Z}^t)$ onto the subspace obtained by discarding the second element of the pair $(\bm{X}^t,\bm{B}^t)$, noting that $\bm{B}^t$ is the same for all elements of $\sigma^{-1}(\bm{Z}^t)$. With this modified notation, we can now write:
+    \[
+        q(\bm{X}^1) = f(\bm{x}^1),
+    \]
+    on $\Omega_1 = \Real^M$ and for $t \geq 2$,
+    \begin{eqnarray*}
+        q(\bm{X}^t | \bm{Z}^{t-1}) & = & \frac{f(\bm{x}^1)}{r(\bm{z}^1)}  \prod_{i=2}^{t-1} \frac{f(\bm{x}^i | \bm{x}^{i-1}) }{r(\bm{z}^t | \bm{Z}^{t-1})} f(\bm{x}^t | \bm{x}^{t-1})
+    \end{eqnarray*}
+    on $\Omega_t = \Omega_{t-1}' \times \Real^M $ and 
+    \begin{eqnarray*}
+        p(\bm{X}^t | \bm{Z}^t) 
+        & = & \frac{f(\bm{x}^1)}{r(\bm{z}^1)} \prod_{i=2}^t \frac{f(\bm{x}^i | \bm{x}^{i-1}) }{r(\bm{z}^t | \bm{Z}^{t-1})} 
+    \end{eqnarray*}
+    on $\Omega_t'$.
+\end{frame}
+
+
+\begin{frame}
+    If $\bm{B}^t$ evolves independently of $\bm{X}^t$, the partial weights simplify to
+    \begin{eqnarray*}
+        w^{t}_{1j} &=& \frac{f((\bm{x}_j')^1)}{f(\bm{x}_j^1)}
+    \end{eqnarray*}
+    and
+    \begin{eqnarray*}
+        w^{t}_{ij} &=& \frac{f((\bm{x}_j')^i | (\bm{x}_j')^{i-1})}{f(\bm{x}_j^i | \bm{x}_j^{i-1})}
+    \end{eqnarray*}
+    for $i \in \{ 2, \ldots, t-1 \}$. 
+    However, the final $g$ term (for $i = t$) does not cancel in general, hence
+    \begin{eqnarray*}
+        w^{t}_{tj} &=& \frac{f((\bm{x}_j')^t | (\bm{x}_j')^{t-1})}{f(\bm{x}_j^t | \bm{x}_j^{t-1})} \frac{g((\bm{b}_j')^t | \bm{b}_j^{t-1})}{g(\bm{b}_j^t | \bm{b}_j^{t-1})}
+    \end{eqnarray*}
+    The alternative partial weight $v_{ij}^t$ simplifies similarly (and is again equal to the numerator of $w_{ij}^t$).
+\end{frame}
+
+
+
+
+
+\begin{frame}{Appendix 3: An alternative distribution for $u$}
+    An alternative distribution for $u$, is obtained by restricting $q(\bm{y}^{t} | \bm{Z}^{t-1})$ to the set $F(\bm{(y')}^{t})$. In this case, the normalising constant, obtained by integrating $q(\bm{y}^{t} | \bm{Z}^{t-1})$ over $F(\bm{(y')}^{t})$, depends on the specific value of $\bm{(y')}^{t}$. In our examples below it can be evaluated exactly, but in some cases it may require estimation. 
+    For this $u$ the normalised weights after cancelling terms are
+    \begin{eqnarray*}
+        w^{t}_j &=& \frac{\frac{1}{N_j} \prod_{i=1}^t v^{t}_{ij}}{\sum_{l=1}^n \frac{1}{N_l}\prod_{i=1}^t v^{t}_{il}}
+    \end{eqnarray*}
+    where $N_j$ is the normalisation constant obtained by integrating $q(\bm{y}^{t} | \bm{Z}^{t-1})$ over $F((\bm{y}_j')^{t})$, and the alternative partial weights are given by
+    \[
+        v^{t}_{1j} = w^{t}_{1j} f(\bm{x}_j^1)g(\bm{b}_j^1 | \bm{x}_j^1) = f((\bm{x}_j')^1)g((\bm{b}_j')^1 | (\bm{x}_j')^1)
+    \]
+    and
+    \begin{eqnarray*}
+        v^{t}_{ij} &=& w^{t}_{ij} f(\bm{x}_j^i | \bm{x}_j^{i-1}) g(\bm{b}_j^i | \bm{x}_j^i, \bm{b}_j^{i-1}) \\
+        &=& f((\bm{x}_j')^i | (\bm{x}_j')^{i-1}) g((\bm{b}_j')^i | (\bm{x}_j')^i, (\bm{b}_j')^{i-1})
+    \end{eqnarray*}
+    for $i \geq 2$.
+\end{frame}
 
 
 

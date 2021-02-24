@@ -1,7 +1,7 @@
 \chapter[A novel Spatio-temporal self-exciting point process to model invasive species]{a novel Spatio-temporal self-exciting point process to model invasive speciess}
 \label{ch:Model}
 
-We are proposing a new model for the RIFA invasion based on a self-exciting point process.
+Here we introduce a new model for the RIFA invasion based on a self-exciting point process.
 
 In this new approach we are seeking to simplify and improve on Keith and Spring agent-based model \cite{Keith} with the aim to reduce the running time without compromising on flexibility and completeness.
 
@@ -18,6 +18,8 @@ We have been also considering the detection processes in parallel with the found
 We then included unobserved nests alongside observed nests in the detection likelihood to fully model the missing data.
 
 Finally, we have considered events as happening continuously in time.
+
+\section{RIFA Model}
 
 Let us consider a self-exciting spatial-temporal point process $N$ as a generalization of an Hawkes model. We can then specify an intensity function $\lambda(x, y, t)$ which represents the infinitesimal expected  rate of events at time $t$ and location $(x, y)$  given all the events up to time $t$.
 
@@ -158,4 +160,23 @@ In Bayesian statistics, we begin with prior distributions $P(\Theta)$ which enco
 \[
 P(\Theta | s_{1}, ..., s_{n}, f_{1}, ... , f_{n}, t_{1}, ..., t_{n}) \propto L(s_{1}, ..., s_{n}, f_{1}, ... , f_{n}, t_{1}, ..., t_{n} | \Theta) \times P(\Theta)
 \]
+
+\section{Model simulation} \label{section:simulationModel}
+
+For the simulation of the process in a time interval $\tau_j = (T_{j-1}, T_j]$ between observations we will view the model as a branching Poisson process \cite{Lewis} which is a natural choice for invasive species. This immigration-birth representation gives rise to a simpler simulation procedure than the thinning algorithm introduced by Ogata \cite{Ogata}. A procedure of this kind was introduced by Zhuang \cite{Zhuang} for self-exciting spatial temporal point processes in the context of earthquake models. The simulation will proceed as follow:
+
+\begin{enumerate}
+    \item Consider the catalogue of events $G^{T_{j-1}}$ which contains the nests that have not been observed and killed at or before time $T_{j-1}$. Take all the unobserved nests that will be mature (older than 8 months) by time $T_j$ and put them in the catalogue $G_l^{T_j}$.
+    \item Set $l = 0$.
+    \item From $G_l^{T_j}$ select which nests are mature and put in catalogue $M_l^{T_j}$.
+    \item For each nest in $M_l^{T_j}$ simulate the number of offspring $\nu^{T_j}$ produced in the time interval $\tau_j$ from a Poisson distribution with parameter $ m^{T_j} = \zeta (T_j-t_m)$ where $m^{T_j}$ was defined in equation (\ref{eq:NumOffsp}).
+    \item Simulate for each of the offspring the time of founding from a uniform distribution that is $1/(T_j-t_m)$ if $t_m \leq f - f' \leq T_j$ and $0$ otherwise.
+    \item Simulate the number of long-distance jumps $\mu^{T_j}$ from a binomial distribution with probability $\gamma$ and total number of offspring $\nu^{T_j}$.
+    \item Simulate the location of these offspring. This is done simulating the angular direction and the radial direction separately, then calculating the coordinates $x$ and $y$. The angular direction will be simulated from a uniform distribution in the interval $(0, 2\pi]$. The radial direction for the long jumps will be simulated form a L\'evy distribution with parameter $c$ (VVV the bigger this parameter the higher the jumps simulated). The radial direction for the cluster events will be simulated from a decaying exponential distribution with parameter $\rho$.
+    \item Simulate for each offspring the time from establishment to notification from an exponential distribution with parameter $\varphi$.
+    \item Delete all parent nests that have been observed in the time interval $\tau_j$.
+    \item Store each newly generated and not yet observed nest's location, time of founding and time of observation in $O_l^{T_j}$. Let $G_{l}^{T_j} = \bigcup_{k=1}^{\nu^{T_j}} (O_l^{T_j})_k$.
+    \item If $G_l^{T_j}$ is not empty, set $l = l+1$ and return to step 3. Otherwise return $\bigcup_{h=0}^l G^{T_j}_h$ as the final set of simulated events for the time interval $\tau_j$.
+
+\end{enumerate}
 

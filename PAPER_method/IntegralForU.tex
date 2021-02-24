@@ -1,0 +1,149 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}  
+\usepackage{amsfonts} 
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+%\usepackage[demo]{graphicx}
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+\usepackage{xcolor}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+\textwidth=16cm \hoffset = -1.9cm
+\lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\s}{\mathbb{S}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\Q}{\mathsf{Q}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+\newcommand{\D}{\mathrm{d}}
+
+\newcommand{\ds}{\displaystyle}
+
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator*{\esssup}{ess~sup}
+\DeclareMathOperator*{\essinf}{ess~inf}
+\DeclareMathOperator*{\diam}{diam}
+\DeclareMathOperator*{\ROC}{ROC}
+\DeclareMathOperator*{\sinc}{sinc}
+\DeclareMathOperator*{\sign}{sign}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\newcommand{\K}{\mathbb{K}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+\begin{document}
+We want to find the normalization constant $N_j$ for the particle $j$. To do so we want to integrate $q(\vec{X}^t | \vec{Z}^{t-1})$ over $F((\vec{X}'_j)^t, \vec{Z}^t)$. Here for readability we have substituted the superscripts of $x$ with subscripts, so $x^i = x_i$.
+
+\[
+    \frac{1}{(\sqrt{2 \pi \sigma^2})^t} \int \frac{\exp [-\frac{1-\varphi^2}{2 \sigma^2}x_1^2]}{r(\vec{z}^1)} \prod_{i=2}^{t-1} \frac{\exp[-\frac{1}{2 \sigma^2} (x_i - \varphi x_{i-1})^2]}{r(\vec{z}^i | \vec{Z}^{i-1})} \exp \bigg[-\frac{1}{2 \sigma^2} (x_t - \varphi x_{t-1})^2 \bigg] \prod_{ \{ i \leq t : (b'_i)^t \neq (b'_i)^{t-1}\}} \d x_i
+\]
+which we also rewrite as
+
+\[
+    \frac{1}{(\sqrt{2 \pi \sigma^2})^t} \int \frac{1}{{r(\vec{Z}^{t-1})}}\Bigg(\exp \bigg[-\frac{1-\varphi^2}{2 \sigma^2}x_1^2 \bigg] \prod_{i=2}^t \exp \bigg[-\frac{1}{2 \sigma^2} (x_i - \varphi x_{i-1})^2 \bigg] \Bigg) \prod_{ \{ i \leq t : (b'_i)^t \neq (b'_i)^{t-1}\}} \d x_i
+\]
+where
+\[
+    r(\vec{Z}^{t-1}) = r(\vec{z}^1) \prod_{i=2}^{t-1} r(\vec{z}^i | \vec{Z}^{i-1}) = \int \exp \bigg[-\frac{1-\varphi^2}{2 \sigma^2}x_1^2 \bigg] \prod_{i=2}^{t-1} \exp \bigg[-\frac{1}{2 \sigma^2} (x_i - \varphi x_{i-1})^2 \bigg] \prod_{ \{ i \leq t-1, m \in {i, \dots, M} : z^{t-1}_i = - \} } \d x_i
+\]
+the quantity $r(\vec{Z}^{t-1})$ does not depend on the variables we integrate on and can be brought out of the integral. Also, this quantity will be the same for all particles and will cancel at normalization alongside the constant $\frac{1}{(\sqrt{2 \pi \sigma^2})^t}$. We now need to solve 
+
+\[
+    \int \exp \bigg[-\frac{1-\varphi^2}{2 \sigma^2}x_1^2 \bigg] \prod_{i=2}^t \exp \bigg[-\frac{1}{2 \sigma^2} (x_i - \varphi x_{i-1})^2 \bigg] \prod_{ \{ i \leq t : (b'_i)^t \neq (b'_i)^{t-1}\}} \d x_i
+\]
+which we can rewrite as
+\[
+    \int \exp \bigg[-\alpha x_1^2 -\beta \sum_{i=2}^t (x_i - \varphi x_{i-1})^2 \bigg] \prod_{ \{ i \leq t : (b'_i)^t \neq (b'_i)^{t-1}\}} \d x_i
+\]
+with $\alpha = \frac{1-\varphi^2}{2\sigma^2}$ and $\beta = \frac{1}{2\sigma^2}$.
+Squaring we get
+\[
+    \int \exp \bigg[-(\alpha+ \varphi^2 \beta) x_1^2 -\beta (1+ \varphi^2) \sum_{i=2}^{t-1} x_i^2 - \beta x^2_t + 2\varphi \beta \sum_{i=2}^t x_i x_{i-1} \bigg] \prod_{ \{ i \leq t : (b'_i)^t \neq (b'_i)^{t-1}\}} \d x_i
+\]
+which we can rewrite
+\[
+    \int \exp \bigg[-a x_1^2 - \beta x^2_t - b \sum_{i=2}^{t-1} x_i^2 + c \sum_{i=2}^t x_i x_{i-1} \bigg] \prod_{ \{ i \leq t : (b'_i)^t \neq (b'_i)^{t-1}\}} \d x_i
+\]
+with $a = (\alpha+ \varphi^2 \beta) = \frac{1}{2 \sigma^2} = \beta$, $b = \beta (1+ \varphi^2) = \frac{(1+ \varphi^2)}{2 \sigma^2}$ and $c = 2\varphi \beta = \frac{\varphi}{ \sigma^2}$.
+This integral can be solved iteratively and to do so we use the following well known integrals:
+\[
+    \int_{-\infty}^{+ \infty} h e^{-k x^2_j} \d x_j = \frac{\sqrt{\pi} h}{\sqrt k}
+\]
+and
+\[
+    \int_{-\infty}^{+ \infty} h e^{-k x^2_j + l x_j x_{j-1} } \d x_j = \frac{\sqrt{\pi} h}{\sqrt k} e^{\frac{l^2 x_{j-1}}{4 k}}
+\]
+for some constants $h$ and $k > 0$.
+
+We now have to consider different cases. 
+
+\begin{itemize}
+    \item we have $m$ non consecutive newly observed elements (that are not $x_i$ or $x_t$)
+    \item $x_1$ is newly observed,
+    \item $x_t$ is newly observed,
+    \item we have $n$ even consecutive newly observed elements,
+    \item we have $n+1$ odd consecutive newly observed elements.
+\end{itemize}
+For $m$ non consecutive newly observed elements (excluding $x_1$ and $x_t$) the solution of the integral is
+
+\[
+    \frac{(\sqrt{\pi})^m}{(\sqrt{b})^m} \exp \Bigg[ \sum_{\{ 1 < i < t : (b'_i)^t \neq (b'_i)^{t-1}\}} \frac{c^2}{4 b} x_{i-1}\Bigg]\exp \Bigg[ \sum_{\{ j \neq i\}} (- \beta x^2_1 -\beta x^2_t - b x^2_j + c x_j x_{j-1})\Bigg].
+\]
+If we also observe $x_1$ the solution is
+
+\[
+    \frac{(\sqrt{\pi})^{m+1}}{(\sqrt{b})^m \sqrt{\beta}} \exp \Bigg[ \sum_{\{ i < t : (b'_i)^t \neq (b'_i)^{t-1}\}} \frac{c^2}{4 b} x_{i-1}\Bigg] \exp \Bigg[ \sum_{\{ j \neq i\}} (- \beta x^2_t- b x^2_i + c x_j x_{j-1})\Bigg].
+\]
+If we also observe $x_t$ the solution is
+
+\[
+    \frac{(\sqrt{\pi})^{m+2}}{(\sqrt{b})^m \beta} \exp \Bigg[ \sum_{\{ i \leq t : (b'_i)^t \neq (b'_i)^{t-1}\}} \frac{c^2}{4 b} x_{i-1}\Bigg] \exp \Bigg[ \sum_{\{ j \neq i\}} (- b x^2_j + c x_j x_{j-1})\Bigg]
+\]
+If we also observe $n$ even consecutive elements the solution is
+
+\[
+    \frac{(\sqrt{\pi})^{m+n+2} (\sqrt{2})^n}{(\sqrt{b})^m \beta(\sqrt{c})^n} \exp \Bigg[ \sum_{\{ i \leq t : (b'_i)^t \neq (b'_i)^{t-1}\}} \frac{c^2}{4 b} x_{i-1}\Bigg] \exp \Bigg[ \sum_{\{ j \neq i\}} (- b x^2_j + c x_j x_{j-1})\Bigg]
+\]
+If instead we also observe $n+1$ odd consecutive elements the solution is
+
+\[
+    \frac{(\sqrt{\pi})^{m+n+3} (\sqrt{2})^n}{(\sqrt{b})^{m+1} \beta(\sqrt{c})^n} \exp \Bigg[ \sum_{\{ i \leq t : (b'_i)^t \neq (b'_i)^{t-1}\}} \frac{c^2}{4 b} x_{i-1}\Bigg] \exp \Bigg[ \sum_{\{ j \neq i\}} (- b x^2_j + c x_j x_{j-1})\Bigg]
+\]
+noticing that $b > 0$, $\beta > 0$, $\frac{2^{n/2}}{c^{n/2}} > 0$, $\frac{c^2}{4 b} > 0$.
+
+\end{document}

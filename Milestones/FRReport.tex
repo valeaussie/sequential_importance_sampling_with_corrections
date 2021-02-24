@@ -83,10 +83,10 @@ Although this approach is ultimately aimed at inference for invasive species, th
 
 To solve problems of this kind we take a Sequential Importance Sampling (SIS) approach in which we generate a population of particles, each representing a plausible sequence of system states, and evolve each particle at each time step according to a model of system dynamics. We then use observations that arrive sequentially in time to adjust the weights assigned to particles. A crucial new element in our method is that we allow missing values imputed at earlier time steps to be corrected so that they are consistent with the new observations.
 
-We are also presenting a new model for the RIFA invasion, using a spatial-temporal self-exciting approach that can be applied to problems where we know the exact locations and times of observation of invaders as opposed to problem where data are grid based. In this approach we do not need to rebuild the phylogeny of nests, although this can be reconstructed if needed. We therefore define a Markovian System to which we apply our new SIS methodology.
+We are also presenting a new model for the RIFA invasion, using a spatial-temporal self-exciting approach that can be applied to problems where we know the exact locations and times of observation of invaders as opposed to problems where data are grid based. In this approach we do not need to rebuild the phylogeny of nests, although this can be reconstructed if needed. We therefore define a Markovian System to which we apply our new SIS methodology.
 
 Some of the results of this research have been added below (see Fig. \ref{fig:1} and Fig. \ref{fig:2})
-\section{State of Current work}
+\section{State of Current Work}
 
 Substantial progress have been made from the last milestone: One paper and the draft of a second paper have been so far produced. The first paper will be submitted in January 2021 to the journal `Statistics and Computing' and aims to introduce the novel `Sequential Importance Sampling With Correction' methodology applied to two toy models for which observations are simulated: an AR(1) model, and the model of a river invasion. The second paper is an application of the method to the RIFA invasion data-set. In this second paper we also present the new model for the RIFA invasion based on spatial-temporal Hawkes processes. While a first draft of the second paper have been completed, I am still working on the algorithm which I am expecting to finish in February 2021.
 
