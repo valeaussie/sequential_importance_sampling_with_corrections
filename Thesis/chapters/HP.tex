@@ -1,4 +1,91 @@
-\chapter[Hawkes Processes and Spatio-temporal self-exciting point processes]{Hawkes Processes and Spatio-temporal self-exciting point processes}
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}  
+\usepackage{amsfonts} 
+\usepackage{graphicx} 
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{float}
+\usepackage{xcolor}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+
+ \textwidth=16cm \hoffset = -1.9cm
+ \lineskip=1.5\lineskip
+
+
+% MATH -----------------------------------------------------------
+\newcommand{\Real}{\mathbb R}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\nbr}{\mathrm{nbr}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Hil}{\mathscr{H}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\s}{\mathbb{S}}
+\newcommand{\p}{\mathscr{P}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\one}[1]{\mathbf{1}_{\{#1\}}}
+\newcommand{\oneset}[1]{\mathbf{1}_{#1}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\Q}{\mathsf{Q}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\osimplex}{\mathcal{S}^{d-1}}
+\newcommand{\csimplex}{\bar{\mathcal{S}}^{d-1}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\ind}{\mathrm{I}}
+\newcommand{\D}{\mathscr{D}}
+\newcommand{\Borel}{\mathscr{B}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\Z}{\mathcal{Z}}
+\renewcommand{\d}[1]{\ensuremath{\operatorname{d}\!{#1}}}
+
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\ds}{\displaystyle}
+
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator*{\esssup}{ess~sup}
+\DeclareMathOperator*{\essinf}{ess~inf}
+\DeclareMathOperator*{\diam}{diam}
+\DeclareMathOperator*{\ROC}{ROC}
+\DeclareMathOperator*{\sinc}{sinc}
+\DeclareMathOperator*{\sign}{sign}
+\newcommand{\voila}{\hfill $\blacksquare$}
+\newcommand{\Id}{\mathrm{Id}}
+\newcommand{\K}{\mathbb{K}}
+\renewcommand{\Re}{\mathrm{Re}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+
+
+
+\title{Novel approach for modelling and forecating the spread of invasive species}
+
+
+\author{Valentina Di Marco}
+
+
+\date{\today}
+
+
+
+\begin{document}
+ \maketitle
+
+
+
+\section{Hawkes Processes and Spatio-temporal self-exciting point processes}
 \label{ch:Hawkes}
 
 The idea of self-exciting point processes was first introduced by \cite{Hawkes71}. These models are well suited to events that would cluster and have been used in a variety of fields, from seismic activities (\cite{Ogata88}) to neuroscience (\cite{Reynaud}, \cite{Chornoboy}), crime prediction (\cite{Mohler13}, \cite{White} \\ \cite{Reinhart2018}) and social media (\cite{Chen}). Another interesting and application is in modelling the spread of diseases. For example \\ \cite{Browning} have recently been modelling retrospectively daily counts of deaths during the COVID-19 pandemic outbreak using a time-discrete Hawkes process. 
@@ -206,7 +293,7 @@ Finally, since $\bm{X}$ is ergodic with a finite and positive intensity equal to
 
 
 
-\section{Self-exciting spatial-temporal point process}
+\section{self-exciting spatial-temporal point process}
 
 So far we have considered only the temporal form of the self-exciting point processes but we can extend this models to spatio-temporal processes. The definition will be analogous to Definition \ref{def:Hawkes} with conditional intensity
 
@@ -389,3 +476,7 @@ A Simulation process based on the branching structure of a self-exciting spatial
 \cite{Moller} developed a perfect simulation algorithm for temporal Hawkes processes which avoids edge effects, but its extension to spatio-temporal processes remains to be developed \cite{Reinhart}.
 
 In our paper on the reconstruction of the fire ants invasion (chapter \ref{ch:ModelMethod}) we will utilise the cluster algorithm modified for a spatial-temporal point process.
+
+
+
+\end{document}

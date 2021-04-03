@@ -51,8 +51,8 @@ grestore
 %
 % insert here the call for the packages your document requires
 %\usepackage{latexsym}
-\usepackage[demo]{graphicx}
-%\usepackage{graphicx}
+%\usepackage[demo]{graphicx}
+\usepackage{graphicx}
 \usepackage[caption = false]{subfig}
 \graphicspath{ {./images/} }
 \usepackage[round]{natbib}
@@ -112,11 +112,7 @@ grestore
 \begin{document} \sloppy
 \bibliographystyle{plainnat}
 
-\title{Sequential Importance Sampling With Corrections For Partially Observed States
-%\thanks{Grants or other notes
-%about the article that should go on the front page should be
-%placed here. General acknowledgments should be placed at the end of the article.}
-}
+\title{Sequential Importance Sampling With Corrections For Partially Observed States}
 
 \author{Valentina Di Marco \and
         Jonathan Keith}
@@ -124,13 +120,10 @@ grestore
 \institute{Valentina Di Marco \at
               School of Mathematical Science, Monash University, Clayton Campus, VIC 3800, Australia \\
               Tel.: +61-4-23330509\\
-              \email{valentina.dimarco@monash.edu}      
+              \email{valentina.dimarco@monash.edu}\\
               \and
               Jonathan Keith \at
-              School of Mathematical Science, Monash University, Clayton Campus, VIC 3800, Australia
-              \and
-              Daniel Spring \at
-              School of Ecosystem and Forest Sciences, The University of Melbourne, Parkville, Victoria 3010, Australia}
+              School of Mathematical Science, Monash University, Clayton Campus, VIC 3800, Australia}\\
 
 \date{Received: date / Accepted: date}
 % The correct dates will be entered by the editor
@@ -164,7 +157,7 @@ In the first chapter of this paper we introduce our Bayesian approach that uses 
 
 Our method addresses a problem that is common in practice: new observations made in real time can render previously imputed missing values implausible, and may even conflict with what has been simulated. For example, in the invasive species context described above, undetected individuals imputed to geographic areas that do not contain any invaders become increasingly implausible as time passes without any detection being made in those regions. In standard SIS approaches, such particles receive low weights and are eventually eliminated by resampling, but a common problem is that all particles can become implausible, if not inconsistent, with observations.
 
-Problems of this kind arise in many contexts other than invasive species detection. We can envisage the approach being used to study the evolution of a species' geographic range, for both invasive and non-invasive species. The algorithm could also be applied to a variety of other missing data problems where new incomplete data is continuously acquired, such as in crime prediction, (\cite{Malathy}) or bushfire modeling (\cite{Beer}). Another potential application is in the study of the spread of infectious diseases, where observations are made in the form of diagnosed cases, but there is missing data in the form of undiagnosed cases (\cite{O'Neill}). 
+Problems of this kind arise in many contexts other than invasive species detection. We can envisage the approach being used to study the evolution of a species' geographic range, for both invasive and non-invasive species. The algorithm could also be applied to a variety of other missing data problems where new incomplete data is continuously acquired, such as in the prediction of earthquake aftershocks, (\cite{Seif}) or bushfire modeling (\cite{Beer}). Another potential application is in the study of the spread of infectious diseases, where observations are made in the form of diagnosed cases, but there is missing data in the form of undiagnosed cases (\cite{O'Neill}). 
 
 Missing data problems are ubiquitous in ecological and evolutionary data sets as in many other branches of science. Two common methods used to deal with missing data are to delete rows of a data matrix (corresponding to individuals or cases) that contain missing data, or to use the mean to fill in missing values. However, these methods result in biased estimation of parameters and uncertainty, and reduction in statistical power. Better missing data procedures such as data augmentation (\cite{Tanner}) and multiple imputation (\cite{RubinMI}) are available  (\cite{Nakagawa}).
 For an up-to-date treatment of missing data in statistics see \cite{Little}.
@@ -517,7 +510,7 @@ We have run our simulations with 1,000 particles and 30 times and compared our m
 \section{Application to an invasive species model}
 \label{sec:7}
 
-This second example illustrates the applicability of our method to invasive species models. For simplicity, we consider a one-dimensional environment such as a river without tributaries or confluences. We divide the length of the river into $M$ sections or cells and suppose the first introduction of the invasive species occurs in a cell with index $\mu$. From this cell, the invasion can propagate only in the immediately adjacent sections of the river, namely the cells indexed by $\mu-1$ and $\mu+1$ (an unrealistic assumption for most water-borne invasive species, but convenient for illustrative purposes). At each time step, a cell becomes infested from an adjacent infested cell with probability $\theta$. We represent the state of the system at time $t \in \{ 1, \dots, T \}$ by a binary vector $\vec{x}^{t} = (x_1^{t}, \dots, x_{M}^{t})$. These vectors indicate the state of each cell at time $t$: $x_m^t = 1$ if cell $m$ is infested and $x_m^t = 1$ otherwise. The invasion will be complete, (that is, all cells will be infested) at an unknown time $T$. 
+This second example illustrates the applicability of our method to invasive species models. For simplicity, we consider a one-dimensional environment such as a river without tributaries or confluences. We divide the length of the river into $M$ sections or cells and suppose the first introduction of the invasive species occurs in a cell with index $\mu$. From this cell, the invasion can propagate only in the immediately adjacent sections of the river, namely the cells indexed by $\mu-1$ and $\mu+1$ (an unrealistic assumption for most water-borne invasive species, but convenient for illustrative purposes). At each time step, a cell becomes infested from an adjacent infested cell with probability $\theta$. We represent the state of the system at time $t \in \{ 1, \dots, T \}$ by a binary vector $\vec{x}^{t} = (x_1^{t}, \dots, x_{M}^{t})$. These vectors indicate the state of each cell at time $t$: $x_m^t = 1$ if cell $m$ is infested and $x_m^t = 0$ otherwise. The invasion will be complete, (that is, all cells will be infested) at an unknown time $T$. 
 The invasion expands in two directions (left and right) simultaneously with the same probability $\theta$ of expansion by one cell applicable in both directions. It is convenient to collect these vectors to form a $t\times M$ matrix $\vec{X}^{t}$, in which each row $i$ is the binary vector $\vec{x}^{i}$.
 
 We store information regarding which cells have been observed to contain the invasive species at or before time $t$ in a binary matrix $\vec{b}^t = (b_{im}^t)$, where $b_{im}^t = 1$ if the state of cell $m$ at time $i$ is known by time $t$, and $b_{im}^t = 0$ otherwise. The observations available at time $t$ are represented by a matrix $\vec{z}^t = (z_{im}^t)$, where we set $z_{im}^t = x^i_m$ if $b_{im}^t = 1$ and $z_{im}^t = -$ otherwise. However, in this example only presences may be observed, so $b_{im}^t = 1$ implies $x_m^i = 1$ and thus $z_{im}^t = 1$. Thus $\vec{b}^t$ and $\vec{z}^t$ fully determine each other: $z_{im}^t = 1$ if and only if $b_{im}^t = 1$, and $z_{im}^t = -$ if and only if $b_{im}^t = 0$. Moreover, $\vec{b}^t$ fully determines $\vec{b}^{t'}$ at any earlier time $t' < t$ by discarding the matrix rows corresponding to times after $t'$, and similarly for $\vec{z}^t$. Thus it is not necessary to form $\vec{B}^t = (\vec{b}^1,\ldots,\vec{b}^t)$ or $\vec{Z}^t = (\vec{z}^1,\ldots,\vec{z}^t)$ as in the general case: the same information is already contained in $\vec{b}^t$ or $\vec{z}^t$.
@@ -550,16 +543,16 @@ The distribution for the observations is:
 \end{align*}
 where $g_R(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1})$ is the probability of detecting invaders on the right of the cells previously observed as infested and $g_L(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1})$ is the probability of detecting invaders on the left of the cells previously observed as infested. These two events are independent.
 
-Let $a^{t}$ be the largest integer in the set $\{ m : b_{tm}^{t} = 1 \}$, that is, the index of the highest numbered cell at which the invader has been observed at time $t$ on the right of the invasion. Then the number of new probes at which the invader is successfully detected at time $t$ is $a^{t} - a^{t-1}$. Probing on the right can stop in two ways: either because all invaded sites on the right have been found, in which case $g_R(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) = \varphi^{a^{t} - a^{t-1}}$, or because the last probe on the right failed to detect an invaded cell, in which case $g_R(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) = \varphi^{a^{t} - a^{t-1}} (1 - \varphi)$.
+Let $a_{t}$ be the largest integer in the set $\{ m : b_{tm}^{t} = 1 \}$, that is, the index of the highest numbered cell at which the invader has been observed at time $t$ on the right of the invasion. Then the number of new probes at which the invader is successfully detected at time $t$ is $a_{t} - a_{t-1}$. Probing on the right can stop in two ways: either because all invaded sites on the right have been found, in which case $g_R(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) = \varphi^{a_{t} - a_{t-1}}$, or because the last probe on the right failed to detect an invaded cell, in which case $g_R(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) = \varphi^{a_{t} - a_{t-1}} (1 - \varphi)$.
 
-Similarly, let $c^{t}$ be the smallest integer in the set $\{ m : b_{tm}^{t} = 1 \}$, that is, the index of the smallest cell at which the invader has been observed at time $t$ on the left of the invasion. Then the number of new probes at which the invader is successfully detected at time $t$ is $c^{t} - c^{t-1}$.
+Similarly, let $c_{t}$ be the smallest integer in the set $\{ m : b_{tm}^{t} = 1 \}$, that is, the index of the smallest cell at which the invader has been observed at time $t$ on the left of the invasion. Then the number of new probes at which the invader is successfully detected at time $t$ is $c_{t} - c_{t-1}$.
 
 The distribution for the observation will therefore be:
 \begin{align*}
-    g(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) = &\varphi^{(a^{t} - a^{t-1})} \bigg(1 - \varphi \bigg)^{1-\one {a^{t}=\gamma^{t}}}\\
-    &\varphi^{(c^{t} - c^{t-1})} \bigg( 1 - \varphi \bigg)^{1-\one {c^{t}=\beta^{t}}}
+    g(\vec{b}^{t} | \vec{x}^{t}, \vec{b}^{t-1}) = &\varphi^{(a_{t} - a_{t-1})} \bigg(1 - \varphi \bigg)^{\one {a_{t} \neq \gamma_{t}}}\\
+    &\varphi^{(c_{t} - c_{t-1})} \bigg( 1 - \varphi \bigg)^{\one {c_{t} \neq \beta_{t}}}
 \end{align*}
-were $\gamma^{t}$ is the limit of the invasion on the right and $\beta^{t}$ is the limit of the invasion on the left. Notice that for simplicity we will assume that we observe the beginning of the invasion at time $t=1$. 
+were $\gamma_{t}$ is the limit of the invasion on the right and $\beta_{t}$ is the limit of the invasion on the left. Notice that for simplicity we will assume that we observe the beginning of the invasion at time $t=1$. 
 
 The distribution $f(\vec{x}^{t} | \vec{x}^{t-1})$ if the expansion can happen in two directions is:
 \begin{equation*}
@@ -575,16 +568,11 @@ with $k \in \{0,1\}$ and $h \in \{0,1\}$, where $k = 1$ if the invasion expanded
 
 Substituting and expanding the recursion in equation \eqref{eq:3} we have
 \begin{align}
-    & q(\vec{X}^{t},\vec{b}^{t} | \vec{b}^{t-1}) =  \prod_{i=2}^{t} \varphi^{(a^{i} - a^{i-1})}\bigg(1 - \varphi \bigg)^{1-\one {a^i=\gamma^i}} \nonumber \\
-    & \varphi^{(c^{i} - c^{i-1})} \bigg(1 - \varphi\bigg)^{1-\one {c^i=\beta^i}} \; \prod_{i=2}^{\min\{t,r\}} \theta^{k_i} (1-\theta)^{1-k_i}  \label{eq:4} \\ 
+    & q(\vec{X}^{t},\vec{b}^{t} | \vec{b}^{t-1}) =  \prod_{i=2}^{t} \varphi^{(a_{i} - a_{i-1})}\bigg(1 - \varphi \bigg)^{\one {a_i \neq \gamma_i}} \nonumber \\
+    & \varphi^{(c_{i} - c_{i-1})} \bigg(1 - \varphi\bigg)^{\one {c_i \neq \beta_i}} \; \prod_{i=2}^{\min\{t,r\}} \theta^{k_i} (1-\theta)^{1-k_i}  \label{eq:4} \\ 
     & \prod_{i=2}^{\min\{t,l\}} \theta^{h_i} (1-\theta)^{1-h_i} \nonumber
 \end{align}
 where $l$ is the time at which the invasion has reached the left end of the modelled region, $r$ is the time at which the invasion has reached the right end of the modelled region, $k_i \in \{0,1\}$ and $h_i \in \{0,1\}$ where $k_i = 1$  if the invasion expanded one cell to the right at time $i$ and $k_i = 0$ otherwise, and $h_i = 1$ if the invasion expanded one cell to the left at time $i$ and $h_i = 0$ otherwise.
-
-
-
-
-
 
 
 For each particle j, the partial weights at time t are calculated with the following formula
@@ -594,29 +582,25 @@ For each particle j, the partial weights at time t are calculated with the follo
 \end{equation*}
 
 \begin{align*}
-    w_{ij}^t = & \frac{\varphi^{(a')^i} \Big(1-\varphi \Big)^{1-\one {(a')^i = \gamma^i}} \varphi^{(c')^i}(1-\varphi)^{1-\one {(c')^i = \beta^i}}}{\varphi^{a^i} \Big(1-\varphi \Big)^{1-\one {a^i = \gamma^i}} \varphi^{c^i} \Big(1-\varphi \Big)^{1-\one {c^i = \beta^i}}} \\ \nonumber
-    & \Bigg(\frac{\theta^{(k')_i} (1-\theta )^{1-(k')_i} }{ \theta^{k_i} (1-\theta )^{1-k_i}} \Bigg)^{\one {i \leq min\{ t, r\}} } \\ \nonumber
-    & \Bigg( \frac{ \theta^{(h')_i} (1-\theta )^{1-(h')_i} }{ \theta^{h_i} (1-\theta )^{1-h_i} } \Bigg)^{\one {i \leq min\{ t, l\}}}.
+    w_{ij}^t = & \frac{\varphi^{a'_i} \Big(1-\varphi \Big)^{\one {a'_i \neq \gamma_i}} \varphi^{c'_i}(1-\varphi)^{1-\one {c'_i = \beta_i}}}{\varphi^{a_i} \Big(1-\varphi \Big)^{\one {a_i \neq \gamma_i}} \varphi^{c_i} \Big(1-\varphi \Big)^{1-\one {c_i = \beta_i}}} \\ \nonumber
+    & \Bigg(\frac{\theta^{k'_i} (1-\theta )^{1-k'_i} }{ \theta^{k_i} (1-\theta )^{1-k_i}} \Bigg)^{\one {i \leq min\{ t, r\}} } \\ \nonumber
+    & \Bigg( \frac{ \theta^{('_i} (1-\theta )^{1-h'_i} }{ \theta^{h_i} (1-\theta )^{1-h_i} } \Bigg)^{\one {i \leq min\{ t, l\}}}.
 \end{align*}
-%Similarly to the AR(1) model, since our corrections are deterministic, the unnormalised weights are calculated as follows:
-%\begin{equation*}
-%    w^{t}_i = \frac{q(\vec{(X')}^{t}_i,\vec{(b')}^{t}_i | \vec{b}^{t-1})}{q(\vec{X}^{t}_i,\vec{b}^{t}_i | \vec{b}^{t-1})}
-%\end{equation*}
-%where the primed are the corrected terms. Again, there will be many cancellations in the calculations of the weights.
+
 Figure 2 shows a series of heat maps for 3 possible invasions and observations simulated from the distributions in the river example. The map is a visualization of the probability of finding an invader in each location at each time for different values of the observation parameter $\varphi$ but for the same value of the expansion  parameter $\theta$. The length of the vertical axis represents the time at which the simulated invasion reached an end and all cells are occupied: for example in figure A1 at time 165 in the simulated invasion all the cells are invaded. The image shows how we get a more accurate representation of the invasion with a higher number of observations. We can also see that the algorithm becomes less accurate when we have only few observations.
 
 \begin{figure*}
-    \subfloat[fig 1]{\includegraphics[width=0.5\linewidth]{ar1_001.PNG}}
-    \subfloat[fig 2]{\includegraphics[width=0.5\linewidth]{ar1_002.PNG}}\\
-    \subfloat[fig 3]{\includegraphics[width=0.5\linewidth]{ar1_003.PNG}}
-    \subfloat[fig 4]{\includegraphics[width=0.5\linewidth]{ar1_004.PNG}}\\
-    \subfloat[fig 5]{\includegraphics[width=0.5\linewidth]{ar1_005.PNG}}
+    \subfloat[fig 1]{\includegraphics[width=0.5\linewidth]{Fig1.PNG}}
+    \subfloat[fig 2]{\includegraphics[width=0.5\linewidth]{Fig2.PNG}}\\
+    \subfloat[fig 3]{\includegraphics[width=0.5\linewidth]{Fig3.PNG}}
+    \subfloat[fig 4]{\includegraphics[width=0.5\linewidth]{Fig4.PNG}}\\
+    \subfloat[fig 5]{\includegraphics[width=0.5\linewidth]{Fig5.PNG}}
     \caption{AR(1) MODEL: Simulations with 1,000 particles and 30 times compared to the gold standard for the 5 missing times of the AR(1) model. In Green the value for the observation. The AR(1) model had parameter $\varphi = 0.5$, variance $\sigma^2 = 1$. The Bernoulli distribution had parameter $p = 0.2$}
 \label{fig:1}
 \end{figure*}
 
 \begin{figure*}
-    \includegraphics[width=\textwidth]{river_007.png}
+    \includegraphics[width=\textwidth]{Fig7.PNG}
     \caption{RIVER INVASION: Simulations with 1,000 particles and 50 cells of 3 possible river invasions all with probability of invasion $\theta = 0.3$ but with different values of the parameter $\varphi$ for the probability of the observations. Figures A1, B1 and C1 show the simulations of the 3 invasions while figures A2, B2 and C2 show the same simulations but with the observations superimposed in red. A1 and A2 show the invasion with $\varphi = 0.3$, B1 and B2 show the invasion with $\varphi = 0.1$. Figure C1 and C2 show the invasion with $\varphi = 0.8$.}
     \label{fig:2}
 \end{figure*}
@@ -628,24 +612,23 @@ Figure 2 shows a series of heat maps for 3 possible invasions and observations s
 \section{Conclusions and further developments}
 \label{sec:9}
 
-The present investigation shows how our new methodology can be used to estimate the past and present state of a system for which incomplete information is continuously gathered. In particular in the case of invasive species it will be well suited to estimate the past trajectories and current extent of an invasion. This could be then used to help understanding the efficacy of an eradication program or to inform on where to search for currently hidden invades or to assess the risk from currently unobserved individuals.
+The present investigation shows how our new methodology can be used to estimate the past and present state of a system for which incomplete information is continuously gathered. In particular in the case of invasive species it will be well suited to estimate the past trajectories and current extent of an invasion. This could then be used to help understand the efficacy of an eradication program, or to inform management actions regarding where to search for currently hidden invaders, or to assess the risk from currently unobserved individuals.
 
-The results we have for the AR(1) model compared to the gold standard show that our simulations closely approximate analytical solutions, while the rive example shows the applicability of the method to a simple invasive species problem.
+The results for the AR(1) model compared to the gold standard show that our simulations closely approximate analytical solutions, while the river example shows the applicability of the method to a simple invasive species problem.
 
-As mentioned in the introduction, different methods exist to numerically solve estimations problems with exact but incomplete observations in an online manner. However, our method is the first one, at the best of our knowledge, that uses corrections seeking to improve previous estimations as each new observation is acquired.
+As mentioned in the introduction, different methods exist to numerically solve estimation problems with exact but incomplete observations in an online manner. However, our method is the first one, to the best of our knowledge, that corrects previous estimations as each new observation is acquired.
 
-The methodology could also be used in the more complex scenario where not only we have entire cases unobserved, but also the number of missing cases is unknown, for example, in more general predictive modeling of a species geographical distribution. In this context we are planning to apply our new method to a specific invasive species problem: the fire ants invasion in Queensland, Australia. This application will seek to improve and complement the existing agent based approach developed by Keith and Spring (\cite{Keith}). Their method consisted of constructing a likelihood model in terms of some unknown parameters that included, among other things, the phylogeny, jump type, founding type and treatment success rate. The posterior distribution was then sampled using a generalised Gibbs technique that enabled trans-dimensional sampling, which is used when the number of parameters is unknown, as in their case. However, their method needed to be re-run each time new data was available and could not be updated online.
+The methodology could also be used in the more complex scenario where not only we have entire cases unobserved, but also the number of missing cases is unknown, for example, in predictive modeling of a species' geographical distribution. In this context, we are planning to apply our new method to a specific invasive species problem: the fire ants invasion in Queensland, Australia. This application will seek to improve and complement the existing agent based approach developed by Keith and Spring (\cite{Keith}). Their method consisted of constructing a likelihood model in terms of some unknown parameters that included, among other things, the phylogeny, jump type, founding type and treatment success rate. The posterior distribution was then sampled using a generalised Gibbs technique that enabled trans-dimensional sampling, which is used when the number of parameters is unknown, as in their case. However, their method needed to be re-run each time new data was available and could not be updated online.
 
-In this new application the methodology will need to be adapted to time continuous models. We also envisage the possibility of improving our approach to allow for non-deterministic revision of imputed values that, while not inconsistent with later observations, can nevertheless be updated in light of new information. This will require a different definition of the probability $p^*$ and some more theoretical proof of its existence and validity. 
+In this new application, the methodology will need to be adapted to continuous time models. We also envisage the possibility of improving our approach to allow for non-deterministic revision of imputed values that, while not inconsistent with later observations, can nevertheless be updated in light of new information. This will require a different definition of the probability $p^*$ and some more theoretical proof of its existence and validity. 
 
-Our algorithm is reasonably fast as the weights involve cancellations that significantly reduce the calculations required. However, we might need to optimise and further maximise efficiency when running with bigger data sets. For example, we could apply a more efficient resampling step.
+Our algorithm is reasonably fast, as the weights involve cancellations that significantly reduce the calculations required. However, we might need to optimise and further maximise efficiency when running with bigger data sets. For example, we could apply a more efficient resampling step.
 
 
 
-%\begin{acknowledgements}
-%If you'd like to thank anyone, place your comments here
-%and remove the percent signs.
-%\end{acknowledgements}
+\begin{acknowledgements}
+We thank Dr. Daniel Spring as the idea for this work arose as a result of our discussions about modelling the Brisbane fire ant invasion.
+\end{acknowledgements}
 
 \begin{thebibliography}{}
 
@@ -673,9 +656,6 @@ Geweke, B.: Bayesian Inference in Econometric Models Using Monte Carlo Integrati
 
 \bibitem [\protect\citeauthoryear{Little and Rubin}{2019}]{Little} Little, R, Rubin, D.: Statistical Analysis with Missing Data, Third Edition. Wiley, New York (2019).
 
-\bibitem [\protect\citeauthoryear{Malathy and Baboo}{2011}]{Malathy} 
-Malathy, A., Baboo, S.S.: An Enhanced Algorithm to Predict a Future Crime using Data Mining. Int. J. Comput. Appl. 21(1): 1-6 (2011).
-
 \bibitem [\protect\citeauthoryear{Nakagawa}{2015}]{Nakagawa}
 Nakagawa, S.: Missing data. In: Fox G.A., Negrete-Yankelevich S., Sosa V.J. (eds.) Ecological Statistics: Contemporary theory and application, pp 81-105. Oxford University Press (2015). 
 
@@ -688,6 +668,9 @@ Amer. Math. Soc. 1(10): 1-52 (1962).
 
 \bibitem [\protect\citeauthoryear{Rubin}{1987}]{RubinMI}
 Rubin, D.B.: Multiple imputation for nonresponse in surveys. Wiley, New York (1987).
+
+\bibitem [\protect\citeauthoryear{Seif}{2017}]{Seif} 
+Seif, S., Mignan, A., Zechar, J.D., Werner, M.J., Wiemer, M.J.: Estimating ETAS: The effects of truncation, missing data, and model assumptions. Journal of Geophysical Research: Solid Earth. 122: 449–469 (2017).
 
 \bibitem [\protect\citeauthoryear{Tanner and Wong}{1987}]{Tanner}
 Tanner, M.A., Wong, W.H.: The Calculation of Posterior Distributions by Data Augmentation. J. Am. Stat. Assoc. 82(398): 528-540 (1987).
@@ -750,22 +733,24 @@ Zhang, X., Khwaja A. S., Luo J., Housfater A.S., Anpalagan A.: Multiple Imputati
 	\item Perform resampling
 	\begin{enumerate}
 	    \item Draw $n$ particles from the current particle set with probabilities proportional to their weights. Replace the current particle set with the new $n$ particles.
-	    \item Set $w^t_j=1/n$
+	    \item Set $w^t_j=1/n$.
 	\end{enumerate}
 \end{enumerate}
   
  \end{algorithmic}
 \end{algorithm}
 
+
+
+
+
+
+
+
+
 \begin{algorithm}[H]
 \caption{SIR with corrections for an river invasion}\label{SIR_River}
  \begin{algorithmic}
-
-
-
-
-
-
 
 \State  \bf{Initialize:} \normalfont At time t = 1
             
@@ -806,7 +791,7 @@ Zhang, X., Khwaja A. S., Luo J., Housfater A.S., Anpalagan A.: Multiple Imputati
 	\item Perform resampling
 	\begin{enumerate}
 	    \item Draw $n$ particles from the current particle set with probabilities proportional to their weights. Replace the current particle set with the new $n$ particles.
-	    \item Set $w^t_j=1/n$
+	    \item Set $w^t_j=1/n$.
 	\end{enumerate}
 \end{enumerate}
   

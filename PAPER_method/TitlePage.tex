@@ -1,0 +1,83 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath}  
+\usepackage{amsfonts} 
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage[usenames]{color}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+\usepackage{xcolor}
+%\usepackage[T1]{fontenc}
+%\usepackage[utf8]{inputenc}
+\usepackage{authblk}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclareMathOperator{\esssupp}{ess\,supp}
+
+\textwidth=16cm \hoffset = -1.9cm
+\lineskip=1.5\lineskip
+
+
+
+
+
+
+
+
+\title{Sequential Importance Sampling With Corrections For Partially Observed States}
+\author[1]{Valentina Di Marco\thanks{valentina.dimarco@monash.edu, https://orcid.org/0000-0003-3432-0494}}
+\author[2]{Jonathan Keith\thanks{Jonathan.Keith@monash.edu, https://orcid.org/0000-0002-9675-3976}}
+\affil[1]{School of Mathematical Science, Monash University, Clayton Campus, VIC 3800, Australia}
+\affil[2]{School of Mathematical Science, Monash University, Clayton Campus, VIC 3800, Australia}
+
+%\renewcommand\Authands{ and }
+
+\begin{document}
+\maketitle
+
+
+\section*{Abstract}
+We consider an evolving system for which a sequence of observations is being made, with each observation revealing additional information about current and past states of the system. We suppose each observation is made without error, but does not fully determine the state of the system at the time it is made. 
+
+Our motivating example is drawn from invasive species biology, where it is common to know the precise location of invasive organisms that have been detected by a surveillance program, but at any time during the program there are invaders that have not been detected.
+
+We propose a sequential importance sampling strategy to infer the state of the invasion under a Bayesian model of such a system. The strategy involves simulating multiple alternative states consistent with current knowledge of the system, as revealed by the observations. However, a difficult problem that arises is that observations made at a later time are invariably incompatible with previously simulated states. To solve this problem, we propose a two-step iterative process in which states of the system are alternately simulated in accordance with past observations, then corrected in light of new observations. We identify criteria under which such corrections can be made while maintaining appropriate importance weights.
+
+\section*{Funding}
+\begin{itemize}
+    \item The authors did not receive support from any organization for the submitted work.
+    \item No funding was received to assist with the preparation of this manuscript.
+    \item No funding was received for conducting this study.
+    \item No funds, grants, or other support was received.
+\end{itemize}
+
+\section*{Conflicts of interest/Competing interests}
+\begin{itemize}
+    \item The authors have no relevant financial or non-financial interests to disclose.
+    \item The authors have no conflicts of interest to declare that are relevant to the content of this article.
+    \item All authors certify that they have no affiliations with or involvement in any organization or entity with any financial interest or non-financial interest in the subject matter or materials discussed in this manuscript.
+    \item The authors have no financial or proprietary interests in any material discussed in this article.
+\end{itemize}
+
+\section*{Availability of data and material}
+\begin{itemize}
+    \item Only simulated data have been used in this paper
+\end{itemize}
+
+\section*{Code availability}
+The code related to this paper can be found at 
+\begin{itemize}
+    \item https://github.com/valeaussie/SIS, 
+    \item https://github.com/valeaussie/river, 
+    \item https://github.com/valeaussie/SIS\_AR1
+\end{itemize}
+
+\section*{Authors' contributions }
+All authors contributed to the study conception and design. Material preparation, data simulation and analysis were performed by Valentina Di Marco, and Jonathan Keith. The first draft of the manuscript was written by Valentina Di Marco and all authors commented on previous versions of the manuscript. All authors read and approved the final manuscript.
+
+
+\end{document}

@@ -1,4 +1,49 @@
-\chapter[MissingData]{MissingData}
+\chapter[The Problem of Missing Data]{The Problem of Missing Data}
 \label{ch:MissingData}
 
-On missing data
+The problem of missing data is ubiquitous in every field of science, engineering and business and can present itself even in well designed and controlled studies. 
+
+Sometimes unobserved data are meaningless and can be safely deleted or ignored a the statistical analysis. There are two common ways to handle this data deletion. The simplest is \textit{list-wise deletion} where the missing cases are eliminated and models are run with the data-set without those missing cases. The second one is the \textit{pair-wise deletion} which is used when the statistical procedure utilise cases with some missing variables. For example if we have cases with 3 variables $x$, $y$ and $z$ we might miss some data from each of those variables. Missing some data from each variable still allow us to use the other two variables to run our statistical analysis.
+
+Deletion however can produce loss of information and a reduction in statistical power and can also introduce systematic deviations from the population or true parameter values (\textit{bias}) (\cite{Nakagawa}).
+
+In order to minimise these issues an option is to "fill-in" or impute guessed values for the unobserved elements. The simplest way to do so is to use a sample mean value (\textit{mean imputation}). Alternatively we can use a regressions prediction to fill the missing cases (\textit{regression imputation}). However, these methods, known as single imputation techniques, do not take into account the uncertainty that the missing values would have contributed to and can again lead to biased parameter estimations (\cite{Nakagawa}).
+
+Better form of imputation are \textit{multiple imputation} (MI) (\cite{RubinMI}) and \textit{data augmentation} (DA) (\cite{Tanner}). We will discuss briefly these two methods in chapter \ref{sec:MIDA}.
+
+In ecology in particular (see \cite{Nakagawa} for an overview of missing data in ecology), we often need to make estimations of the real numbers and location of the individuals of a species while the data we have available is only partial. In this case we will need reliable methods to impute the locations of the undetected individuals. In Invasive species this is of particular importance if we want to guide an eradication program or assess its efficacy.
+
+
+
+
+
+
+\section{Mechanism Of Missing Data} \label{sec:mechanism}
+
+When approaching missing data problems it is useful to understand the patterns that describe which values are missing as well as understand the mechanisms concerning the missing data, with which we mean the statistical relationship between observations and the probability of missing data.
+
+The foundations of missing data theory where first laid in the mid 1970s by Little and Rubin (see \cite{Rubin76}, \cite{Little89}, and \cite{Little}). It was then established a categorization of the different missing data mechanisms in 3 types: (1) Missing Completely At Random (MCAR), (2) Missing At Random (MAR) and (3) Missing Not At Random (MNAR).
+
+To give a formal definition of these three types of mechanism we introduce the following terminology (\cite{Little}):
+
+\begin{itemize}
+    \item $Y$ is the matrix of the data-set. This can be decomposed into $Y_o$ for the observed part of the set and $Y_u$ for the unobserved part.
+    \item $M$ is the matrix that indicates whether the elements in $Y$ are observed or missed. This is usually a binary matrix so that the elements 0 represent missing observations and the elements 1 represent observations (or vice-versa).
+    \item $\theta$ is the vector of the unknown parameters.
+\end{itemize}
+The missingness mechanism is characterized by the conditional distribution of $m_i$ given $y_i$, say $f_{M|Y}(m_i|y_i, \theta)$
+If the missingness mechanism does not depend on the values of the data, that is , the data are MCAR. When the missingness depends only the 
+
+
+
+The MCAR mechanism occurs when the probability of missing data in one variable is not related to any other variable in the data set. The MAR mechanism is at work when the probability of missing data in a variable
+is related to some other variable(s) in the data set. The MNAR mechanism happens when the probability of missing data in a variable
+is associated with this variable itself, even after controlling for other observed (related) variables.
+
+
+However, techniques like multiple imputations and data augmentation generally do not make use of past observations and the state transition equation of the system when estimating the probability of the hidden state in light of the observations. This can result in poor performance when the problem can be well modelled, for example, by a Markov structure (\cite{Zhang}).
+
+\section{Multiple Imputation and Data Augmentation} \label{sec:MIDA}
+
+
+
